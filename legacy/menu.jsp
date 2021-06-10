@@ -4,28 +4,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <sec:authentication var="principal" property="principal" />
 
-<script type="text/javascript">
-	
-	function initscript() {
-		pageStart(); // call others
-	}
-		
-	/* Hide the menu if user clicks outside the menu area */
-	document.addEventListener("click", (evt) => {
-    const flyoutElement = document.getElementById("mySidenav");
-    const openMenu = document.getElementById("navOpen");
-    let targetElement = evt.target; // clicked element
-
-    do {
-        if (targetElement == flyoutElement || targetElement == openMenu) {
-            // This is a click inside. Do nothing, just return.
-            return;
-        }
-        // Go up the DOM
-        targetElement = targetElement.parentNode;
-    } while (targetElement);   
-});
-</script>
 
 <title><spring:eval
 		expression="@environment.getProperty('website.title')" /></title>
