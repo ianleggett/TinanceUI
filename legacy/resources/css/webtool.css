@@ -1,0 +1,716 @@
+
+[data-toggle="collapse"] .fa:before {  
+  content: "\f139";
+}
+
+[data-toggle="collapse"].collapsed .fa:before {
+  content: "\f13a";
+}
+
+* {
+	box-sizing: border-box;
+}
+
+.nav-tabs {
+    border-bottom: none !important;
+}
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  color: #fff !important;
+  border: none;
+  background: none !important;
+}
+.nav-tabs .nav-link,
+.nav-tabs .nav-item.show .nav-link {
+  color: #D3D3D3 !important;
+  border: none;
+  background: none !important;
+}
+.nav-tabs .nav-link:hover {
+  border: none;}
+.nav-link {
+	transition: none !important;
+}
+/* New nav layout ***********************/
+body {
+	max-width: 1000px !important;}
+.flex-container {
+	display: flex;}
+.newNav {
+	padding: 20px 0px 100px 0px;
+	max-width: 1000px;
+	margin: auto;}
+.logo {
+	float: left;
+	height: 40px;}
+.logoimg {
+	margin-right: 10px;
+	vertical-align: bottom;
+	height: 30px;}
+.navMenu {
+	float: right;
+	line-height: 30px;
+	padding-top: 10px;
+	vertical-align: bottom;
+	width: 750px;}
+.menuItem {
+	color: #000000;
+	font-family: Open Sans,Segoe UI,HelveticaNeue-Light,sans-serif;
+	font-size: 15px;
+	width: 16% !important;
+	text-align: center;}
+	
+.menuItem:hover {
+	color: grey;}
+a.menuItem{
+	text-decoration: none;
+}
+.menuItem.menuGo {
+	color: blue;
+	background-color: #DBE9FC;
+	border-radius:20px;
+	-moz-border-radius:20px;
+	-webkit-border-radius:20px;}
+.menuItem.menuGo:hover {
+	color: #fff;
+	background-color: green;}	
+.menuItem.menuMore {
+	color: blue;
+	background-color: #DBE9FC;
+	border-radius:20px;
+	-moz-border-radius:20px;
+	-webkit-border-radius:20px;}
+.menuItem.menuMore:hover {
+	color: #fff;
+	background-color: blue;}		
+.dropdown-menu a {
+	font-size: 15px;
+	color: grey !important;}
+.menuItem .svg-inline--fa {
+	margin-right: 10px !important;
+	color: blue !important;}
+.dropdown-menu {
+	border-radius: 1rem !important;}
+
+	
+	
+	
+/* Dashboard ******************************/
+.zaraCardWhite {
+	width: 50%;
+	min-width: 700px;
+	max-width: 1200px;
+	border: none; 
+	box-shadow: 2px 2px 6px #c0c0c0;
+	border-radius: 10px; 
+	padding: 10px;
+	margin: 20px;
+}
+
+.zaraCard {
+	width: 100%;
+	min-width: 800px;
+	border: none; 
+	box-shadow: 2px 2px 6px #c0c0c0;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px; 
+	padding: 10px;
+	text-align: center;
+	background-color: #0d6efd;
+	color: #fff;}
+
+.topCard {
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 20px 20px 0px 0px;
+	border-radius: 20px 20px 0px 0px;}
+.bottomCard {
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px 0px 20px 20px;
+	border-radius: 0px 0px 20px 20px;
+	background-color: #fff;
+	color: #000;
+	margin-bottom: 100px;}
+.expNum {
+	width: 30px;
+	border: none;
+	box-shadow: 1px 0px 2px #c0c0c0;}
+.expSelect {
+	border: none;}
+.expSelect.selected {
+	background-color: DodgerBlue;
+	border: none;
+}
+.arrow {
+	margin-left: 20px;}
+	
+.nav-item {
+	width: 25%;
+	background-color: none;}
+
+.tab-pane {
+	padding: 40px 0 40px 0;}
+	
+.tradeItem {
+	text-align: center;
+	font-size: 20px;}	
+.currCode	{
+	font-size: 36px;}
+input.currCode {
+	background-color: #0d6efd;
+	border: none;
+	width: 200px;}	
+input.currCode:focus {
+	outline: none;
+	background-color: #4F99F9;}
+.zaraCard-lg {
+	width:100%;
+	border: none; 
+	box-shadow: 2px 2px 6px #c0c0c0;
+	border-radius: 10px; 
+	padding: 10px;
+	margin: 20px;
+}
+
+.nav-item {
+	width: 25%;
+	background-color: none;}
+
+.tab-pane {
+	padding: 40px 0 40px 0;	
+}
+
+.btn-light {
+	margin: 0px 5px;}
+.btn-light:hover {
+	background-color: rgba(20,20,20,0.4) !important;
+	color: #fff !important;}
+.btn-check:checked+.btn-light {
+	background-color: #0d6efd !important;
+	color: #fff !important;}
+.nav-link.active {
+	font-weight: bold;
+	color: #0d6efd !important;}
+.nav-tabs {
+	background: 0 0;
+}
+/* Transition menu *************************************************************************************************************************************/
+/*	width: 132px;
+	height: 44px;
+	background-color: transparent;
+	border: none;
+	color: #fff;
+	font-size: 30px;
+}*/
+.roundTable {
+	border: 2px #c0c0c0 solid; 
+	box-shadow: 2px 2px 6px #a0a0a0;
+	border-radius: 10px; 
+	padding: 10px;
+}
+
+.navButton:focus {
+	outline:none;
+}
+
+.sidenav {
+	height: 100%; /* 100% Full-height */
+	width: 0; /* 0 width - change this with JavaScript */
+	position: fixed; /* Stay in place */
+	z-index: 99; /* Stay on top */
+	top: 0; /* Stay at the top */
+	left: 0;
+	background-color: #0B0987; /* Blue*/
+	overflow-x: hidden; /* Disable horizontal scroll */
+	padding-top: 80px; /* Place content 60px from the top */
+	transition: 0.5s;
+	/* 0.5 second transition effect to slide in the sidenav */
+	color: #fff;
+}
+
+/* The navigation menu links */
+.sidenav a {
+	padding: 20px 8px 20px 32px;
+	text-decoration: none;
+	font-size: 16px;
+	display: block;
+	transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+  background-color: #007bff;
+  cursor: pointer;
+}
+
+.closebtn:hover {
+  cursor: pointer;
+}
+
+/* Position and style the close button (top right corner) */
+.sidenav .closebtn {
+	position: absolute;
+	top: 0px;
+	right: 25px;
+	font-size: 36px;
+	margin-left: 50px;
+	color: #fff;
+}
+
+.isnotPage {
+	background-color: inherit;
+}
+
+.isPage {
+	background-color: #ffc107;
+	color: #000000;
+}
+
+a.isPage:not([href]):not([tabindex]) {
+	color: #000000 !important;	
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+	.sidenav {
+		padding-top: 15px;
+	}
+	.sidenav a {
+		font-size:1rem;
+	}
+}
+/* Ensure dropdown options are grouped well */
+.dropdown-menu a {
+	color: white;
+	padding: 10px 0px 10px 20px;
+}
+
+
+
+/*****************************************************************************************************************************************************/
+
+/*  Flex settings  */
+
+.homesearch-flex {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-content: space-between;
+	width: 100%;
+	padding: 0px 0px 60px 0px;
+	background-color: lightgrey;
+}
+
+.homesearch-flex > div {
+	background-color: #fff;
+	width: 400px;
+	margin: 10px;
+	text-align: center;
+	line-height: 40px;
+	font-size: 30px;
+}
+
+.logo-flex {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	background-color: #fff;
+	margin-top: 100px;
+}
+
+.logo-flex > div {
+	background-color: #fff;
+	text-align: center;
+}
+
+.navflex {
+	display: flex;
+	flex-direction: row;
+	align-content: space-around;
+	align-items: center;
+	width: 100%;
+	height: 80px;
+	background-color: #0b0987;
+}
+
+.searchTitleFlex {
+	display: flex;
+	flex-direction: row;
+	justify-content: left;
+	align-content: space-between;
+	align-items: center;
+	width: 100%;
+	background-color: lightgrey;
+	padding: 20px 0px 20px 20%;
+	text-align: left;
+	font-size: 40px;
+	font-family: impact;
+}
+.pageHeadFlex {
+	display: flex;
+	flex-direction: row;
+	justify-content: left;
+	align-content: space-between;
+	align-items: center;
+	width: 100%;
+	background-color: lightgrey;
+	padding: 20px 0px 20px 0px;
+}
+
+.pageTitleFlex {
+	text-align: left;
+	background-color: lightgrey;
+	font-size: 40px;
+	font-family: impact;;
+	width: 40%;
+	padding-left: 50px;
+}
+
+.pageExtrasFlex {
+	text-align: right;
+	background-color: lightgrey;
+	padding: 20px 20px 20px 0px;
+	align-items: center;
+	width: 70%;
+	height: 60px;
+}
+
+.container-fluid{
+	margin-top: 10px;
+}
+
+.btn-xs {
+	padding: 3px 3px !important;
+}
+/*****************************************************************************************************************************************************/
+.btn.disabled, .btn:disabled {
+	/*opacity: 1;*/
+	cursor: not-allowed;
+}
+.btn-theme, .bg-theme {
+	background-color: #0b0987;
+	color: white;
+}
+
+.custDetailTable {
+	 width: 90%; 
+	 border: none;
+	 box-sizing: border-box;
+	 margin: 50px 15px;
+}
+
+.themeTable {
+	 border-collapse: collapse; 
+	 border-spacing: 0; 
+	 width:100%; 
+	 border: solid 2px #0b0987;
+}
+
+table.dataTable thead .sorting:after,table.dataTable thead .sorting_asc:after,table.dataTable thead .sorting_desc:after,table.dataTable thead .sorting_asc_disabled:after,table.dataTable thead .sorting_desc_disabled:after {
+	content:"";
+}
+table.dataTable thead .sorting:before,table.dataTable thead .sorting_asc:before,table.dataTable thead .sorting_desc:before,table.dataTable thead .sorting_asc_disabled:before,table.dataTable thead .sorting_desc_disabled:before {
+	content:"";
+}
+
+table.dataTable thead th   {
+	border-bottom: solid 2px #0b0987 !important;
+	padding: 5px 2px;
+	}
+
+table.dataTable tbody td {
+	padding: 5px 2px !important;
+	
+}
+
+.totalBar {
+	color: #000;
+	margin: 0px 15px;
+}
+
+.dropdown-item {
+	display: inline-block !important;	
+}
+
+.modal-header {
+	background-color: #0b0987;
+	color: #fff;
+}
+
+.card-header {
+	padding-left: 20px;
+}
+
+.dark {
+	color: #000 !important;
+}
+
+.card-header-sm {
+	max-width: 760px;
+}
+
+.card-sm {
+	margin-left: 40px;
+	max-width: 760px;
+	border: none;
+}
+
+table.catalogTable td {
+	padding: 5px 30px;
+	border: 1px solid #0b0987;
+}
+
+#lname {
+	min-width: 20px;
+}
+
+historyTbl {
+	border-collapse: collapse;
+	border: none;
+	text-align: left;
+	width: 100%;
+	margin-bottom: 30px;
+}
+
+td.historyTd {	
+	text-align: left;
+	vertical-align: middle;		
+}
+
+td.col1 {
+	width: 25%;
+	text-align: right;
+}
+
+.col2 {
+	width: 25%;
+}
+.col3 {
+	
+}
+
+#keypad {margin:auto; margin-top:20px;}
+
+#keypad tr td {
+	vertical-align:middle; 
+	text-align:center; 
+	border:1px solid #000000; 
+	font-size:32px; 
+	font-weight:bold; 
+	width:100px; 
+	height:80px; 
+	cursor:pointer; 
+	background-color:#666666; 
+	color:#ffffff;}
+#keypad tr td:hover {background-color:#999999; color:#FFFF00;}
+
+#presentData {	
+	width: 40%;
+	margin: auto;
+	text-align: right;
+	line-height: 40px;
+	align-items: flex-end;
+}
+
+.numericdisplay {
+	width:200px; 
+	margin:10px auto auto auto; 
+	background-color:#c0c0c0; 
+	color:#000000; 
+	font-size:32px;
+	text-align: right; 
+	border:1px solid #999999;	
+}
+
+.payButton {
+	margin-top: 10px;
+	background-color: #008000;
+	text-align: center;
+	font-size:24px;
+	font-weight: bold;
+	color: #ffffff;
+	width: 100%
+}
+
+.refundButton {
+	margin-top: 10px;
+	background-color: #7f0000;
+	text-align: center;
+	font-size:24px;
+	font-weight: bold;
+	color: #ffffff;
+	width: 100%;
+}
+
+/* END of Zaras stuff*/
+
+.topaystyle{
+	color: red;
+}
+
+.torefundstyle{
+	color: green;
+	font-style: bold;
+}
+
+.table-costx{
+	color: blue;
+	font-style: italic;
+	font-size: 10px;
+}
+
+.table-opts{
+	width:100%;
+}
+.table-opttitle{
+	color: black;
+	font-style: normal;
+	font-size: 15px;
+}
+.table-optval{
+	color: black;
+	font-weight: bold;
+}
+.table-optqty{
+	color: black;
+	font-weight: bold;
+}
+.table-sku{
+	color: blue;
+	font-style: normal;
+	font-size: 15px;
+}
+.table-shtdesctext{
+	color: green;
+	font-style: normal;
+	font-size: 15px;
+}
+.table-desctext{
+	color: dark-grey;
+	font-style: normal;
+	font-size: 15px;
+}
+
+.table-name{
+	color: black;
+	font-style: italic;
+	font-size: 15px;
+}
+.table-qty{
+	color: blue;
+	font-style: italic;
+	font-size: 10px;
+}
+.table-badge-qty{
+	font-size: 14px;
+}
+
+.table-totaltotal{
+	color: blue;
+	font-style: normal;
+	font-weight: bold;
+	font-size: 25px;
+}
+/* This is the row total*/
+.table-totalCost{
+	color: blue;	
+	font-size: 20px;
+}
+
+.table-qty_ordered{
+	text-align: center;
+	color: black;	
+	font-size: 20px;
+}
+.badge-basketcount{
+	color: black;
+	font-style: normal;
+	font-weight: bold;
+	font-size: 20px;
+}
+.btn-xs {
+    padding: 5px 5px;
+    font-size: 10px;
+    border-radius: 8px;
+}
+
+.btn-chk {
+    padding: 5px 5px;
+    font-size: 15px;
+    border-radius: 8px;
+}
+
+.printed{
+	color: white;
+	font-style: normal;	
+	font-size: 10px;
+}
+
+.not-printed{
+	color: white;
+	font-style: normal;	
+	font-size: 10px;
+}
+.missingvalue{
+	color: black;
+	background-color : #FACBC6;
+}
+.rqdclass{
+	color: white;
+	font-style: normal;	
+	font-size: 10px;
+}
+
+.titlebar{
+	color: white;
+	font-style: normal;	
+	font-size: 20px;
+}
+
+.rqdclass{
+	color: white;
+	font-style: normal;	
+	font-size: 7px;
+}
+
+.barcode-style{
+	color: black;
+	font-style: normal;	
+	font-size: 30px;
+}
+
+/* Zara changes */
+
+.input-group-addon {
+	padding-right: 5px;
+	padding-top: 7px;
+	min-width: 24px;
+}
+
+.input-group-addon-lg {
+	width: 66px;
+}
+
+.button-block{
+	float:left;
+	padding-right: 5px;
+}
+
+.button-wrap {
+	display: block;
+/*	font-size: 14px; */
+	min-width: 280px;
+	word-spacing : break-word;
+	white-space: normal;
+}
+
+.cellHeight {
+	border: 3px solid darkgray;	
+	background-color: white;
+	height: 80px;
+}
+
+.gridbuttons {
+	position: left;
+	margin-left: 2%;
+}

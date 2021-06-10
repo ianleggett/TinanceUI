@@ -1,3 +1,5 @@
+
+const WEBSERVER = "https://tinance.techiaz.com/";
 const FEEPCT = 0.0015
 const minABI = [
     {
@@ -275,7 +277,7 @@ let selectedAccount;
 	}
 	
 	function setPayTypes(divid){
-	$.getJSON('paymenttypes.json', function(ptypes){		
+	$.getJSON(WEBSERVER+'paymenttypes.json', function(ptypes){		
 		var idx=1;
 	    ptypes.forEach( item=>{
 		    $('#'+divid).append(
@@ -306,9 +308,8 @@ let selectedAccount;
 		});
 	}
 
-	function pageStart() {
-				
-		var ixy = $.getJSON("ccycodes.json", {
+	function pageStart() {		
+		var ixy = $.getJSON(WEBSERVER+"ccycodes.json", {
 			format: "json"
 		})
 		.done(function(data){			
@@ -323,7 +324,7 @@ let selectedAccount;
 
 		setPayTypes('paymethods')				
 		
-		$.getJSON('getuserdetails.json', function(usr){		    	
+		$.getJSON(WEBSERVER+'getuserdetails.json', function(usr){		    	
 			App.usrid = usr.id;			
     	});
 		
@@ -389,7 +390,7 @@ let selectedAccount;
 					.ajax(
 							{
 								type : 'POST',
-								url : 'takeorder.json',// + csrfname +'='+csrfvalue,
+								url : WEBSERVER+'takeorder.json',// + csrfname +'='+csrfvalue,
 								data : JSON.stringify(postObject),
 								contentType : "application/json",
 								dataType : 'json',
@@ -460,7 +461,7 @@ let selectedAccount;
 
 	function pretrade(ordid){
 		clearPanel();
-		$.getJSON('getoffer.json?oid=' + ordid, function(puboffer) {
+		$.getJSON(WEBSERVER+'getoffer.json?oid=' + ordid, function(puboffer) {
 			$('#pretrade').css("display", "block");
 			thisoffer = puboffer;
 			showthisoffer(puboffer)
@@ -473,7 +474,7 @@ let selectedAccount;
 	}
 	
 	function showuserpublic(uid){		
-	$.getJSON('getprofilepublic.json?uid='+uid, function(details){	    
+	$.getJSON(WEBSERVER+'getprofilepublic.json?uid='+uid, function(details){	    
 	    // set up details
 		var stars = "";		
         for(var x=1; x<=details.feedback;x++){
@@ -493,7 +494,7 @@ let selectedAccount;
 	}
 	
 	function showuserrecenttrades(uid){		
-		$.getJSON('userTrades.json?uid='+uid, function(trades){	    
+		$.getJSON(WEBSERVER+'userTrades.json?uid='+uid, function(trades){	    
 		    // set up details
 			console.log(trades);
 				trades.forEach( k=>{
@@ -542,7 +543,7 @@ let selectedAccount;
  		var ischecked=$('input[id="livecheck'+kid+'"]').is(':checked');
  		$.ajax({
  			type: 'POST',
- 			url: 'toggleLive.json?kid='+kid+'&v='+ischecked,// + csrfname +'='+csrfvalue,
+ 			url: WEBSERVER+'toggleLive.json?kid='+kid+'&v='+ischecked,// + csrfname +'='+csrfvalue,
  		    data: JSON.stringify(""),
  		    contentType: "application/json",
  		    dataType: 'json',
@@ -560,7 +561,7 @@ let selectedAccount;
  		if (confirm('Confirm delete offer?')){
  			$.ajax({
  	 			type: 'POST',
- 	 			url: 'deleteoffer.json?kid='+kid,// + csrfname +'='+csrfvalue,
+ 	 			url: WEBSERVER+'deleteoffer.json?kid='+kid,// + csrfname +'='+csrfvalue,
  	 		    data: JSON.stringify(""),
  	 		    contentType: "application/json",
  	 		    dataType: 'json',
@@ -726,7 +727,7 @@ function validateForm(attrib){
 						
 			$.ajax({
 			    type: 'POST',
-			    url: 'addupdateorder.json',// + csrfname +'='+csrfvalue,
+			    url: WEBSERVER+'addupdateorder.json',// + csrfname +'='+csrfvalue,
 			    data: JSON.stringify(postObject),
 			    contentType: "application/json",
 			    dataType: 'json',
@@ -752,7 +753,7 @@ function validateForm(attrib){
 		hideMsgs();
 		var postFilter = {fromccy:1,toccy:1}
 		var filtStr = '?filt='+encodeURI( JSON.stringify(postFilter) )
-		$.getJSON('useroffers.json'+filtStr, function(offerList){
+		$.getJSON(WEBSERVER+'useroffers.json'+filtStr, function(offerList){
 			clearPanel();
 			clearBar();
 			// create button
@@ -800,7 +801,7 @@ function validateForm(attrib){
 	function browseOffers(){
 		var postFilter = {fromccy:1,toccy:1}
 		var filtStr = '?filt='+encodeURI( JSON.stringify(postFilter) );
-		$.getJSON('offers.json'+filtStr, function(offerList){
+		$.getJSON(WEBSERVER+'offers.json'+filtStr, function(offerList){
 			clearPanel();
 			clearBar();	
 		
@@ -837,7 +838,7 @@ function validateForm(attrib){
 	}
 	
 function initCoins(completeFunc){    
-	var ixy = $.getJSON("ccycodes.json", {
+	var ixy = $.getJSON(WEBSERVER+"ccycodes.json", {
 		format: "json"
 	})
 	.done(function(data){			
@@ -912,7 +913,7 @@ function setUserWallet(usrwalletaddr){
   console.log(JSON.stringify(postObject));
 		$.ajax({
 		    type: 'POST',
-		    url: 'setusercoin.json',// + csrfname +'='+csrfvalue,
+		    url: WEBSERVER+'setusercoin.json',// + csrfname +'='+csrfvalue,
 		    data: JSON.stringify(postObject),
 		    contentType: "application/json",
 		    dataType: 'json',
@@ -1017,7 +1018,7 @@ async function refreshAccountData() {
 
   const web3 = new Web3(provider);
 
-	$.getJSON('getnetworkconfig.json', function(netw){	
+	$.getJSON(WEBSERVER+'getnetworkconfig.json', function(netw){	
 		//console.log("Network : "+JSON.stringify(netw));
 		App.BLOCK_NETWORK = netw.httpService;  // "http localhost or Mainnet address
 		App.escrow_details.address = netw.escrowCtrAddr;  // Contract Address Escro
@@ -1161,7 +1162,7 @@ window.addEventListener('load', async () => {
 				.then(function(app_res){
 			         alert("Allowance set for USDT "+humanAmt)
 			 		 setTimeout(() => {
-			 			 ajaxPOST('startcontract.json?oid='+ordId,"",alert("You Deposited funds USDT "+humanAmt));			 			 
+			 			 ajaxPOST(WEBSERVER+'startcontract.json?oid='+ordId,"",alert("You Deposited funds USDT "+humanAmt));			 			 
 			 		 }, 1000);			        
 				});
 			}else{				
@@ -1176,7 +1177,7 @@ window.addEventListener('load', async () => {
 	
 	function goodsSent(ordId){
 		// indicate to the server when the funds were sent
-		 ajaxPOST('flagfundssent.json?oid='+ordId,"",alert("OK, Bank transfer recorded"));
+		 ajaxPOST(WEBSERVER+'flagfundssent.json?oid='+ordId,"",alert("OK, Bank transfer recorded"));
 		// start timer for 3 days then reverse the transaction
 	}
 	
@@ -1199,7 +1200,7 @@ window.addEventListener('load', async () => {
 	/**  Get user trades old and new  ContractMatch object  **/
 	function showMyTrades(){
 		clearPanel();
-		$.getJSON('userTrades.json', function(tradeList){
+		$.getJSON(WEBSERVER+'userTrades.json', function(tradeList){
 			$('#myorders').empty();
 			$('#posttrade').css("display", "block");
 			//console.log(tradeList);
