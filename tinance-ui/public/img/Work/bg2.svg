@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="319" height="501" viewBox="0 0 319 501">
+    <defs>
+        <radialGradient id="b" cx="94.953%" cy="4.333%" r="172.55%" fx="94.953%" fy="4.333%" gradientTransform="matrix(-.5299 .55443 -.35302 -.83223 1.468 -.447)">
+            <stop offset="0%" stop-color="#00B1FF"/>
+            <stop offset="100%" stop-color="#0060FF"/>
+        </radialGradient>
+        <rect id="a" width="501" height="319" rx="159.5"/>
+    </defs>
+    <g fill="none" fill-rule="evenodd" transform="rotate(90 159.5 159.5)">
+        <mask id="c" fill="#fff">
+            <use xlink:href="#a"/>
+        </mask>
+        <use fill="url(#b)" xlink:href="#a"/>
+        <ellipse cx="366.666" cy="-131.45" fill="#FFF" fill-opacity=".1" mask="url(#c)" rx="247.747" ry="249.15" style="mix-blend-mode:soft-light"/>
+        <ellipse cx="375.475" cy="-73.15" fill="#FFF" fill-opacity=".1" mask="url(#c)" rx="256.556" ry="257.95" style="mix-blend-mode:soft-light"/>
+        <ellipse cx="421.721" cy="2.2" fill="#FFF" fill-opacity=".1" mask="url(#c)" rx="313.813" ry="315.7" style="mix-blend-mode:soft-light"/>
+    </g>
+</svg>
