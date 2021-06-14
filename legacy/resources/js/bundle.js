@@ -1,5 +1,5 @@
 
-const WEBSERVER = "https://tinance.techiaz.com/";
+const WEBSERVER = "https://localhost:8443/";
 const FEEPCT = 0.0015
 const minABI = [
     {
@@ -236,7 +236,8 @@ App = {
   escrow_details : {address:"none",ctr:"none"},
   accounts : null,
   usrid : 0,
-  mytrades: {}
+  mytrades: {},
+  jwttoken : null
 };
 
 const Web3Modal = window.Web3Modal.default;
@@ -249,6 +250,60 @@ let web3Modal
 let provider;
 // Address of the selected account
 let selectedAccount;
+
+
+
+function getJWTJSON(shortUrl,jsondata,dataFunction,fail){
+	$.ajax({		
+		type: 'GET',				  
+		contentType : "application/json",
+		dataType : 'json',
+		data : JSON.stringify(jsondata),
+		url: WEBSERVER+shortUrl,
+		headers: { "Authorization": "Bearer "+App.jwttoken,
+		   "accept": "application/json",
+		 },
+		success:dataFunction,		
+	  });
+}
+
+
+	function jwtlogin(){		
+			var name = $('#username').val();
+			var pwd = $('#password').val();
+			var token = ''
+			console.log("user "+name)
+			$.ajax({
+			  type: 'POST',
+			  contentType : "application/json",
+			  dataType : 'json',
+			  url: WEBSERVER+'auth/signin',
+			  data: JSON.stringify({ username: name , password: pwd }),
+			  success: function(resultData){
+				App.jwttoken = resultData.token;
+				console.log("got token "+App.jwttoken);
+				// $.ajax({
+				//    //crossDomain: true,				   
+				//    type: 'GET',				  
+				//    contentType : "application/json",
+			    //    dataType : 'json',
+				//    url: WEBSERVER+'v1/getUserCoins.json',
+				//    headers: { "Authorization": "Bearer "+App.jwttoken,
+				//       "accept": "application/json",
+				// 	},
+				//    success: function(data){
+				//  	 console.log(data)
+				//    }
+				//  });
+			  }
+			});		
+	}
+
+    function testAuth(){
+		getJWTJSON('v1/getUserCoins.json',"",(data)=>{
+			console.log(data);
+		});
+	}
 
 	function clearPanel(){
 		$("#mainDiv").empty();
@@ -1272,3 +1327,4 @@ window.addEventListener('load', async () => {
 		}); 	
 	}
 	
+
