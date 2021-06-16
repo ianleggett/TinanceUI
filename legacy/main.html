@@ -17,6 +17,8 @@
 
 <script src="resources/js/snackbar.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
 	crossorigin="anonymous"></script>
@@ -39,11 +41,11 @@
 						<li><a class="dropdown-item">CN - &#x4E2D;&#x6587; </a></li>						    
 					</ul>
 				</div>            	
-			<div class="menuItem" onclick="browseOffers()">Browse</div>
-			<div class="menuItem">FAQ</div>
+			<div class="menuItem" onclick="browseOffers()">Browse</div>		
+			<div class="menuItem" onclick="myOffers()">FAQ</div>
 			<div class="menuItem">Explorer</div>
 			<!--sec:authorize access="!isAuthenticated()"-->
-				<a class="menuItem" onclick="showlogin()" >Sign in</a>
+				<a class="menuItem" id="signinmenu" onclick="showlogin()" >Sign in</a>
 			<!--/sec:authorize-->
 			<!--sec:authorize access="isAuthenticated()"-->
 				<div id="btn-connect" class="menuItem menuGo">Connect</div>
@@ -68,6 +70,8 @@
 						<li><a class="dropdown-item"><i class="fas fa-flask"></i> Request a feature</a></li>
 						<li><a class="dropdown-item"><i class="fas fa-balance-scale"></i> Terms & Conditions</a></li>
 						<li><a class="dropdown-item"><i class="fas fa-user-secret"></i> Privacy Policy</a></li>
+						<li><a class="dropdown-item" onclick="showCacheData()"><i class="fas fa-user-secret"></i> Show Cache</a></li>
+						<li><a class="dropdown-item" onclick="clearData()"><i class="fas fa-user-secret"></i> Clear Cache</a></li>
 					</ul>
 				</div>
 			<div class="menuItem menuMore">Kovan</div>
@@ -160,21 +164,13 @@
 				aria-selected="true">
 				Offer <img src="resources/images/arrow.png" class="arrow" />
 			</button>
-
-		</li>
+		</li>	
 		<li class="nav-item" role="presentation">
 			<button class="nav-link" id="payment-tab" data-bs-toggle="tab"
 				data-bs-target="#payment" type="button" role="tab"
-				aria-controls="payment" aria-selected="false">
-				Payment details <img src="resources/images/arrow.png" class="arrow" />
-			</button>
-		</li>
-		<li class="nav-item" role="presentation">
-			<button class="nav-link" id="details-tab" data-bs-toggle="tab"
-				data-bs-target="#details" type="button" role="tab"
-				aria-controls="details" onclick="validateForm()"
+				aria-controls="payment" onclick="validateForm()"
 				aria-selected="false">
-				Trade size
+				Payment Details
 			</button>
 		</li>		
 	</ul>
@@ -195,8 +191,7 @@
 							<div class="dropdown-toggle" id="dropdownCurr1"
 								data-bs-toggle="dropdown" aria-haspopup="true"
 								aria-expanded="false">USDT</div>
-							<div class="dropdown-menu" id="fromccy" aria-labelledby="dropdownCurr1">
-														
+							<div class="dropdown-menu" id="fromccy" aria-labelledby="dropdownCurr1">														
 							</div>
 						</div>
 					</div>
@@ -231,35 +226,14 @@
 		</div>
 		<div class="tab-pane fade" id="payment" role="tabpanel"
 			aria-labelledby="payment-tab">
-		
 			<h5>Payment methods</h5>
 			<div id="paymethods"></div>
-			<hr>
-			<button type="button" class="btn btn-light float-end"
-				onclick="$('#details-tab').click();">Next >></button>
-				
-		</div>
-		<div class="tab-pane fade" id="details" role="tabpanel"
-			aria-labelledby="details-tab">
-			<h5>Trade sizes</h5>
-			<div class="input-group mb-3">
-				<span class="input-group-text">Min trade</span><label
-					for="ccyqtybuy" id="mintradelabel"></label> <input name="mintrade"
-					type="text" class="form-control" placeholder="amount" id="mintrade"
-					aria-label="amtbuy" aria-describedby="mintrade">
-			</div>
-
-			<div class="input-group mb-3">
-				<span class="input-group-text">Max trade</span><label
-					for="ccyqtybuy" id="maxtradelabel"></label> <input name="maxtrade"
-					type="text" class="form-control" placeholder="amount" id="maxtrade"
-					aria-label="amtbuy" aria-describedby="ccytype">
-			</div>
 			<hr>
 			<button type="button" id="offervalid"
 				class="btn btn-light float-end" onclick="placeOrder();">Publish
 				Offer >></button>
-		</div>
+				
+		</div>	
 	</div>
 </div>
 <div class="card-body bottomCard zaraCard" id="newofferdiv2" style="display: none">
@@ -357,7 +331,7 @@
 										  <h3 class="text-center font-weight-light my-4">Trade Finance Login</h3>
 									  </div>
 									  <div class="card-body">
-										  <form method="POST" name='f' action="login">
+										  <form method="POST" name='f' action="">
 											  <div class="form-group ${error != null ? 'has-error' : ''}">
 											  <br /> <span>${message}</span>
 												  <label class="small mb-1" for="username">Username</label>
@@ -372,7 +346,7 @@
 											  <div style="text-align: center;">${error}</div>
 											  <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
 												  <a class="small" href="password.html">Forgot Password?</a>
-												  <button class="btn btn-primary" type="submit">Login</button>
+												  <button class="btn btn-primary" onclick="jwtlogin()" type="button">Login</button>
 											  </div>
 										  </form>
 									  </div>
