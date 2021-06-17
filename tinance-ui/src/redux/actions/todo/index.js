@@ -1,5 +1,5 @@
 import axios from "axios"
-import { history } from "../../../history"
+// import { history } from "../../../history"
 
 export const getTodos = routeParams => {
   return async dispatch => {
@@ -32,7 +32,7 @@ export const starTask = todo => {
 }
 
 export const importantTask = todo => {
-  
+
   return dispatch => {
     Promise.all([
       dispatch({ type: "IMPORTANT_TASK", id: todo.id, value: todo.isImportant })
@@ -99,7 +99,7 @@ export const searchTask = val => {
 export const changeFilter = filter => {
   return dispatch => {
     dispatch({ type: "CHANGE_FILTER", filter })
-    history.push(`/todo/${filter}`)
+    // history.push(`/todo/${filter}`)
     dispatch(getTodos({ filter }))
   }
 }
