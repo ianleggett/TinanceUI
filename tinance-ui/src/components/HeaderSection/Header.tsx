@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+
+import { Modal } from "antd";
 import ConnectorsUIScreen from "../../libs/connectors-ui";
 import { sessionCheck, logOut } from "../../redux/actions/auth/loginActions";
 
@@ -15,7 +17,7 @@ type HeaderProps = {
   logOut: () => void;
 };
 type HeaderState = {
-  connectorsUI: boolean;
+  isConnectorsUI: boolean;
 };
 
 declare global {
@@ -27,7 +29,7 @@ declare global {
 
 class Header extends Component<HeaderProps, HeaderState> {
   state: HeaderState = {
-    connectorsUI: false,
+    isConnectorsUI: false,
   };
 
   googleTranslateElementInit() {
@@ -53,6 +55,13 @@ class Header extends Component<HeaderProps, HeaderState> {
   logOut() {
     this.props.logOut();
   }
+
+  modalToggle = (event) => {
+    event.stopPropagation();
+    this.setState({
+      isConnectorsUI: !this.state.isConnectorsUI,
+    });
+  };
 
   render() {
     return (
@@ -136,7 +145,7 @@ class Header extends Component<HeaderProps, HeaderState> {
                     <Link
                       className="nav-link"
                       to="#"
-                      onClick={() => this.setState({ connectorsUI: true })}
+                      onClick={(event) => this.modalToggle(event)}
                     >
                       Connect
                     </Link>
@@ -248,16 +257,15 @@ class Header extends Component<HeaderProps, HeaderState> {
           </div>
         </header>
 
-        {this.state.connectorsUI && (
-          <div style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            zIndex: 999
-          }}>
-            <ConnectorsUIScreen />
-          </div>
-        )}
+        <Modal
+          title="Please choose the kind of wallet"
+          visible={this.state.isConnectorsUI}
+          width={800}
+          footer={""}
+          onCancel={this.modalToggle}
+        >
+          <ConnectorsUIScreen />
+        </Modal>
       </div>
     );
   }

@@ -265,7 +265,6 @@ function App() {
           gridTemplateColumns: '1fr 1fr',
           maxWidth: '20rem',
           margin: 'auto',
-          backgroundColor: 'transparent'
         }}
       >
         {Object.keys(connectorsByName).map(name => {
