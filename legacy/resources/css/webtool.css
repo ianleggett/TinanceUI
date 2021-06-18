@@ -58,7 +58,9 @@ body {
 	font-family: Open Sans,Segoe UI,HelveticaNeue-Light,sans-serif;
 	font-size: 15px;
 	width: 16% !important;
-	text-align: center;}
+	text-align: center;
+	cursor: pointer;
+}
 	
 .menuItem:hover {
 	color: grey;}
