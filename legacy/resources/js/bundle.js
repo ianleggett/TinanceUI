@@ -690,7 +690,7 @@ function showMyOffers() {
 	var postFilter = { fromccy: 1, toccy: 1 }
 	var filtStr = '?filt=' + encodeURI(JSON.stringify(postFilter))
 	
-	getJWTJSON(WEBSERVER + 'v1/public/offers.json' + filtStr, "", function (offerList) {
+	getJWTJSON('v1/public/offers.json' + filtStr, "", function (offerList) {
 		clearPanel();
 		clearBar();
 		// create button
@@ -999,7 +999,7 @@ function showuserrecenttrades(uid) {
 /**  Get user trades old and new  ContractMatch object  **/
 function showMyTrades() {
 	clearPanel();
-	getJWTJSON(WEBSERVER + 'v1/public/userTrades.json', "", function (tradeList) {
+	getJWTJSON('v1/public/userTrades.json', "", function (tradeList) {
 		$('#mytrades').empty();
 		$('#posttrade').css("display", "block");
 		console.log(tradeList);
