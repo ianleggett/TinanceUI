@@ -1,5 +1,4 @@
-I have already sent invite to you
-please look at your skype
+Just put your skype id here::
 
 // const WEBSERVER = "https://localhost:8443/";
 const WEBSERVER = "https://tinance.techiaz.com/"
