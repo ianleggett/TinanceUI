@@ -1,5 +1,5 @@
 
-const WEBSERVER = "https://localhost:8443/";
+const WEBSERVER = "https://tinance.techiaz.com/";
 const FEEPCT = 0.0015
 const minABI = [
     {
@@ -224,34 +224,13 @@ const minABI = [
     }
 ];
 
-// App = {
-//   web3Provider: null,
-//   contracts : {},
-//   USR_WALLETS : null,	 	  	
-//   BLOCK_NETWORK : 'NOT-SET',
-//   ccydict : {},
-//   ccyMap : {},    // map of ISO name to ccy
-//   web3 : null,
-//   usdt_details : {address:"none",decimals:0,ctr:"none"},
-//   escrow_details : {address:"none",ctr:"none"},
-//   accounts : null,
-//   usrid : 0,
-//   mytrades: {},
-//   jwttoken : null
-// };
 const APP_DECL = 'app';
 const Web3Modal = window.Web3Modal.default;
 const WalletConnectProvider = window.WalletConnectProvider.default;
 const Fortmatic = window.Fortmatic;
 const evmChains = window.evmChains;
-// Web3modal instance
-//let web3Modal
-// Chosen wallet provider given by the dialog window
-//let provider;
-// Address of the selected account
-//let selectedAccount;
 
-var App = {
+const APP_DEFAULT = {
 	web3Provider: null,
 	contracts : {},
 	USR_WALLETS : null,	 	  	
@@ -271,28 +250,7 @@ var App = {
 	selectedAccount : null,
   };
 
-function saveAppData() {
-	console.log('Saving app data');	
-	localStorage.setItem(APP_DECL, JSON.stringify(App));
-}
-
-function getAppData() {
-    if (localStorage) {			
-		if (localStorage.getItem(APP_DECL) == "null"){			    	
-			saveAppData();			
-		}else{
-			console.log('Loading app data ');	
-		}
-		App = JSON.parse(localStorage.getItem(APP_DECL));
-		console.log(App);
-    }else{
-		alert("browser not supporting local storage");
-	}
-}
-
-function clearData(){
-	localStorage.setItem(APP_DECL,null);
-}
+var App = APP_DEFAULT;
 
 function pageStart() {	
 		
@@ -314,15 +272,16 @@ function pageStart() {
 		 setCcyAll('fromccy',0);
 		 setCcyAll('toccy',1);	
 		 saveAppData( );	
-	});	
-
-	setPayTypes('paymethods')				
+	});				
 	
-	getJWTJSON('v1/getuserdetails.json', function(usr){		    	
-		App.usrid = usr.id;	
-		App.usrname = usr.username;		
-	});
-	
+	// if we are logged in....
+	if (App.jwttoken!==null){
+		getJWTJSON('v1/getuserdetails.json', function(usr){		    	
+			App.usrid = usr.id;	
+			App.usrname = usr.username;	
+			saveAppData();	
+		});
+	}
 	 const providerOptions = {
 		walletconnect: {
 		  package: WalletConnectProvider,
@@ -343,11 +302,46 @@ function pageStart() {
 		App.web3Modal = new Web3Modal({
 		cacheProvider: false, // optional
 		providerOptions, // required
-		disableInjectedProvider: false, // optional. For MetaMask / Brave / Opera.
+		disableInjectedProvider: false, // optional. For MetaMask / Brave / Opera.		
 	  });
 	
 	browseOffers();
 	document.querySelector("#btn-connect").addEventListener("click", onConnect);
+	saveAppData();
+}
+
+function hinkytest(){
+	clearData();
+	showlogin();
+}
+
+
+function saveAppData() {
+	console.log('Saving app data');	
+	localStorage.setItem(APP_DECL, JSON.stringify(App));
+}
+
+function getAppData() {
+    if (localStorage) {			
+		if (localStorage.getItem(APP_DECL) == "null"){			    	
+			saveAppData();			
+		}else{
+			console.log('Loading app data ');	
+		}
+		App = JSON.parse(localStorage.getItem(APP_DECL));
+		console.log(App);
+    }else{
+		alert("browser not supporting local storage");
+	}
+}
+
+function clearData(){
+	localStorage.setItem(APP_DECL,'null');
+	App = APP_DEFAULT;
+}
+
+function showCacheData(){
+	getAppData();
 }
 
 function getJWTJSON(shortUrl,jsondata,dataFunction){
@@ -356,21 +350,22 @@ function getJWTJSON(shortUrl,jsondata,dataFunction){
 		"accept": "application/json",
 		"Access-Control-Allow-Origin":"*"
 	  };
-	  if (App.jwttoken) header["Authorization"]="Bearer "+App.jwttoken;	  
+	  if (App.jwttoken!=null){
+		   header["Authorization"]="Bearer "+App.jwttoken;	  
+	  }
 	$.ajax({
 		crossDomain: true,		
 		type: 'GET',				  
 		contentType : "application/json",
 		dataType : 'json',
-		data : JSON.stringify(jsondata),
+		data : jsondata==null ? null : JSON.stringify(jsondata),
 		url: WEBSERVER+shortUrl,
 		headers: header,
 		success: dataFunction,	
-		fail : function(jqXHR, textStatus, errorThrown) {
-			$('#editpaydetails').modal('hide');
-			$('#msgdetails')
-					.html(
-							'<button type="button" class="btn btn-danger">Failed - system is down please contact support desk</button>');
+		fail : function(jqXHR, textStatus, errorThrown) {		
+			$('#msgdetails').html(
+				'<button type="button" class="btn btn-danger">Failed - system is down please contact support desk</button>');
+			$('#msgdialog').modal('show')
 		},
 	}).fail(function(msg) {
 		/// report error
@@ -380,20 +375,24 @@ function getJWTJSON(shortUrl,jsondata,dataFunction){
 
 
 function postJWTJSON(shortUrl,jsondata,dataFunction){
+	header = { 	
+		"accept": "application/json",
+		"Access-Control-Allow-Origin":"*"
+	  };
+	  if (App.jwttoken!=null){
+		   header["Authorization"]="Bearer "+App.jwttoken;	  
+	  }
 	$.ajax({
 		type: 'POST',
 		url: WEBSERVER+shortUrl,
-		data: JSON.stringify(jsondata),
+		data:  jsondata==null ? null : JSON.stringify(jsondata),
 		contentType: "application/json",
 		dataType: 'json',
-		headers: { "Authorization": "Bearer "+App.jwttoken,
-		   "accept": "application/json",
-		   "Access-Control-Allow-Origin":"*"
-		 },				
+		headers: header,		
 		success: dataFunction,
-		fail: function(jqXHR, textStatus, errorThrown) {
-			$('#editjob').modal('hide');
-			$('#msgdetails').html('<button type="button" class="btn btn-danger">Failed - system is down please contact support desk</button>');
+		fail: function(jqXHR, textStatus, errorThrown) {			
+			$('#msgdetails').html('<button type="button" class="btn btn-danger">Failed - system is down please contact support desk</button>');			
+			$('#msgdialog').modal('show')
 		},
 	}).fail(function(){alert('error')});		
 }
@@ -411,11 +410,12 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 			  data: JSON.stringify({ username: name , password: pwd }),
 			  success: function(resultData){
 				App.jwttoken = resultData.token;				
-				getJWTJSON('v1/getuserdetails.json','', function(usr){	
+				getJWTJSON('v1/getuserdetails.json',null, function(usr){	
 					console.log("got user data "+usr)	    	
 					App.usrid = usr.id;	
-					App.usrname = usr.username;	
-					saveAppData();	
+					App.usrname = usr.username;						
+					$('#loginmodal').modal('hide');					
+					saveAppData();
 				});
 			  }
 			});		
@@ -430,10 +430,6 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 	}hideMsgs();
 	function clearBar(){
 		$("#alertbar").empty();
-	}
-	
-	function showCacheData(){
-		console.log(JSON.stringify(App));
 	}
 
 	function showlogin(){		
@@ -452,13 +448,15 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 	}
 	
 	function setPayTypes(divid){
-	$.getJSON(WEBSERVER+'paymenttypes.json', function(ptypes){		
+	getJWTJSON('v1/public/paymenttypes.json',null, function(ptypes){	
+		console.log("Payment Types: "+ptypes)	
+		$('#'+divid).empty();
 		var idx=1;
 	    ptypes.forEach( item=>{
 		    $('#'+divid).append(
 				'<input type="checkbox" class="btn-check" name="paychk" value="'+item.name+'" id="btncheck'+idx+'" autocomplete="off">'+
 				 '<label class="btn btn-sm btn-light" for="btncheck'+idx+'">'+item.name+'</label>'
-									);
+			);
 			idx++;
 		});
 	});
@@ -477,7 +475,7 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 	    paylist.forEach( item=>{
 		    $('#'+divid).append(			
 			 '<input type="radio" id="payid_'+idx+'" class="btn-check" onclick="userpay('+idx+')" value="'+item.id+'" name="selectedpay" autocomplete="off" >'+
-  			 '<label class="btn btn-outline-primary btn-sm" for="payid_'+idx+'">'+item.name+'</label>'
+  			 '<label class="btn btn-outline-primary btn-sm" for="payid_'+idx+'">'+item.payType.name+'</label>'
 			);			
 			idx++;
 		});
@@ -546,15 +544,14 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 		$("#thisoffer").empty();
 		$("#thisoffer")
 				.append(
-						'You are the '+buySellStr+'(exch rate:'+k.exchRate+')'
+						'<button type="button" class="btn btn-info"  style="float: right; margin-left: 50px;" class="btn btn-sm btn-primary font-weight-bold">'
+						+ k.fromAmount + ' ' + k.fromccy.name
+						+ '<br>available</button>'
+						+'You are the '+buySellStr+' (rate:'+k.exchRate+')'
 						+'<br/> Selling '
 								+ k.toccy.name
 								+ ' Buying '
-								+ k.fromccy.name
-								+ '   '
-								+ '<button type="button" class="btn btn-info"  style="float: right;" class="btn btn-sm btn-primary font-weight-bold">'
-								+ k.fromAmount + ' ' + k.fromccy.name
-								+ ' available</button>');
+								+ k.fromccy.name );
 
 		setOfferPayButtons('paydetail', k.paymentDetails);	
 		$('#preamtsell').val( k.toAmount );	
@@ -574,7 +571,7 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 
 	function pretrade(ordid){
 		clearPanel();
-		getJWTJSON('v1/getoffer.json?oid=' + ordid,'', function(puboffer) {
+		getJWTJSON('v1/getoffer.json?oid=' + ordid,null, function(puboffer) {
 			console.log(puboffer);
 			$('#pretrade').css("display", "block");
 			thisoffer = puboffer;
@@ -588,8 +585,9 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 	}
 	
 	function showuserpublic(uid){		
-	  getJWTJSON('v1/public/getprofilepublic.json?uid='+uid, function(details){	    
+	  getJWTJSON('v1/public/getprofilepublic.json?uid='+uid,null, function(details){	    
 	    // set up details
+		console.log(JSON.stringify(details));
 		var stars = "";		
         for(var x=1; x<=details.feedback;x++){
 	        stars +='<i class="fas fa-star"></i>';
@@ -598,7 +596,7 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 		    stars +='<i class="far fa-star"></i>';
 		}
        // console.log(details);
-	    $("#username").html( details.username );
+	    $("#uname").html( details.username );
 	    $("#blurb").html( details.blurb ? details.blurb : "no blurb yet" );
 	    $("#feedback").html( stars );
 	    $("#lastseen").html( moment(details.lastseen).fromNow() );
@@ -608,7 +606,7 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 	}
 	
 	function showuserrecenttrades(uid){		
-		getJWTJSON('v1/public/userTrades.json?uid='+uid, function(trades){	    
+		getJWTJSON('v1/public/userTrades.json?uid='+uid,null, function(trades){	    
 		    // set up details
 			console.log(trades);
 				trades.forEach( k=>{
@@ -655,33 +653,29 @@ function postJWTJSON(shortUrl,jsondata,dataFunction){
 
  	function setLive(kid){ 	
  		var ischecked=$('input[id="livecheck'+kid+'"]').is(':checked');
- 		$.ajax({
- 			type: 'POST',
- 			url: WEBSERVER+'toggleLive.json?kid='+kid+'&v='+ischecked,// + csrfname +'='+csrfvalue,
- 		    data: JSON.stringify(""),
- 		    contentType: "application/json",
- 		    dataType: 'json',
-		    success: function(data) {
-		    	console.log(data);
-		    },	
-		    fail: function(jqXHR, textStatus, errorThrown) {
-		    	$('#coinDialog').modal('hide');
-		    	$('#msgdetails').html('<button type="button" class="btn btn-danger">Failed - system is down please contact support desk</button>');
-		    },
-		}).fail(function(){alert('error')});		
+		postJWTJSON('v1/toggleLive.json?kid='+kid+'&v='+ischecked,null,function(data){
+			console.log(data);
+		});
  	}
  	
  	function deleteOffer(kid){
  		if (confirm('Confirm delete offer?')){
-			postJWTJSON('v1/deleteoffer.json?kid='+kid,'',function(data) {
+			postJWTJSON('v1/deleteoffer.json?kid='+kid,null,function(data) {
 				myOffers();
 			}); 		
  		}
  	}
+ 	function extendOffer(kid){		
+		   postJWTJSON('v1/extendoffer.json?kid='+kid,null,function(data) {
+			   myOffers();
+		   }); 			
+	}
+	 
 
 	function newOffer(){
 		clearPanel();
 		clearBar();
+		setPayTypes('paymethods');
 		$('#newofferdiv1').css("display", "block");
 		$('#newofferdiv2').css("display", "block");
 	}
@@ -792,15 +786,15 @@ function validateForm(attrib){
 		// fees are attached to USDT always!!!!					
 
 		if (crypt.buy){						
-				amt = parseFloat($('#amtsell').val()); 
+				amt = parseFloat($('#amtbuy').val()); 
 				fee = FEEPCT * amt;
 				$('#exchrate').html( exchrate );
-				$('#amtfee').html( fee + 'USDT' ); 
+				$('#amtfee').html( fee + ' USDT' ); 
 		}else{			
-				amt = parseFloat($('#amtbuy').val()); 
+				amt = parseFloat($('#amtsell').val()); 
 				fee = FEEPCT * amt;				
 				$('#exchrate').html( exchrate );
-				$('#amtfee').html( fee + 'USDT' ); 
+				$('#amtfee').html( fee + ' USDT' ); 
 		}			
 		$('#amtfee').val( fee );
 	}
@@ -808,7 +802,7 @@ function validateForm(attrib){
 	function placeOrder(){
 
 		var postObject = {fromccyid:99, toccyid:99, fromamt: $('#amtsell').val(), toamt: $('#amtbuy').val(), 
-		feevalue: $('#amtfee').val(), payTypes:[] }	
+		feevalue: $('#amtfee').val(), expiry : $('#expiry').val(), expUnit: $('#expUnit').val(), payTypes:[] }	
 		
 		postObject.payTypes = getSelectedPayTypes();
 		var crypt = getCryptBuySell();
@@ -842,7 +836,7 @@ function validateForm(attrib){
 		hideMsgs();
 		var postFilter = {fromccy:1,toccy:1}
 		var filtStr = '?filt=';//+encodeURI( JSON.stringify(postFilter) )
-		getJWTJSON('v1/useroffers.json'+filtStr,"", (offerList) => {
+		getJWTJSON('v1/myoffers.json',null, (offerList) => {
 			console.log(offerList);
 			clearPanel();
 			clearBar();
@@ -859,11 +853,15 @@ function validateForm(attrib){
 				  '<input class="form-check-input" type="checkbox" onclick="setLive('+k.id+')" id="livecheck'+k.id+'" '+(k.live?'checked':'')+'>'+				 
 				  '</div>';
 				var delbutton = '<button class="btn btn-sm btn-danger" style="float: right;" type="button" onclick="deleteOffer('+k.id+')"><i class="far fa-trash-alt"></i></button>';
-								
+						
+				var statusActions = '<div class="row><button class="btn btn-sm btn-info" disable type="button">'+ k.procStatus +'</button>';
+				statusActions += k.procStatus=="EXPIRED" ? '<button class="btn btn-sm btn-info" onclick="extendOffer('+k.id+')" type="button">Extend 1h</button>': '';
+				statusActions += '</div>';
+
 				var res = moment(k.created).fromNow();
 		    	$("#mainDiv").append(		    			
 		    	'<div class="card-body zaraCardWhite" id="'+k.id+'">' +			    	
-		    	 '<div class="card mb-3"> <div class="card-header">'+islive + '<h5>'+k.fromccy.name+'/'+k.toccy.name+' '+delbutton+'</h5></div> ('+res+') ' + k.status +
+		    	 '<div class="card mb-3"> <div class="card-header">'+islive + '<h5>'+k.fromccy.name+'/'+k.toccy.name+' '+delbutton+'</h5></div> ('+res+') ' + statusActions +
 		    	  '<div class="card-body">'+
    	  			    '<h5 class="card-title">'+k.fromAmount+' '+k.fromccy.name+' => '+   
    	  			    k.toAmount+' '+k.toccy.name+'</h5>'+
@@ -891,7 +889,7 @@ function validateForm(attrib){
 	function browseOffers(){
 		var postFilter = {fromccy:1,toccy:1}
 		var filtStr = '?filt=';//+encodeURI( JSON.stringify(postFilter) );
-			getJWTJSON('v1/public/offers.json'+filtStr,"", (offerList) => {
+			getJWTJSON('v1/public/offers.json',null, (offerList) => {
 			clearPanel();
 			clearBar();	
 		
@@ -927,8 +925,47 @@ function validateForm(attrib){
 		}); 	
 	}
 	
+	
+function initContractData(){
+		getJWTJSON('v1/getnetworkconfig.json',null, function(netw){	
+		console.log("Network : "+JSON.stringify(netw));
+		App.BLOCK_NETWORK = netw.httpService;  // "http localhost or Mainnet address
+		App.escrow_details.address = netw.escrowCtrAddr;  // Contract Address Escro
+		App.usdt_details.address = netw.usdtcoinCtrAddr;		
+		
+		const web3 = new Web3(App.provider);
+		
+/*		
+		if (typeof App.web3 !== 'undefined') {
+			        App.web3 = new Web3(web3.currentProvider);
+			      } else {
+			        App.web3 = new Web3(new Web3.providers.HttpProvider(App.BLOCK_NETWORK));
+		}
+*/
+		//console.log("network: "+App.BLOCK_NETWORK);	
+		//provider = 	new Web3.providers.HttpProvider(BLOCK_NETWORK);
+		//console.log(provider)
+		//web3 = new Web3(provider);
+		//console.log("Web 3 ver: "+web3.version);
+		
+		App.usdt_details.ctr = new web3.eth.Contract(minABI,App.usdt_details.address);   // the USD / JVM coin
+		usdt_dec = App.usdt_details.ctr.methods.decimals().call( function(error, decimals){
+			App.usdt_details.decimals = decimals;
+		});		
+    	 $.getJSON(WEBSERVER+'resources/contracts/TinanceEscrow.json', function(){
+			 
+		 })
+		 .done(function(abi_data){	
+			console.log(abi_data);						 
+			App.escrow_details.ctr = new web3.eth.Contract(abi_data.abi, App.escrow_details.address);
+			completeFunc();			
+		 });
+			
+	});
+}
+	
 function initCoins(completeFunc){    
-	var ixy = $.getJSON(WEBSERVER+"ccycodes.json", {
+	var ixy = getJWTJSON("ccycodes.json", null, {
 		format: "json"
 	})
 	.done(function(data){			
@@ -940,7 +977,7 @@ function initCoins(completeFunc){
 	setCcyCrypto('sellcrypto');
 	setCcyFiat('fiatexchange');
 	});	
-/***	
+/**	
 	$.getJSON('getnetworkconfig.json', function(netw){			
 		BLOCK_NETWORK = netw.httpService;  // "http localhost or Mainnet address
 		escrow_details.address = netw.escrowCtrAddr;  // Contract Address Escro
@@ -971,8 +1008,8 @@ function initCoins(completeFunc){
 			completeFunc();		 
 		 });
 	});	
+**/	
 	
-	**/
 }
 
 function setCcyAll(targetdiv,from){
@@ -1001,22 +1038,11 @@ function setUserWallet(usrwalletaddr){
   var usdtcoin = App.ccyMap['USDT'];
   var postObject = {coinid:usdtcoin.id,walletAddr:usrwalletaddr}	
   console.log(JSON.stringify(postObject));
-		$.ajax({
-		    type: 'POST',
-		    url: WEBSERVER+'setusercoin.json',// + csrfname +'='+csrfvalue,
-		    data: JSON.stringify(postObject),
-		    contentType: "application/json",
-		    dataType: 'json',
-		    success: function(data) {		    	
-		    	if (data.statusCode!=0){		    		
-		    		$('#msgdetails').html('<button type="button" class="btn btn-danger">Failed '+data.msg+'</button>');		    		
-		    	}		    	
-		    },	
-		    fail: function(jqXHR, textStatus, errorThrown) {
-		    	$('#coinDialog').modal('hide');
-		    	$('#msgdetails').html('<button type="button" class="btn btn-danger">Failed - system is down please contact support desk</button>');
-		    },
-		}).fail(function(){alert('error set user coin')});		
+  postJWTJSON('v1/setusercoin.json',postObject,function( data ){
+	if (data.statusCode!=0){		    		
+		$('#msgdetails').html('<button type="button" class="btn btn-danger">Failed '+data.msg+'</button>');		    		
+	}		    	
+  });	
 }
 
 function completeFunc(){
@@ -1050,6 +1076,8 @@ async function fetchAccountData() {
   document.querySelector("#selected-account").textContent = App.selectedAccount;
 
   setUserWallet(App.selectedAccount);
+  initContractData();
+
 
   // Get a handl
   const template = document.querySelector("#template-balance");
@@ -1080,6 +1108,9 @@ async function fetchAccountData() {
   // Display fully loaded UI for wallet data
   //document.querySelector("#prepare").style.display = "none";
   document.querySelector("#connected").style.display = "block";
+  
+  
+
 }
 
 
@@ -1106,42 +1137,7 @@ async function refreshAccountData() {
   await fetchAccountData(App.provider);
   //document.querySelector("#btn-connect").removeAttribute("disabled")
 
-  const web3 = new Web3(App.provider);
-
-	$.getJSON(WEBSERVER+'getnetworkconfig.json', function(netw){	
-		//console.log("Network : "+JSON.stringify(netw));
-		App.BLOCK_NETWORK = netw.httpService;  // "http localhost or Mainnet address
-		App.escrow_details.address = netw.escrowCtrAddr;  // Contract Address Escro
-		App.usdt_details.address = netw.usdtcoinCtrAddr;		
-/*		
-		if (typeof App.web3 !== 'undefined') {
-			        App.web3 = new Web3(web3.currentProvider);
-			      } else {
-			        App.web3 = new Web3(new Web3.providers.HttpProvider(App.BLOCK_NETWORK));
-		}
-*/
-		//console.log("network: "+App.BLOCK_NETWORK);	
-		//provider = 	new Web3.providers.HttpProvider(BLOCK_NETWORK);
-		//console.log(provider)
-		//web3 = new Web3(provider);
-		//console.log("Web 3 ver: "+web3.version);
-		
-		App.usdt_details.ctr = new web3.eth.Contract(minABI,App.usdt_details.address);   // the USD / JVM coin
-		usdt_dec = App.usdt_details.ctr.methods.decimals().call( function(error, decimals){
-			App.usdt_details.decimals = decimals;
-			 //console.log("USDT : "+JSON.stringify(App.usdt_details));					
-		});		
-    	 $.getJSON('resources/contracts/TinanceEscrow.json', function(){
-			 
-		 })
-		 .done(function(abi_data){	
-			 //console.log(abi_data);						 
-			App.escrow_details.ctr = new web3.eth.Contract(abi_data.abi, App.escrow_details.address);
-			completeFunc();		 
-		 });
-			
-	});	
-
+  App.web3 = new Web3(App.provider);
 
   $('#showwallet').modal('show')
 }
@@ -1252,7 +1248,7 @@ window.addEventListener('load', async () => {
 				.then(function(app_res){
 			         alert("Allowance set for USDT "+humanAmt)
 			 		 setTimeout(() => {
-			 			 ajaxPOST(WEBSERVER+'startcontract.json?oid='+ordId,"",alert("You Deposited funds USDT "+humanAmt));			 			 
+			 			 postJWTJSON('v1/startcontract.json?oid='+ordId,"",alert("You Deposited funds USDT "+humanAmt));			 			 
 			 		 }, 1000);			        
 				});
 			}else{				
@@ -1267,7 +1263,7 @@ window.addEventListener('load', async () => {
 	
 	function goodsSent(ordId){
 		// indicate to the server when the funds were sent
-		 ajaxPOST(WEBSERVER+'flagfundssent.json?oid='+ordId,"",alert("OK, Bank transfer recorded"));
+		postJWTJSON('v1/flagfundssent.json?oid='+ordId,"",alert("OK, Bank transfer recorded"));
 		// start timer for 3 days then reverse the transaction
 	}
 	
@@ -1278,7 +1274,7 @@ window.addEventListener('load', async () => {
         console.log("Escrow_addr:"+App.escrow_details.address+" sellerAddr:"+sellerAddr+ " USD coin:"+App.usdt_details.address+" ordNum:"+ordNum);
         App.escrow_details.ctr.methods.releaseEscrow(ordNum).send(data)       
         .on('transactionHash',function(hash){
-        	ajaxPOST('flagcomplete.json?oid='+ordId+"&txn="+hash,"",alert("OK, Bank transfer received"));
+        	postJWTJSON('v1/flagcomplete.json?oid='+ordId+"&txn="+hash,"",alert("OK, Bank transfer received"));
         })        
 
 	}
@@ -1288,9 +1284,11 @@ window.addEventListener('load', async () => {
     }
 	
 	/**  Get user trades old and new  ContractMatch object  **/
-	function showMyTrades(){
-		clearPanel();
-		$.getJSON(WEBSERVER+'userTrades.json', function(tradeList){
+	function showMyTrades(){		
+		getJWTJSON('v1/mytrades.json',null, function(tradeList){
+			console.log(tradeList);
+			clearPanel();
+
 			$('#myorders').empty();
 			$('#posttrade').css("display", "block");
 			//console.log(tradeList);
