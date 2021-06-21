@@ -9,7 +9,7 @@ The site needs converting to use React/jsx as a single web page UI where content
 ## Site-map
 ![digram](site-map.svg)
 
-## Future gaol
+## Future goal
 We have a simple wireframe mock up of menu with a set of functions. We have a wireframe example of the functions
 
 ```https://balsamiq.cloud/sud7lfj/pecczo2/r2278```
@@ -28,7 +28,7 @@ In summary, ```bundle.js``` contains:
 
 
 The REST API can be interactively browsed (Swagger) at 
-```
+```javascript
 https://tinance.techiaz.com/swagger-ui.html
 ```
 
