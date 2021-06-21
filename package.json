@@ -1,0 +1,64 @@
+{
+  "name": "tinance",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "tinance-ui"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "test": "lerna run test"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 edge version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "prettier": {
+    "printWidth": 100,
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "eslintConfig": {
+    "settings": {
+      "polyfills": [
+        "URLSearchParams"
+      ]
+    },
+    "extends": [
+      "@fastcms"
+    ],
+    "root": true
+  },
+  "eslintIgnore": [
+    "build",
+    "coverage",
+    "legacy",
+    "node_modules"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.14.6",
+    "@fastcms/eslint-config": "^1.5.4",
+    "@types/jest": "^26.0.23",
+    "@types/js-cookie": "^2.2.6",
+    "@types/node": "^15.12.4",
+    "@types/react": "^17.0.11",
+    "@types/react-dom": "^17.0.8",
+    "@types/react-router-dom": "^5.1.7",
+    "eslint": "^7.29.0",
+    "lerna": "^4.0.0",
+    "prettier": "^2.3.1",
+    "prettier-plugin-packagejson": "^2.2.11",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.3.4"
+  }
+}
