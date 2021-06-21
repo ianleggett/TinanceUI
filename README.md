@@ -6,16 +6,46 @@ We have a Java/SpringBoot based system that delivers a service using json calls.
 
 The site needs converting to use React/jsx as a single web page UI where content and authenticated data is taken from our Java system using jwt & rset API.
 
-In the /legacy folder, we have examples of the system.
-
-We have a simple menu with a set of functions. We have a wireframe example of the functions
-
-```
-https://balsamiq.cloud/sud7lfj/pecczo2/r2278
-```
-
-## site-map
+## Site-map
 ![digram](site-map.svg)
+
+## Future gaol
+We have a simple wireframe mock up of menu with a set of functions. We have a wireframe example of the functions
+
+```https://balsamiq.cloud/sud7lfj/pecczo2/r2278```
+
+
+## Our example app in html/js
+In the /legacy folder, we have a basic example of the system.
+The ```main.html``` is our single page app supported by ```bundle.js``` which calls functions and changes the DOM tree. (We are working on breaking down ```bundle.js``` into logical files for easier reading - to be updated in the next few days)
+
+In summary, ```bundle.js``` contains:
+* core functions
+* menu functions
+* functions to show and hide DOM elements
+
+```bundle.js``` also calls our REST api to get data for the server
+
+
+The REST API can be interactively browsed (Swagger) at 
+```
+https://tinance.techiaz.com/swagger-ui.html
+```
+
+## Public functions
+Without login / authenticating, any client can view the public functions.
+
+### jwt-public-data
+* GET ​/v1​/public​/paymenttypes.json
+    ** list of payment types that are available
+* GET ​/v1​/public​/offers.json
+* GET ​/v1​/public​/getprofilepublic.json
+* GET ​/v1​/public​/ccycodes.json
+* GET ​/v1​/public​/userTrades.json (**deprecated)
+
+
+
+
 
 ## Start page
 ```javascript
@@ -63,18 +93,4 @@ TinanceUI\legacy\main.html
 
 
 
-The REST API can be interactively browsed (Swagger) at 
-```
-https://tinance.techiaz.com/swagger-ui.html
-```
 
-## Public functions
-Without login / authenticating, any client can view the public functions.
-
-### jwt-public-data
-* GET ​/v1​/public​/paymenttypes.json
-    ** list of payment types that are available
-* GET ​/v1​/public​/offers.json
-* GET ​/v1​/public​/getprofilepublic.json
-* GET ​/v1​/public​/ccycodes.json
-* GET ​/v1​/public​/userTrades.json (**deprecated)
