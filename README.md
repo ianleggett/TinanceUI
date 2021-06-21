@@ -33,16 +33,28 @@ https://tinance.techiaz.com/swagger-ui.html
 ```
 
 ## Public functions
-Without login / authenticating, any client can view the public functions.
+Without login / authenticating, any client can view public data.
 
 ### jwt-public-data
-* GET ​/v1​/public​/paymenttypes.json
-    ** list of payment types that are available
-* GET ​/v1​/public​/offers.json
-* GET ​/v1​/public​/getprofilepublic.json
-* GET ​/v1​/public​/ccycodes.json
-* GET ​/v1​/public​/userTrades.json (**deprecated)
+````GET ​/v1​/public​/paymenttypes.json```` - list of payment types that are available. Only bank transfer is valid for version 1.0.
 
+```GET ​/v1​/public​/offers.json``` - list current offers in play from all members.
+
+```GET ​/v1​/public​/getprofilepublic.json``` - show the profile of a user (i.e. public available data)
+```GET ​/v1​/public​/ccycodes.json``` - lists the known curencies of the system
+
+```GET ​/v1​/public​/userTrades.json``` (**deprecated)
+
+## Core functions
+Within the bundle.js we have highlight the core functions in use
+
+* pageStart()
+* getJWTJSON()
+* postJWTJSON()
+* browseOffers()
+* myOffers()
+* newOffer()
+* showMyTrades()
 
 
 
