@@ -1,8 +1,9 @@
 import { Container } from '@material-ui/core';
 import type { Dispatch } from 'react';
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useMemo, useReducer } from 'react';
 
 import { appConfig } from '../constants';
+import { GlobalFooter } from './GlobalFooter';
 import { GlobalHeader } from './GlobalHeader';
 
 export const initialState = appConfig;
@@ -35,15 +36,22 @@ const LayoutDispatchContext = createContext<Dispatch<AppContextAction> | undefin
 export const AppContextProvider: React.FC<AppContextProviderProps> = (props) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, { ...initialState, ...props });
-  const { title, logo, maxWidth } = state;
+  const { title, logo, maxWidth, privacy, terms } = state;
 
   return (
     <LayoutStateContext.Provider value={state}>
       <LayoutDispatchContext.Provider value={dispatch}>
         <GlobalHeader title={title} logo={logo} maxWidth={maxWidth} />
-        <Container component="main" maxWidth={maxWidth} disableGutters>
+        <Container component="main" maxWidth={maxWidth} style={{ flex: 1 }} disableGutters>
           {children}
         </Container>
+        <GlobalFooter
+          title={title}
+          startYear={2020}
+          maxWidth={maxWidth}
+          privacy={privacy}
+          terms={terms}
+        />
       </LayoutDispatchContext.Provider>
     </LayoutStateContext.Provider>
   );
