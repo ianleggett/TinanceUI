@@ -1,18 +1,18 @@
-import { Container } from '@material-ui/core';
+import Container from '@material-ui/core/Container';
 import type { Dispatch } from 'react';
-import { createContext, useContext, useMemo, useReducer } from 'react';
+import { createContext, useContext, useReducer } from 'react';
 
 import { appConfig } from '../constants';
 import { GlobalFooter } from './GlobalFooter';
 import { GlobalHeader } from './GlobalHeader';
 
-export const initialState = appConfig;
+const initialState = appConfig;
 
 export type AppContextState = typeof initialState;
 
-export type AppContextAction = {
-  type: 'reset';
-};
+export type AppContextAction =
+  | { type: 'update'; payload: Partial<AppContextState> }
+  | { type: 'reset' };
 
 export interface AppContextProviderProps extends Partial<AppContextState> {
   children: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal;
@@ -20,12 +20,19 @@ export interface AppContextProviderProps extends Partial<AppContextState> {
 
 const reducer = (state: AppContextState, action: AppContextAction): AppContextState => {
   switch (action.type) {
+    case 'update': {
+      return {
+        ...initialState,
+        ...action.payload,
+      };
+    }
+
     case 'reset': {
       return initialState;
     }
 
     default: {
-      throw new Error(`Unhandled action type: ${action.type}`);
+      return state;
     }
   }
 };

@@ -1,5 +1,8 @@
-import { Box, Container, Link, Typography } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import Container from '@material-ui/core/Container';
+import Link from '@material-ui/core/Link';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 

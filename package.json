@@ -47,7 +47,7 @@
   ],
   "devDependencies": {
     "@babel/core": "^7.14.6",
-    "@fastcms/eslint-config": "^1.5.4",
+    "@fastcms/eslint-config": "^1.5.5",
     "@types/jest": "^26.0.23",
     "@types/js-cookie": "^2.2.6",
     "@types/node": "^15.12.4",

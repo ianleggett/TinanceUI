@@ -1,8 +1,9 @@
 import { ThemeProvider } from '@material-ui/core/styles';
 import { UseRequestProvider } from 'ahooks';
+import { SnackbarProvider } from 'notistack';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
-import { AppContextProvider, HomeRoute, PrivateRoute } from './components';
+import { AppContextProvider, HomeRoute, PrivateRoute, UserContextProvider } from './components';
 import { theme } from './constants';
 import ForbiddenPage from './pages/403';
 import NotFoundPage from './pages/404';
@@ -23,29 +24,33 @@ import UserProfilePage from './pages/UserProfile';
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
-      <UseRequestProvider value={{ manual: true }}>
-        <BrowserRouter basename={process.env.PUBLIC_URL}>
-          <AppContextProvider>
-            <Switch>
-              <HomeRoute path="/" component={HomePage} authedComponent={TradeListPage} exact />
-              <Route path="/signin" component={SignInPage} exact />
-              <Route path="/signup" component={SignUpPage} exact />
-              <Route path="/forgot-password" component={ForgotPasswordPage} exact />
-              <Route path="/faq" component={FaqPage} exact />
-              <PrivateRoute path="/markets" component={MarketListPage} exact />
-              <PrivateRoute path="/offers" component={OfferListPage} exact />
-              <PrivateRoute path="/offers/create" component={OfferFormPage} exact />
-              <PrivateRoute path="/offers/:id" component={OfferDetailPage} exact />
-              <PrivateRoute path="/trades" component={TradeListPage} exact />
-              <PrivateRoute path="/trades/:id" component={TradeDetailPage} exact />
-              <PrivateRoute path="/account/profile" component={UserProfilePage} exact />
-              <PrivateRoute path="/account/password" component={ChangePasswordPage} exact />
-              <Route path="/403" component={ForbiddenPage} exact />
-              <Route path="*" component={NotFoundPage} />
-            </Switch>
-          </AppContextProvider>
-        </BrowserRouter>
-      </UseRequestProvider>
+      <SnackbarProvider>
+        <UseRequestProvider value={{ manual: true }}>
+          <BrowserRouter basename={process.env.PUBLIC_URL}>
+            <UserContextProvider>
+              <AppContextProvider>
+                <Switch>
+                  <HomeRoute path="/" component={HomePage} authedComponent={TradeListPage} exact />
+                  <Route path="/signin" component={SignInPage} exact />
+                  <Route path="/signup" component={SignUpPage} exact />
+                  <Route path="/forgot-password" component={ForgotPasswordPage} exact />
+                  <Route path="/faq" component={FaqPage} exact />
+                  <PrivateRoute path="/markets" component={MarketListPage} exact />
+                  <PrivateRoute path="/offers" component={OfferListPage} exact />
+                  <PrivateRoute path="/offers/create" component={OfferFormPage} exact />
+                  <PrivateRoute path="/offers/:id" component={OfferDetailPage} exact />
+                  <PrivateRoute path="/trades" component={TradeListPage} exact />
+                  <PrivateRoute path="/trades/:id" component={TradeDetailPage} exact />
+                  <PrivateRoute path="/account/profile" component={UserProfilePage} exact />
+                  <PrivateRoute path="/account/password" component={ChangePasswordPage} exact />
+                  <Route path="/403" component={ForbiddenPage} exact />
+                  <Route path="*" component={NotFoundPage} />
+                </Switch>
+              </AppContextProvider>
+            </UserContextProvider>
+          </BrowserRouter>
+        </UseRequestProvider>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 };

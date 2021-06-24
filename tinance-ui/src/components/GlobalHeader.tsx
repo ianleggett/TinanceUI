@@ -1,26 +1,34 @@
-import {
-  AppBar,
-  Box,
-  Button,
-  Container,
-  Hidden,
-  IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  SwipeableDrawer,
-  Toolbar,
-  Typography,
-} from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import Avatar from '@material-ui/core/Avatar';
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import Hidden from '@material-ui/core/Hidden';
+import IconButton from '@material-ui/core/IconButton';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import Toolbar from '@material-ui/core/Toolbar';
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import AttachMoneyOutlinedIcon from '@material-ui/icons/AttachMoneyOutlined';
 import ExpandMoreOutlinedIcon from '@material-ui/icons/ExpandMoreOutlined';
 import MenuOutlinedIcon from '@material-ui/icons/MenuOutlined';
 import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined';
+import { useRequest } from 'ahooks';
+import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
+
+import { SignOutService } from '../services';
+import { clearProfile, clearToken } from '../utils';
+import { useUserContext } from './UserContext';
 
 const useStyles = makeStyles((theme) => {
   return createStyles({
@@ -50,6 +58,9 @@ const useStyles = makeStyles((theme) => {
         margin: theme.spacing(1),
       },
     },
+    menuItem: {
+      minWidth: 36,
+    },
     drawer: {
       '& .MuiDrawer-paperAnchorLeft': {
         width: '38vw',
@@ -59,6 +70,11 @@ const useStyles = makeStyles((theme) => {
       '& > * + *': {
         margin: theme.spacing(1),
       },
+    },
+    avatar: {
+      width: theme.spacing(3),
+      height: theme.spacing(3),
+      border: `1px solid ${theme.palette.divider}`,
     },
   });
 });
@@ -80,8 +96,19 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const classes = useStyles();
   const history = useHistory();
   const { pathname } = useLocation();
+  const [{ profile }, dispatch] = useUserContext();
+  const { enqueueSnackbar } = useSnackbar();
   const [showDrawer, setShowDrawer] = useState(false);
+  const [userMenu, setUserMenu] = useState<HTMLButtonElement | null>(null);
   const { title, logo, maxWidth } = props as PropsWithDefault;
+
+  const { run: signout } = useRequest(SignOutService, {
+    onSuccess() {
+      enqueueSnackbar('Sign out successful', {
+        variant: 'success',
+      });
+    },
+  });
 
   const handleDrawerOpen = useCallback(() => {
     setShowDrawer(true);
@@ -89,6 +116,14 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
 
   const handleDrawerClose = useCallback(() => {
     setShowDrawer(false);
+  }, []);
+
+  const handleUserMenuOpen = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    setUserMenu(event.currentTarget);
+  }, []);
+
+  const handleUserMenuClose = useCallback(() => {
+    setUserMenu(null);
   }, []);
 
   const handleGoToMarketsPage = useCallback(() => {
@@ -109,6 +144,27 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const handleGoToSigninPage = useCallback(() => {
     history.push('/signin');
   }, [history]);
+
+  const handleGoToProfilePage = useCallback(() => {
+    setUserMenu(null);
+    history.push('/account/profile');
+  }, [history]);
+
+  const handleGoToChangePasswordPage = useCallback(() => {
+    setUserMenu(null);
+    history.push('/account/password');
+  }, [history]);
+
+  const handleSignOut = useCallback(() => {
+    setUserMenu(null);
+
+    signout();
+    dispatch({ type: 'clearUserInfo' });
+
+    clearToken();
+    clearProfile();
+    history.replace('/');
+  }, [dispatch, history, signout]);
 
   return (
     <AppBar position="static" color="transparent" variant="outlined" className={classes.root}>
@@ -186,10 +242,50 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
             </SwipeableDrawer>
           </Hidden>
 
-          <Box className={classes.buttons}>
-            <Button color="primary" variant="contained" onClick={handleGoToSigninPage}>
-              Sign In
-            </Button>
+          <Box display="flex" alignItems="center" className={classes.buttons}>
+            {profile ? (
+              <>
+                <Tooltip title="User Center" enterDelay={300}>
+                  <Button
+                    color="inherit"
+                    aria-haspopup="true"
+                    aria-owns="user-menu"
+                    startIcon={
+                      <Avatar
+                        alt={profile.username}
+                        src={profile.avatar}
+                        className={classes.avatar}
+                      />
+                    }
+                    endIcon={<ExpandMoreOutlinedIcon />}
+                    onClick={handleUserMenuOpen}
+                  >
+                    {profile.username}
+                  </Button>
+                </Tooltip>
+                <Menu
+                  id="user-menu"
+                  anchorEl={userMenu}
+                  open={Boolean(userMenu)}
+                  onClose={handleUserMenuClose}
+                >
+                  <MenuItem key="profile" onClick={handleGoToProfilePage}>
+                    Profile
+                  </MenuItem>
+                  <MenuItem key="password" onClick={handleGoToChangePasswordPage}>
+                    Change Password
+                  </MenuItem>
+                  <MenuItem key="signout" onClick={handleSignOut}>
+                    Sign Out
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Button color="primary" variant="contained" onClick={handleGoToSigninPage}>
+                Sign In
+              </Button>
+            )}
+
             <Hidden mdUp>
               <IconButton color="primary" aria-label="Open Menu" onClick={handleDrawerOpen}>
                 <MenuOutlinedIcon />
