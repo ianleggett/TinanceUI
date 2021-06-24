@@ -3,7 +3,7 @@
 declare namespace User {
   interface Model {
     id: number;
-    avatar: string;
     username: string;
+    avatar: string;
   }
 }

@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) => {
   return createStyles({
     root: {
       flex: '0 0 64px',
+      background: theme.palette.background.paper,
     },
     toolbar: {
       display: 'flex',

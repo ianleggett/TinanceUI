@@ -49,7 +49,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = (props) => 
     <LayoutStateContext.Provider value={state}>
       <LayoutDispatchContext.Provider value={dispatch}>
         <GlobalHeader title={title} logo={logo} maxWidth={maxWidth} />
-        <Container component="main" maxWidth={maxWidth} style={{ flex: 1 }} disableGutters>
+        <Container component="main" maxWidth={maxWidth} style={{ flex: 1 }}>
           {children}
         </Container>
         <GlobalFooter

@@ -1,6 +1,7 @@
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { useRequest } from 'ahooks';
@@ -16,9 +17,12 @@ import { saveProfile, saveToken } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    margin: '64px 0',
+    padding: '32px 16px',
+  },
+  form: {
     'display': 'flex',
     'flexDirection': 'column',
-    'padding': '64px 16px',
     '& > * + *': {
       marginTop: theme.spacing(2),
     },
@@ -120,53 +124,55 @@ const SignInPage: React.FC = () => {
   }, [history]);
 
   return (
-    <Container maxWidth="xs" disableGutters>
-      <form onSubmit={handleSubmit} className={classes.root}>
-        <TextField
-          id="username"
-          name="username"
-          label="Username"
-          variant="outlined"
-          disabled={loading}
-          autoComplete="username"
-          value={formik.values.username}
-          onChange={formik.handleChange}
-          error={formik.touched.username && Boolean(formik.errors.username)}
-          helperText={formik.touched.username && formik.errors.username}
-          fullWidth
-        />
-        <TextField
-          id="password"
-          name="password"
-          label="Password"
-          variant="outlined"
-          type="password"
-          disabled={loading}
-          autoComplete="current-password"
-          value={formik.values.password}
-          onChange={formik.handleChange}
-          error={formik.touched.password && Boolean(formik.errors.password)}
-          helperText={formik.touched.password && formik.errors.password}
-          fullWidth
-        />
-        <Button
-          type="submit"
-          color="primary"
-          variant="contained"
-          size="large"
-          className={classes.submit}
-        >
-          {loading ? 'Signing In...' : 'Sign In'}
-        </Button>
-        <Box display="flex" justifyContent="space-between" className={classes.links}>
-          <Button variant="text" color="primary" onClick={handleGoToForgotPasswordPage}>
-            Forgot Password?
+    <Container maxWidth="sm" disableGutters>
+      <Paper className={classes.root}>
+        <form onSubmit={handleSubmit} className={classes.form}>
+          <TextField
+            id="username"
+            name="username"
+            label="Username"
+            variant="outlined"
+            disabled={loading}
+            autoComplete="username"
+            value={formik.values.username}
+            onChange={formik.handleChange}
+            error={formik.touched.username && Boolean(formik.errors.username)}
+            helperText={formik.touched.username && formik.errors.username}
+            fullWidth
+          />
+          <TextField
+            id="password"
+            name="password"
+            label="Password"
+            variant="outlined"
+            type="password"
+            disabled={loading}
+            autoComplete="current-password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            error={formik.touched.password && Boolean(formik.errors.password)}
+            helperText={formik.touched.password && formik.errors.password}
+            fullWidth
+          />
+          <Button
+            type="submit"
+            color="primary"
+            variant="contained"
+            size="large"
+            className={classes.submit}
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
           </Button>
-          <Button variant="text" color="primary" onClick={handleGoToSignUpPage}>
-            Need an account? Sign up!
-          </Button>
-        </Box>
-      </form>
+          <Box display="flex" justifyContent="space-between" className={classes.links}>
+            <Button variant="text" color="primary" onClick={handleGoToForgotPasswordPage}>
+              Forgot Password?
+            </Button>
+            <Button variant="text" color="primary" onClick={handleGoToSignUpPage}>
+              Need an account? Sign up!
+            </Button>
+          </Box>
+        </form>
+      </Paper>
     </Container>
   );
 };
