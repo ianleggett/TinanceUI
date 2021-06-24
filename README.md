@@ -29,7 +29,7 @@ In summary, ```bundle.js``` contains:
 
 The REST API can be interactively browsed (Swagger) at 
 ```javascript
-https://tinance.techiaz.com/swagger-ui.html
+https://tinance.techiaz.com/swagger-ui/
 ```
 
 ## Public functions
