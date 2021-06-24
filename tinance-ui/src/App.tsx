@@ -15,6 +15,7 @@ import MarketListPage from './pages/MarketList';
 import OfferDetailPage from './pages/OfferDetail';
 import OfferFormPage from './pages/OfferForm';
 import OfferListPage from './pages/OfferList';
+import ResetPasswordPage from './pages/ResetPassword';
 import SignInPage from './pages/SignIn';
 import SignUpPage from './pages/SignUp';
 import TradeDetailPage from './pages/TradeDetail';
@@ -34,8 +35,9 @@ const App: React.FC = () => {
                   <Route path="/signin" component={SignInPage} exact />
                   <Route path="/signup" component={SignUpPage} exact />
                   <Route path="/forgot-password" component={ForgotPasswordPage} exact />
+                  <Route path="/reset-password" component={ResetPasswordPage} exact />
                   <Route path="/faq" component={FaqPage} exact />
-                  <PrivateRoute path="/markets" component={MarketListPage} exact />
+                  <Route path="/markets" component={MarketListPage} exact />
                   <PrivateRoute path="/offers" component={OfferListPage} exact />
                   <PrivateRoute path="/offers/create" component={OfferFormPage} exact />
                   <PrivateRoute path="/offers/:id" component={OfferDetailPage} exact />

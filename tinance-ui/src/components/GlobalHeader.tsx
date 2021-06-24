@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => {
     },
     drawer: {
       '& .MuiDrawer-paperAnchorLeft': {
-        width: '38vw',
+        width: '62vw',
       },
     },
     buttons: {
