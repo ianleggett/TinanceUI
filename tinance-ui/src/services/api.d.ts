@@ -4,7 +4,12 @@ declare namespace API {
     password: string;
   }
 
-  type SignInResponse = string;
+  type SignInResponse = {
+    token: string;
+    // TODO: replace with User.Model?
+    // profile: User.Model;
+    username: string;
+  };
 
   interface SignOutResponse {
     statusCode: number;

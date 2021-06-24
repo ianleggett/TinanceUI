@@ -1,13 +1,13 @@
 .DS_Store
 
 # dependencies
-node_modules
+node_modules/
 
 # production
 tinance-ui/build/
 
 # testing
-tinance-ui/coverage
+tinance-ui/coverage/
 
 # dotenv
 .env*

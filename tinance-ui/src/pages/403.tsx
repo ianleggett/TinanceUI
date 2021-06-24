@@ -1,5 +1,3 @@
-import React from 'react';
-
 const ForbiddenPage: React.FC = () => {
   return <div>403 Forbidden Page</div>;
 };
