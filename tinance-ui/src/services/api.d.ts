@@ -4,14 +4,18 @@ declare namespace API {
     password: string;
   }
 
-  type SignInResponse = {
+  interface ErrorResponse {
+    errorMessage?: string;
+  }
+
+  interface SignInResponse extends ErrorResponse {
     token: string;
     // TODO: replace with User.Model?
     // profile: User.Model;
     username: string;
-  };
+  }
 
-  interface SignOutResponse {
+  interface SignOutResponse extends ErrorResponse {
     statusCode: number;
     msg: 'string';
   }

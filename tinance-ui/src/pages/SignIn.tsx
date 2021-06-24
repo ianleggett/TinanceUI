@@ -1,5 +1,7 @@
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { useRequest } from 'ahooks';
@@ -15,9 +17,12 @@ import { saveProfile, saveToken } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    margin: '64px 0',
+    padding: '32px 16px',
+  },
+  form: {
     'display': 'flex',
     'flexDirection': 'column',
-    'padding': '64px 16px',
     '& > * + *': {
       marginTop: theme.spacing(2),
     },
@@ -36,14 +41,8 @@ const initialValues = {
 };
 
 const validationSchema = yup.object({
-  username: yup
-    .string()
-    .max(16, 'Username should be of maximum 16 characters length')
-    .required('Username is required'),
-  password: yup
-    .string()
-    .min(8, 'Password should be of minimum 8 characters length')
-    .required('Password is required'),
+  username: yup.string().required('Username is required'),
+  password: yup.string().required('Password is required'),
 });
 
 const SignInPage: React.FC = () => {
@@ -55,7 +54,14 @@ const SignInPage: React.FC = () => {
   const { run: signin, loading } = useRequest(SignInService, {
     onSuccess(res) {
       const { token, username } = res;
-      const redirectUrl = new URLSearchParams(window.location.search).get('from');
+
+      if (!token) {
+        enqueueSnackbar(res.errorMessage || 'Sign in failed', {
+          variant: 'warning',
+        });
+
+        return;
+      }
 
       // TODO: User object (instead of username) after sign in successful?
       const user = {
@@ -75,6 +81,8 @@ const SignInPage: React.FC = () => {
       enqueueSnackbar('Sign in successful', {
         variant: 'success',
       });
+
+      const redirectUrl = new URLSearchParams(window.location.search).get('from');
 
       if (redirectUrl && redirectUrl.startsWith('/') && redirectUrl !== '/signin') {
         history.replace(redirectUrl);
@@ -116,52 +124,56 @@ const SignInPage: React.FC = () => {
   }, [history]);
 
   return (
-    <form onSubmit={handleSubmit} className={classes.root}>
-      <TextField
-        id="username"
-        name="username"
-        label="Username"
-        variant="outlined"
-        disabled={loading}
-        autoComplete="username"
-        value={formik.values.username}
-        onChange={formik.handleChange}
-        error={formik.touched.username && Boolean(formik.errors.username)}
-        helperText={formik.touched.username && formik.errors.username}
-        fullWidth
-      />
-      <TextField
-        id="password"
-        name="password"
-        label="Password"
-        variant="outlined"
-        type="password"
-        disabled={loading}
-        autoComplete="current-password"
-        value={formik.values.password}
-        onChange={formik.handleChange}
-        error={formik.touched.password && Boolean(formik.errors.password)}
-        helperText={formik.touched.password && formik.errors.password}
-        fullWidth
-      />
-      <Button
-        type="submit"
-        color="primary"
-        variant="contained"
-        size="large"
-        className={classes.submit}
-      >
-        {loading ? 'Signing In...' : 'Sign In'}
-      </Button>
-      <Box display="flex" justifyContent="space-between" className={classes.links}>
-        <Button variant="text" color="primary" onClick={handleGoToForgotPasswordPage}>
-          Forgot Password?
-        </Button>
-        <Button variant="text" color="primary" onClick={handleGoToSignUpPage}>
-          Need an account? Sign up!
-        </Button>
-      </Box>
-    </form>
+    <Container maxWidth="sm" disableGutters>
+      <Paper className={classes.root}>
+        <form onSubmit={handleSubmit} className={classes.form}>
+          <TextField
+            id="username"
+            name="username"
+            label="Username"
+            variant="outlined"
+            disabled={loading}
+            autoComplete="username"
+            value={formik.values.username}
+            onChange={formik.handleChange}
+            error={formik.touched.username && Boolean(formik.errors.username)}
+            helperText={formik.touched.username && formik.errors.username}
+            fullWidth
+          />
+          <TextField
+            id="password"
+            name="password"
+            label="Password"
+            variant="outlined"
+            type="password"
+            disabled={loading}
+            autoComplete="current-password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            error={formik.touched.password && Boolean(formik.errors.password)}
+            helperText={formik.touched.password && formik.errors.password}
+            fullWidth
+          />
+          <Button
+            type="submit"
+            color="primary"
+            variant="contained"
+            size="large"
+            className={classes.submit}
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
+          </Button>
+          <Box display="flex" justifyContent="space-between" className={classes.links}>
+            <Button variant="text" color="primary" onClick={handleGoToForgotPasswordPage}>
+              Forgot Password?
+            </Button>
+            <Button variant="text" color="primary" onClick={handleGoToSignUpPage}>
+              Need an account? Sign up!
+            </Button>
+          </Box>
+        </form>
+      </Paper>
+    </Container>
   );
 };
 
