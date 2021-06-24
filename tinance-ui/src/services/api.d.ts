@@ -1,5 +1,3 @@
-import { string } from 'yup/lib/locale';
-
 declare namespace API {
   interface SignInParams {
     username: string;
