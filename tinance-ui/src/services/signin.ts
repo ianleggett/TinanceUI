@@ -1,4 +1,4 @@
-import request from 'umi-request';
+import { request } from '../utils';
 
 /**
  * Sign in service.
@@ -8,12 +8,12 @@ import request from 'umi-request';
  */
 export async function SignInService(params: API.SignInParams): Promise<API.SignInResponse> {
   try {
-    const token = await request<API.SignInResponse>('/auth/signin', {
+    const res = await request<API.SignInResponse>('/auth/signin', {
       method: 'POST',
       data: params,
     });
 
-    return token;
+    return res;
   } catch (error) {
     throw new Error(error.message || 'Sign in failed.');
   }

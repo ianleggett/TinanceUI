@@ -1,11 +1,8 @@
-import request from 'umi-request';
-
-import { getToken } from '../utils';
+import { getToken, request } from '../utils';
 
 /**
  * Sign out service.
  *
- * @param params - Parmas of sign out service.
  * @returns Response of sign out service.
  */
 export async function SignOutService(): Promise<API.SignOutResponse> {
