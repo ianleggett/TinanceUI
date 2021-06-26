@@ -1,9 +1,16 @@
+import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { UseRequestProvider } from 'ahooks';
 import { SnackbarProvider } from 'notistack';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
-import { AppContextProvider, HomeRoute, PrivateRoute, UserContextProvider } from './components';
+import {
+  AccessControlRoute,
+  AppConfigProvider,
+  HomeRoute,
+  UserManagerConsumer,
+  UserManagerProvider,
+} from './components';
 import { theme } from './constants';
 import ForbiddenPage from './pages/403';
 import NotFoundPage from './pages/404';
@@ -21,35 +28,84 @@ import SignUpPage from './pages/SignUp';
 import TradeDetailPage from './pages/TradeDetail';
 import TradeListPage from './pages/TradeList';
 import UserProfilePage from './pages/UserProfile';
+import { SnackbarUtilsConfigurator } from './utils';
 
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <SnackbarProvider>
+        <SnackbarUtilsConfigurator />
         <UseRequestProvider value={{ manual: true }}>
           <BrowserRouter basename={process.env.PUBLIC_URL}>
-            <UserContextProvider>
-              <AppContextProvider>
-                <Switch>
-                  <HomeRoute path="/" component={HomePage} authedComponent={TradeListPage} exact />
-                  <Route path="/signin" component={SignInPage} exact />
-                  <Route path="/signup" component={SignUpPage} exact />
-                  <Route path="/forgot-password" component={ForgotPasswordPage} exact />
-                  <Route path="/reset-password" component={ResetPasswordPage} exact />
-                  <Route path="/faq" component={FaqPage} exact />
-                  <Route path="/markets" component={MarketListPage} exact />
-                  <PrivateRoute path="/offers" component={OfferListPage} exact />
-                  <PrivateRoute path="/offers/create" component={OfferFormPage} exact />
-                  <PrivateRoute path="/offers/:id" component={OfferDetailPage} exact />
-                  <PrivateRoute path="/trades" component={TradeListPage} exact />
-                  <PrivateRoute path="/trades/:id" component={TradeDetailPage} exact />
-                  <PrivateRoute path="/account/profile" component={UserProfilePage} exact />
-                  <PrivateRoute path="/account/password" component={ChangePasswordPage} exact />
-                  <Route path="/403" component={ForbiddenPage} exact />
-                  <Route path="*" component={NotFoundPage} />
-                </Switch>
-              </AppContextProvider>
-            </UserContextProvider>
+            <UserManagerProvider>
+              <AppConfigProvider>
+                <UserManagerConsumer>
+                  {({ isLoggedIn }) => (
+                    <Switch>
+                      <HomeRoute
+                        path="/"
+                        component={HomePage}
+                        authedComponent={TradeListPage}
+                        exact
+                      />
+                      <Route path="/signin" component={SignInPage} exact />
+                      <Route path="/signup" component={SignUpPage} exact />
+                      <Route path="/forgot-password" component={ForgotPasswordPage} exact />
+                      <Route path="/reset-password" component={ResetPasswordPage} exact />
+                      <Route path="/faq" component={FaqPage} exact />
+                      <Route path="/markets" component={MarketListPage} exact />
+
+                      <AccessControlRoute
+                        path="/offers"
+                        component={OfferListPage}
+                        isLoggedIn={isLoggedIn}
+                        exact
+                      />
+                      <AccessControlRoute
+                        path="/offers/create"
+                        component={OfferFormPage}
+                        isLoggedIn={isLoggedIn}
+                        exact
+                      />
+                      <AccessControlRoute
+                        path="/offers/:id"
+                        component={OfferDetailPage}
+                        isLoggedIn={isLoggedIn}
+                        exact
+                      />
+                      <AccessControlRoute
+                        path="/trades"
+                        component={TradeListPage}
+                        isLoggedIn={isLoggedIn}
+                        exact
+                      />
+                      <AccessControlRoute
+                        path="/trades/:id"
+                        component={TradeDetailPage}
+                        isLoggedIn={isLoggedIn}
+                        exact
+                      />
+                      <AccessControlRoute
+                        path="/account/profile"
+                        component={UserProfilePage}
+                        isLoggedIn={isLoggedIn}
+                        exact
+                      />
+                      <AccessControlRoute
+                        path="/account/password"
+                        component={ChangePasswordPage}
+                        isLoggedIn={isLoggedIn}
+                        exact
+                      />
+
+                      <Route path="/403" component={ForbiddenPage} exact />
+                      <Route path="*" component={NotFoundPage} />
+                    </Switch>
+                  )}
+                </UserManagerConsumer>
+              </AppConfigProvider>
+            </UserManagerProvider>
           </BrowserRouter>
         </UseRequestProvider>
       </SnackbarProvider>

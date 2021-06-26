@@ -28,7 +28,7 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { SignOutService } from '../services';
 import { clearProfile, clearToken } from '../utils';
-import { useUserContext } from './UserContext';
+import { useUserManager } from './UserManager';
 
 const useStyles = makeStyles((theme) => {
   return createStyles({
@@ -75,7 +75,6 @@ const useStyles = makeStyles((theme) => {
     avatar: {
       width: theme.spacing(3),
       height: theme.spacing(3),
-      border: `1px solid ${theme.palette.divider}`,
     },
   });
 });
@@ -97,7 +96,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const classes = useStyles();
   const history = useHistory();
   const { pathname } = useLocation();
-  const [{ profile }, dispatch] = useUserContext();
+  const [{ profile }, dispatch] = useUserManager();
   const { enqueueSnackbar } = useSnackbar();
   const [showDrawer, setShowDrawer] = useState(false);
   const [userMenu, setUserMenu] = useState<HTMLButtonElement | null>(null);
@@ -160,10 +159,13 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
     setUserMenu(null);
 
     signout();
-    dispatch({ type: 'clearUserInfo' });
+    dispatch({
+      type: 'clearUserInfo',
+    });
 
     clearToken();
     clearProfile();
+
     history.replace('/');
   }, [dispatch, history, signout]);
 
@@ -251,13 +253,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
                     color="inherit"
                     aria-haspopup="true"
                     aria-owns="user-menu"
-                    startIcon={
-                      <Avatar
-                        alt={profile.username}
-                        src={profile.avatar}
-                        className={classes.avatar}
-                      />
-                    }
+                    startIcon={<Avatar alt={profile.username} className={classes.avatar} />}
                     endIcon={<ExpandMoreOutlinedIcon />}
                     onClick={handleUserMenuOpen}
                   >

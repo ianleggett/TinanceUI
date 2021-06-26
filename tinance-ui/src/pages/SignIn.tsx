@@ -11,9 +11,10 @@ import { useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
-import { useUserDispatch } from '../components';
+import { useUserManagerDispatch } from '../components';
 import { SignInService } from '../services';
-import { saveProfile, saveToken } from '../utils';
+import { GetUserDetailsService } from '../services/get-user-details';
+import { clearProfile, clearToken, saveProfile, saveToken } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,51 +50,53 @@ const SignInPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
-  const dispatch = useUserDispatch();
+  const dispatch = useUserManagerDispatch();
 
-  const { run: signin, loading } = useRequest(SignInService, {
+  const { run: getUserProfile, loading } = useRequest(GetUserDetailsService, {
     onSuccess(res) {
-      const { token, username } = res;
+      if (res) {
+        saveProfile(res);
+        dispatch({
+          type: 'saveUserInfo',
+          payload: res,
+        });
 
-      if (!token) {
-        enqueueSnackbar(res.errorMessage || 'Sign in failed', {
+        enqueueSnackbar('Sign in successful', {
+          variant: 'success',
+        });
+
+        const redirectUrl = new URLSearchParams(window.location.search).get('from');
+
+        if (redirectUrl && redirectUrl.startsWith('/') && redirectUrl !== '/signin') {
+          history.replace(redirectUrl);
+        } else {
+          history.replace('/');
+        }
+      } else {
+        clearToken();
+        clearProfile();
+
+        enqueueSnackbar('Get user profile failed', {
           variant: 'warning',
         });
 
-        return;
-      }
-
-      // TODO: User object (instead of username) after sign in successful?
-      const user = {
-        id: 1,
-        username,
-        avatar: 'https://material-ui.com/static/images/avatar/3.jpg',
-      };
-
-      saveToken(token);
-      saveProfile(user);
-
-      dispatch({
-        type: 'saveUserInfo',
-        payload: user,
-      });
-
-      enqueueSnackbar('Sign in successful', {
-        variant: 'success',
-      });
-
-      const redirectUrl = new URLSearchParams(window.location.search).get('from');
-
-      if (redirectUrl && redirectUrl.startsWith('/') && redirectUrl !== '/signin') {
-        history.replace(redirectUrl);
-      } else {
         history.replace('/');
       }
     },
-    onError(error) {
-      enqueueSnackbar(error.message || 'Sign in failed', {
-        variant: 'warning',
-      });
+  });
+
+  const { run: signin, loading: signing } = useRequest(SignInService, {
+    onSuccess(res) {
+      const { token } = res;
+
+      if (token) {
+        saveToken(token);
+        getUserProfile();
+      } else {
+        enqueueSnackbar(res.message || 'Sign in failed', {
+          variant: 'warning',
+        });
+      }
     },
   });
 
@@ -132,7 +135,7 @@ const SignInPage: React.FC = () => {
             name="username"
             label="Username"
             variant="outlined"
-            disabled={loading}
+            disabled={signing || loading}
             autoComplete="username"
             value={formik.values.username}
             onChange={formik.handleChange}
@@ -146,7 +149,7 @@ const SignInPage: React.FC = () => {
             label="Password"
             variant="outlined"
             type="password"
-            disabled={loading}
+            disabled={signing || loading}
             autoComplete="current-password"
             value={formik.values.password}
             onChange={formik.handleChange}
@@ -161,7 +164,7 @@ const SignInPage: React.FC = () => {
             size="large"
             className={classes.submit}
           >
-            {loading ? 'Signing In...' : 'Sign In'}
+            {signing || loading ? 'Signing In...' : 'Sign In'}
           </Button>
           <Box display="flex" justifyContent="space-between" className={classes.links}>
             <Button variant="text" color="primary" onClick={handleGoToForgotPasswordPage}>
