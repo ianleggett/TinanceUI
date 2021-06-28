@@ -1,21 +1,6 @@
 /// <reference types="react-scripts" />
 
 declare namespace PublicData {
-  interface PublicProfile {
-    cid: number;
-    blurb: string;
-    username: string;
-    email: string;
-    phone: string;
-    feedback: number;
-    tradecount: number;
-    disable: boolean;
-    verified: boolean;
-    msg_mailshot: boolean;
-    msg_updates: boolean;
-    lastseen: string;
-  }
-
   interface CCYCode {
     id: number;
     name: string;
@@ -36,6 +21,23 @@ declare namespace PublicData {
     field4name: string;
     field5name: string;
   }
+
+  interface UserProfile {
+    cid: number;
+    blurb: string;
+    username: string;
+    email: string;
+    phone: string;
+    feedback: number;
+    tradecount: number;
+    disable: boolean;
+    verified: boolean;
+    msg_mailshot: boolean;
+    msg_updates: boolean;
+    lastseen: string;
+  }
+
+  interface UserTrade extends Reacord<string, any> {}
 }
 
 declare namespace User {
@@ -76,6 +78,16 @@ declare namespace User {
 }
 
 declare namespace Offer {
+  type Status =
+    | 'CREATED'
+    | 'CANCELLED'
+    | 'COMPLETE'
+    | 'DELETED'
+    | 'EDIT'
+    | 'EXPIRED'
+    | 'IN_PROGRESS'
+    | 'UNKNOWN';
+
   interface Model {
     id: number;
     buyer: boolean;
@@ -104,7 +116,7 @@ declare namespace Offer {
       updated: number;
       usernotes: string;
     };
-    procStatus: 'IN_PROGRESS';
+    procStatus: Status;
     remainCryptoAmt: number;
     updated: number;
     userId: number;
@@ -137,18 +149,30 @@ declare namespace API {
     msg: 'string';
   }
 
+  interface GetUserTradesParams {
+    uid: number;
+  }
+
   type GetUserDetailsResponse = User.Model;
-  type GetProfilePublicResponse = PublicData.PublicProfile;
   type GetCCYCodesResponse = PublicData.CCYCode[];
   type GetPaymentTypesResponse = PublicData.PaymentType[];
+  type GetProfilePublicResponse = PublicData.UserProfile;
+  type GetUserTradesResponse = PublicData.UserTrade[];
 
-  // TODO: I don't know the name and type of qs.
   interface GetAllOffersParams {
-    crypto?: number;
-    fiat?: number;
-    volume?: number;
-    payment?: number;
+    buy?: boolean;
+    sell?: boolean;
+    fromccyid?: number;
+    toccyid?: number;
+    payTypes?: number[];
+    status?: Offer.Status[];
+    fromamt?: number;
+  }
+
+  interface GetMyOffersParams extends GetAllOffersParams {
+    keyword?: string;
   }
 
   type GetAllOffersResponse = Offer.Model[];
+  type GetMyOffersResponse = Offer.Model[];
 }
