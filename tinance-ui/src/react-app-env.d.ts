@@ -115,7 +115,7 @@ declare namespace Offer {
       timesUsed: number;
       updated: number;
       usernotes: string;
-    };
+    }[];
     procStatus: Status;
     remainCryptoAmt: number;
     updated: number;
@@ -150,6 +150,10 @@ declare namespace API {
   }
 
   interface GetUserTradesParams {
+    uid: number;
+  }
+
+  interface GetProfilePublicParams {
     uid: number;
   }
 

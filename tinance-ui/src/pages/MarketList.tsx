@@ -1,16 +1,21 @@
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Divider from '@material-ui/core/Divider';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
 import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -33,8 +38,29 @@ const useStyles = makeStyles((theme) => ({
     padding: 32,
     marginBottom: 16,
   },
-  trade: {
-    marginTop: 16,
+  dashed: {
+    borderStyle: 'dashed',
+  },
+  title: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  divider: {
+    marginTop: 24,
+    marginBottom: 16,
+  },
+  values: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  arrow: {
+    marginLeft: 8,
+    marginRight: 8,
+    pointerEvents: 'none',
   },
 }));
 
@@ -47,7 +73,7 @@ const initialValues = {
 
 const MarketListPage: React.FC = () => {
   const classes = useStyles();
-  const { ccyCodes, paymentTypes } = useAppConfigState();
+  const { ccyCodes, paymentTypes, publicProfile } = useAppConfigState();
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
@@ -80,13 +106,17 @@ const MarketListPage: React.FC = () => {
       run({
         buy: isBuy,
         sell: !isBuy,
+        fromamt: fromamt || undefined,
         fromccyid: fromccyid || undefined,
         toccyid: toccyid || undefined,
         payTypes: payTypes === 0 ? undefined : [payTypes],
       });
     },
     onReset() {
-      run({ buy: true, sell: false });
+      run({
+        buy: true,
+        sell: false,
+      });
     },
   });
 
@@ -247,66 +277,106 @@ const MarketListPage: React.FC = () => {
       <Grid item xs={12} sm={12} md={9} lg={9} xl={9}>
         {loading ? (
           <Paper className={classes.card}>
+            <Grid xs={12} sm={12} md={12} lg={12} xl={12} className={classes.title} item>
+              <Skeleton variant="rect" width={240} height={32} />
+            </Grid>
+            <Grid xs={12} sm={12} md={12} lg={12} xl={12} item className={classes.values}>
+              <Skeleton variant="rect" width={240} height={56} />
+              <Skeleton variant="rect" width={24} height={24} className={classes.arrow} />
+              <Skeleton variant="rect" width={240} height={56} />
+            </Grid>
+            <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+              <Divider className={classes.divider} />
+            </Grid>
             <Grid container spacing={1}>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+              {[1, 2, 3, 4].map((item) => (
                 <Grid key={item} xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Skeleton variant="text" width={50} />
-                  <Skeleton variant="rect" width={100} style={{ marginTop: 4 }} />
+                  <Skeleton variant="rect" width={100} style={{ marginTop: 6 }} />
                 </Grid>
               ))}
+              <Grid xs={false} sm={false} md={10} lg={10} xl={10} item />
+              <Grid xs={12} sm={12} md={2} lg={2} xl={2} item>
+                <Skeleton variant="rect" height={36} width="100%" />
+              </Grid>
             </Grid>
           </Paper>
         ) : (
           offers.map((offer) => (
             <Paper key={offer.id} className={classes.card}>
               <Grid container spacing={1}>
-                <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
-                  <Typography color="textSecondary" variant="overline">
-                    Crypto
+                <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                  <Typography variant="h5" color="primary" className={classes.title}>
+                    {offer.fromccy.name} / {offer.toccy.name}
                   </Typography>
-                  <Typography color="primary">{offer.fromccy.name}</Typography>
                 </Grid>
-                <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
-                  <Typography color="textSecondary" variant="overline">
-                    Fiat
-                  </Typography>
-                  <Typography color="primary">{offer.toccy.name}</Typography>
+                <Grid xs={12} sm={12} md={12} lg={12} xl={12} item className={classes.values}>
+                  <TextField
+                    label="Crypto"
+                    variant="outlined"
+                    value={offer.fromAmount}
+                    InputProps={{
+                      readOnly: true,
+                      endAdornment: (
+                        <InputAdornment position="end">{offer.fromccy.name}</InputAdornment>
+                      ),
+                    }}
+                  />
+                  <IconButton className={classes.arrow}>
+                    <DoubleArrowOutlinedIcon />
+                  </IconButton>
+                  <TextField
+                    label="Fiat"
+                    variant="outlined"
+                    value={offer.toAmount}
+                    InputProps={{
+                      readOnly: true,
+                      endAdornment: (
+                        <InputAdornment position="end">{offer.toccy.name}</InputAdornment>
+                      ),
+                    }}
+                  />
                 </Grid>
-                <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
-                  <Typography color="textSecondary" variant="overline">
-                    Volume
-                  </Typography>
-                  <Typography color="primary">{offer.fromAmount}</Typography>
+                <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                  <Divider className={classes.divider} />
                 </Grid>
-                <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
                     Exchange Rate
                   </Typography>
                   <Typography color="primary">{offer.exchRate}</Typography>
                 </Grid>
-                <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
+                {offer.paymentDetails[0] ? (
+                  <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
+                    <Typography color="textSecondary" variant="overline">
+                      Payment
+                    </Typography>
+                    <Typography color="primary">{offer.paymentDetails[0].payType.name}</Typography>
+                  </Grid>
+                ) : null}
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
                     Trader One
                   </Typography>
-                  <Typography color="primary">1000 trades</Typography>
+                  <Typography color="primary">
+                    {publicProfile ? publicProfile.tradecount : 0} Trades
+                  </Typography>
                 </Grid>
-                <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
                     Rating
                   </Typography>
                   <Box component="div">
-                    <Rating value={2.5} precision={0.5} size="small" readOnly />
+                    <Rating
+                      size="small"
+                      value={publicProfile ? publicProfile.feedback : 0}
+                      readOnly
+                    />
                   </Box>
                 </Grid>
-                <Grid item xs={12} sm={12} md={3} lg={3} xl={3} />
-                <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-                  <Button
-                    color="secondary"
-                    variant="outlined"
-                    size="small"
-                    className={classes.trade}
-                    fullWidth
-                  >
+                <Grid xs={false} sm={false} md={10} lg={10} xl={10} item />
+                <Grid xs={12} sm={12} md={2} lg={2} xl={2} item>
+                  <Button color="secondary" variant="outlined" fullWidth>
                     Trade
                   </Button>
                 </Grid>

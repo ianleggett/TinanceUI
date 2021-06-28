@@ -6,7 +6,7 @@ export const appConfig = {
   terms: 'https://tinance.techiaz.com/terms',
   ccyCodes: [] as PublicData.CCYCode[],
   paymentTypes: [] as PublicData.PaymentType[],
-  userTrades: [] as PublicData.UserTrade[],
+  publicProfile: null as PublicData.UserProfile | null,
 };
 
 export const offerStatusMap: Record<Offer.Status, string> = {

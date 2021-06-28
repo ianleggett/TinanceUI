@@ -4,7 +4,12 @@ import type { Dispatch } from 'react';
 import { createContext, useContext, useReducer } from 'react';
 
 import { appConfig } from '../constants';
-import { GetCCYCodesService, GetPaymentTypesService } from '../services';
+import {
+  GetCCYCodesService,
+  GetPaymentTypesService,
+  GetProfilePublicService,
+  GetUserTradesService,
+} from '../services';
 import { GlobalFooter } from './GlobalFooter';
 import { GlobalHeader } from './GlobalHeader';
 
@@ -43,9 +48,10 @@ const reducer = (state: AppConfigState, action: AppConfigAction): AppConfigState
  * @param dispatch - Util for saving public data to config context.
  */
 async function getAndSavePublicData(dispatch: Dispatch<AppConfigAction>) {
-  const [ccyCodes, paymentTypes] = await Promise.all([
+  const [ccyCodes, paymentTypes, publicProfile] = await Promise.all([
     await GetCCYCodesService(),
     await GetPaymentTypesService(),
+    await GetProfilePublicService({ uid: 1 }),
   ]);
 
   dispatch({
@@ -53,6 +59,7 @@ async function getAndSavePublicData(dispatch: Dispatch<AppConfigAction>) {
     payload: {
       ccyCodes,
       paymentTypes,
+      publicProfile,
     },
   });
 }
