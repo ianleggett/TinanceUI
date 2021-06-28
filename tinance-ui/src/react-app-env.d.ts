@@ -95,7 +95,7 @@ declare namespace Offer {
     created: number;
     custRef: any;
     exchRate: number;
-    expiry: number[];
+    expiry: number;
     feeAmt: number;
     fromAmount: number;
     toAmount: number;
