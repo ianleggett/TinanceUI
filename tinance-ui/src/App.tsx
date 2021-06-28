@@ -41,68 +41,35 @@ const App: React.FC = () => {
             <UserManagerProvider>
               <AppConfigProvider>
                 <UserManagerConsumer>
-                  {({ isLoggedIn }) => (
-                    <Switch>
-                      <HomeRoute
-                        path="/"
-                        component={HomePage}
-                        authedComponent={TradeListPage}
-                        exact
-                      />
-                      <Route path="/signin" component={SignInPage} exact />
-                      <Route path="/signup" component={SignUpPage} exact />
-                      <Route path="/forgot-password" component={ForgotPasswordPage} exact />
-                      <Route path="/reset-password" component={ResetPasswordPage} exact />
-                      <Route path="/faq" component={FaqPage} exact />
-                      <Route path="/markets" component={MarketListPage} exact />
+                  <Switch>
+                    <HomeRoute
+                      path="/"
+                      component={HomePage}
+                      authedComponent={TradeListPage}
+                      exact
+                    />
+                    <Route path="/signin" component={SignInPage} exact />
+                    <Route path="/signup" component={SignUpPage} exact />
+                    <Route path="/forgot-password" component={ForgotPasswordPage} exact />
+                    <Route path="/reset-password" component={ResetPasswordPage} exact />
+                    <Route path="/faq" component={FaqPage} exact />
+                    <Route path="/markets" component={MarketListPage} exact />
 
-                      <AccessControlRoute
-                        path="/offers"
-                        component={OfferListPage}
-                        isLoggedIn={isLoggedIn}
-                        exact
-                      />
-                      <AccessControlRoute
-                        path="/offers/create"
-                        component={OfferFormPage}
-                        isLoggedIn={isLoggedIn}
-                        exact
-                      />
-                      <AccessControlRoute
-                        path="/offers/:id"
-                        component={OfferDetailPage}
-                        isLoggedIn={isLoggedIn}
-                        exact
-                      />
-                      <AccessControlRoute
-                        path="/trades"
-                        component={TradeListPage}
-                        isLoggedIn={isLoggedIn}
-                        exact
-                      />
-                      <AccessControlRoute
-                        path="/trades/:id"
-                        component={TradeDetailPage}
-                        isLoggedIn={isLoggedIn}
-                        exact
-                      />
-                      <AccessControlRoute
-                        path="/account/profile"
-                        component={UserProfilePage}
-                        isLoggedIn={isLoggedIn}
-                        exact
-                      />
-                      <AccessControlRoute
-                        path="/account/password"
-                        component={ChangePasswordPage}
-                        isLoggedIn={isLoggedIn}
-                        exact
-                      />
+                    <AccessControlRoute path="/offers" component={OfferListPage} exact />
+                    <AccessControlRoute path="/offers/create" component={OfferFormPage} exact />
+                    <AccessControlRoute path="/offers/:id" component={OfferDetailPage} exact />
+                    <AccessControlRoute path="/trades" component={TradeListPage} exact />
+                    <AccessControlRoute path="/trades/:id" component={TradeDetailPage} exact />
+                    <AccessControlRoute path="/account/profile" component={UserProfilePage} exact />
+                    <AccessControlRoute
+                      path="/account/password"
+                      component={ChangePasswordPage}
+                      exact
+                    />
 
-                      <Route path="/403" component={ForbiddenPage} exact />
-                      <Route path="*" component={NotFoundPage} />
-                    </Switch>
-                  )}
+                    <Route path="/403" component={ForbiddenPage} exact />
+                    <Route path="*" component={NotFoundPage} />
+                  </Switch>
                 </UserManagerConsumer>
               </AppConfigProvider>
             </UserManagerProvider>

@@ -1,8 +1,8 @@
-import { useMount, useUnmount } from 'ahooks';
+import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import type { Dispatch } from 'react';
-import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
+import { createContext, useContext, useReducer } from 'react';
 
-import { GetUserDetailsService } from '../services/get-user-details';
+import { GetUserDetailsService } from '../services';
 import { clearProfile, getProfile, getToken, saveProfile } from '../utils';
 
 const initialState = {
@@ -50,28 +50,19 @@ const reducer = (state: UserManagerState, action: UserManagerAction): UserManage
 };
 
 /**
- * Get user profile then save it to cache and context.
+ * Request user profile with server data.
  *
  * @param dispatch - Util for saving user profile to context.
  */
-async function getAndSaveUserProfile(dispatch: Dispatch<UserManagerAction>) {
-  const token = getToken();
+async function requestRemoteUserProfile(dispatch: Dispatch<UserManagerAction>) {
+  const profile = await GetUserDetailsService();
 
-  if (token) {
-    let profile = getProfile();
+  saveProfile(profile);
 
-    if (profile === undefined) {
-      profile = await GetUserDetailsService();
-      saveProfile(profile);
-    }
-
-    dispatch({
-      type: 'saveUserInfo',
-      payload: profile,
-    });
-  } else {
-    clearProfile();
-  }
+  dispatch({
+    type: 'saveUserInfo',
+    payload: profile,
+  });
 }
 
 export interface UserManagerProviderProps {
@@ -82,9 +73,28 @@ export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) =
   const { loginRequired, children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  useMount(async () => {
-    await getAndSaveUserProfile(dispatch);
+  useMount(() => {
+    const token = getToken();
+
+    if (token) {
+      const profile = getProfile();
+
+      if (profile !== undefined) {
+        dispatch({
+          type: 'saveUserInfo',
+          payload: profile,
+        });
+      }
+    } else {
+      clearProfile();
+    }
   });
+
+  useUpdateEffect(() => {
+    if (state.isLoggedIn && state.profile === undefined) {
+      requestRemoteUserProfile(dispatch);
+    }
+  }, [state.isLoggedIn]);
 
   useUnmount(() => {
     dispatch({
