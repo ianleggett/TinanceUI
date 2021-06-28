@@ -15,8 +15,9 @@ import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useMount, useRequest } from 'ahooks';
+import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useAppConfigState } from '../components';
 import { GetAllOffersService } from '../services';
@@ -37,18 +38,30 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const initialValues = {
+  fromccyid: 0,
+  toccyid: 0,
+  fromamt: 0,
+  payTypes: 0,
+};
+
 const MarketListPage: React.FC = () => {
   const classes = useStyles();
-  const theme = useTheme();
   const { ccyCodes, paymentTypes } = useAppConfigState();
+
+  const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
   const direction = useMemo(() => (matches ? 'row' : 'column'), [matches]);
-  const [marketType, setMarketType] = useState<'Buy' | 'Sell'>('Buy');
+
+  const [isBuy, setIsBuy] = useState(true);
   const [offers, setOffers] = useState<Offer.Model[]>([]);
 
   /** Options of Crypto and Fiat select */
   const options = useMemo(() => {
-    return groupBy(ccyCodes, 'ccyType');
+    return groupBy(
+      ccyCodes.filter((v) => v.enable),
+      'ccyType',
+    );
   }, [ccyCodes]);
 
   const { run, loading } = useRequest(GetAllOffersService, {
@@ -59,127 +72,175 @@ const MarketListPage: React.FC = () => {
     },
   });
 
+  const formik = useFormik({
+    initialValues,
+    onSubmit(values) {
+      const { fromccyid, toccyid, fromamt, payTypes } = values;
+
+      run({
+        buy: isBuy,
+        sell: !isBuy,
+        fromccyid: fromccyid || undefined,
+        toccyid: toccyid || undefined,
+        payTypes: payTypes === 0 ? undefined : [payTypes],
+      });
+    },
+    onReset() {
+      run({ buy: true, sell: false });
+    },
+  });
+
+  const handleSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      if (!loading) {
+        formik.handleSubmit();
+      }
+    },
+    [formik, loading],
+  );
+
+  const handleReset = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      if (!loading) {
+        formik.resetForm();
+      }
+    },
+    [formik, loading],
+  );
+
   useMount(run);
 
   return (
     <Grid container direction={direction} spacing={2} className={classes.container}>
       <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
         <Paper className={classes.paper}>
-          <Grid container direction="column" spacing={1}>
-            <Grid item xs={12}>
-              <ButtonGroup color="secondary" fullWidth>
-                <Button
-                  onClick={() => setMarketType('Buy')}
-                  variant={marketType === 'Buy' ? 'contained' : 'outlined'}
-                >
-                  Buy
-                </Button>
-                <Button
-                  onClick={() => setMarketType('Sell')}
-                  variant={marketType === 'Sell' ? 'contained' : 'outlined'}
-                >
-                  Sell
-                </Button>
-              </ButtonGroup>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl variant="outlined" margin="normal" fullWidth>
-                <InputLabel id="crypto-select">Crypto</InputLabel>
-                <Select
-                  id="crypto-select"
-                  labelId="crypto-select"
-                  name="crypto-select"
-                  label="Crypto"
-                  value={0}
-                >
-                  <MenuItem value={0}>
-                    <em>Any Crypto</em>
-                  </MenuItem>
-                  {options.Crypto !== undefined
-                    ? options.Crypto.map((crypto) => (
-                        <MenuItem key={crypto.id} value={crypto.id}>
-                          {crypto.name}
-                        </MenuItem>
-                      ))
-                    : null}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl variant="outlined" margin="normal" fullWidth>
-                <InputLabel id="fiat-select">Fiat</InputLabel>
-                <Select
-                  id="fiat-select"
-                  labelId="fiat-select"
-                  name="fiat-select"
-                  label="Fiat"
-                  value={0}
-                >
-                  <MenuItem value={0}>
-                    <em>Any Fiat</em>
-                  </MenuItem>
-                  {options.Fiat !== undefined
-                    ? options.Fiat.map((fiat) => (
-                        <MenuItem key={fiat.id} value={fiat.id}>
-                          {fiat.name}
-                        </MenuItem>
-                      ))
-                    : null}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                id="volume-input"
-                name="volume-input"
-                label="Volume"
-                variant="outlined"
-                placeholder="Volume"
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl variant="outlined" margin="normal" fullWidth>
-                <InputLabel id="payment-select">Payment</InputLabel>
-                <Select
-                  id="payment-select"
-                  labelId="payment-select"
-                  name="payment-select"
-                  label="Payment"
-                  value={0}
-                >
-                  <MenuItem value={0}>
-                    <em>Any Payment</em>
-                  </MenuItem>
-                  {paymentTypes.map((paymentType) => (
-                    <MenuItem key={paymentType.id} value={paymentType.id}>
-                      {paymentType.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container spacing={1}>
-                <Grid item xs={6}>
-                  <Button color="primary" variant="outlined" type="reset" fullWidth>
-                    Reset
+          <form onSubmit={handleSubmit} onReset={handleReset}>
+            <Grid container direction="column" spacing={1}>
+              <Grid item xs={12}>
+                <ButtonGroup size="small" color="secondary" fullWidth>
+                  <Button onClick={() => setIsBuy(true)} variant={isBuy ? 'contained' : 'outlined'}>
+                    Buy
                   </Button>
-                </Grid>
-                <Grid item xs={6}>
                   <Button
-                    color="primary"
-                    variant="contained"
-                    type="submit"
-                    startIcon={<SearchOutlinedIcon />}
-                    fullWidth
+                    onClick={() => setIsBuy(false)}
+                    variant={isBuy ? 'outlined' : 'contained'}
                   >
-                    Search
+                    Sell
                   </Button>
+                </ButtonGroup>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="outlined" margin="dense" fullWidth>
+                  <InputLabel id="fromccyid-select">Crypto</InputLabel>
+                  <Select
+                    id="fromccyid"
+                    name="fromccyid"
+                    labelId="fromccyid-select"
+                    label="Crypto"
+                    value={formik.values.fromccyid}
+                    onChange={formik.handleChange}
+                  >
+                    <MenuItem value={0}>
+                      <em>Any Crypto</em>
+                    </MenuItem>
+                    {options.Crypto !== undefined
+                      ? options.Crypto.map((crypto) => (
+                          <MenuItem key={crypto.id} value={crypto.id}>
+                            {crypto.name}
+                          </MenuItem>
+                        ))
+                      : null}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="outlined" margin="dense" fullWidth>
+                  <InputLabel id="toccyid-select">Fiat</InputLabel>
+                  <Select
+                    id="toccyid"
+                    name="toccyid"
+                    labelId="toccyid-select"
+                    label="Fiat"
+                    value={formik.values.toccyid}
+                    onChange={formik.handleChange}
+                  >
+                    <MenuItem value={0}>
+                      <em>Any Fiat</em>
+                    </MenuItem>
+                    {options.Fiat !== undefined
+                      ? options.Fiat.map((fiat) => (
+                          <MenuItem key={fiat.id} value={fiat.id}>
+                            {fiat.name}
+                          </MenuItem>
+                        ))
+                      : null}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="fromamt"
+                  name="fromamt"
+                  variant="outlined"
+                  type="number"
+                  label="Volume"
+                  placeholder="Volume"
+                  value={formik.values.fromamt}
+                  onChange={formik.handleChange}
+                  margin="dense"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="outlined" margin="dense" fullWidth>
+                  <InputLabel id="paytypes-select">Payment</InputLabel>
+                  <Select
+                    id="payTypes"
+                    name="payTypes"
+                    labelId="paytypes-select"
+                    label="Payment"
+                    value={formik.values.payTypes}
+                    onChange={formik.handleChange}
+                  >
+                    <MenuItem value={0}>
+                      <em>Any Payment</em>
+                    </MenuItem>
+                    {paymentTypes
+                      .filter((v) => v.enabled)
+                      .map((paymentType) => (
+                        <MenuItem key={paymentType.id} value={paymentType.id}>
+                          {paymentType.name}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <Grid container spacing={1}>
+                  <Grid item xs={6}>
+                    <Button color="primary" variant="outlined" type="reset" fullWidth>
+                      Reset
+                    </Button>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      type="submit"
+                      startIcon={<SearchOutlinedIcon />}
+                      fullWidth
+                    >
+                      Search
+                    </Button>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
+          </form>
         </Paper>
       </Grid>
 
@@ -203,25 +264,25 @@ const MarketListPage: React.FC = () => {
                   <Typography color="textSecondary" variant="overline">
                     Crypto
                   </Typography>
-                  <Typography color="primary">USDT</Typography>
+                  <Typography color="primary">{offer.fromccy.name}</Typography>
                 </Grid>
                 <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
                   <Typography color="textSecondary" variant="overline">
                     Fiat
                   </Typography>
-                  <Typography color="primary">VND</Typography>
+                  <Typography color="primary">{offer.toccy.name}</Typography>
                 </Grid>
                 <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
                   <Typography color="textSecondary" variant="overline">
                     Volume
                   </Typography>
-                  <Typography color="primary">10000</Typography>
+                  <Typography color="primary">{offer.fromAmount}</Typography>
                 </Grid>
                 <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
                   <Typography color="textSecondary" variant="overline">
                     Exchange Rate
                   </Typography>
-                  <Typography color="primary">3600</Typography>
+                  <Typography color="primary">{offer.exchRate}</Typography>
                 </Grid>
                 <Grid item xs={6} sm={6} md={3} lg={3} xl={3}>
                   <Typography color="textSecondary" variant="overline">
@@ -233,7 +294,7 @@ const MarketListPage: React.FC = () => {
                   <Typography color="textSecondary" variant="overline">
                     Rating
                   </Typography>
-                  <Box>
+                  <Box component="div">
                     <Rating value={2.5} precision={0.5} size="small" readOnly />
                   </Box>
                 </Grid>
