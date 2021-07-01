@@ -7,7 +7,8 @@ import TextField from '@material-ui/core/TextField';
 import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
@@ -41,16 +42,19 @@ const initialValues = {
   password: '',
 };
 
-const validationSchema = yup.object({
-  username: yup.string().required('Username is required'),
-  password: yup.string().required('Password is required'),
-});
-
 const SignInPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useUserManagerDispatch();
+
+  const validationSchema = useMemo(() => {
+    return yup.object({
+      username: yup.string().required(t('Username is required')),
+      password: yup.string().required(t('Password is required')),
+    });
+  }, [t]);
 
   const { run: getUserProfile, loading } = useRequest(GetUserDetailsService, {
     onSuccess(res) {
@@ -133,7 +137,7 @@ const SignInPage: React.FC = () => {
           <TextField
             id="username"
             name="username"
-            label="Username"
+            label={t('Username')}
             variant="outlined"
             disabled={signing || loading}
             autoComplete="username"
@@ -146,7 +150,7 @@ const SignInPage: React.FC = () => {
           <TextField
             id="password"
             name="password"
-            label="Password"
+            label={t('Password')}
             variant="outlined"
             type="password"
             disabled={signing || loading}
@@ -164,14 +168,14 @@ const SignInPage: React.FC = () => {
             size="large"
             className={classes.submit}
           >
-            {signing || loading ? 'Signing In...' : 'Sign In'}
+            {signing || loading ? t('Signing In...') : t('Sign In')}
           </Button>
           <Box display="flex" justifyContent="space-between" className={classes.links}>
             <Button variant="text" color="primary" onClick={handleGoToForgotPasswordPage}>
-              Forgot Password?
+              {t('Forgot Password?')}
             </Button>
             <Button variant="text" color="primary" onClick={handleGoToSignUpPage}>
-              Need an account? Sign up!
+              {t('Need an account? Sign up!')}
             </Button>
           </Box>
         </form>

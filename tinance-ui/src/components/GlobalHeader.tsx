@@ -24,6 +24,7 @@ import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined';
 import { useRequest } from 'ahooks';
 import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { SignOutService } from '../services';
@@ -95,6 +96,7 @@ type PropsWithDefault = GlobalHeaderProps & DefaultProps;
 export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const classes = useStyles();
   const history = useHistory();
+  const { t } = useTranslation();
   const { pathname } = useLocation();
   const [{ profile }, dispatch] = useUserManager();
   const { enqueueSnackbar } = useSnackbar();
@@ -186,24 +188,24 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
                 color={pathname.startsWith('/markets') ? 'primary' : 'default'}
                 onClick={handleGoToMarketsPage}
               >
-                Markets
+                {t('Markets')}
               </Button>
               <Button
                 variant="text"
                 color={pathname.startsWith('/offers') ? 'primary' : 'default'}
                 onClick={handleGoToOffersPage}
               >
-                Offers
+                {t('Offers')}
               </Button>
               <Button
                 variant="text"
                 color={pathname.startsWith('/trades') ? 'primary' : 'default'}
                 onClick={handleGoToTradesPage}
               >
-                Trades
+                {t('Trades')}
               </Button>
               <Button variant="text" endIcon={<ExpandMoreOutlinedIcon />}>
-                More
+                {t('More')}
               </Button>
             </Box>
           </Hidden>
@@ -248,7 +250,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
           <Box display="flex" alignItems="center" className={classes.buttons}>
             {profile ? (
               <>
-                <Tooltip title="User Center" enterDelay={300}>
+                <Tooltip title={t('User Center') as string} enterDelay={300}>
                   <Button
                     color="inherit"
                     aria-haspopup="true"
@@ -267,19 +269,19 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
                   onClose={handleUserMenuClose}
                 >
                   <MenuItem key="profile" onClick={handleGoToProfilePage}>
-                    Profile
+                    {t('Profile')}
                   </MenuItem>
                   <MenuItem key="password" onClick={handleGoToChangePasswordPage}>
-                    Change Password
+                    {t('Change Password')}
                   </MenuItem>
                   <MenuItem key="signout" onClick={handleSignOut}>
-                    Sign Out
+                    {t('Sign Out')}
                   </MenuItem>
                 </Menu>
               </>
             ) : (
               <Button color="primary" variant="contained" onClick={handleGoToSigninPage}>
-                Sign In
+                {t('Sign In')}
               </Button>
             )}
 

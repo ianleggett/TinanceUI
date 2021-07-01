@@ -8,7 +8,6 @@ import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
 import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -73,7 +72,7 @@ const initialValues = {
 
 const MarketListPage: React.FC = () => {
   const classes = useStyles();
-  const { ccyCodes, paymentTypes, publicProfile } = useAppConfigState();
+  const { ccyCodes, paymentTypes } = useAppConfigState();
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
@@ -358,20 +357,14 @@ const MarketListPage: React.FC = () => {
                   <Typography color="textSecondary" variant="overline">
                     Trader One
                   </Typography>
-                  <Typography color="primary">
-                    {publicProfile ? publicProfile.tradecount : 0} Trades
-                  </Typography>
+                  <Typography color="primary">{offer.userDetails.tradecount} Trades</Typography>
                 </Grid>
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
                     Rating
                   </Typography>
                   <Box component="div">
-                    <Rating
-                      size="small"
-                      value={publicProfile ? publicProfile.feedback : 0}
-                      readOnly
-                    />
+                    <Rating size="small" value={offer.userDetails.feedback} readOnly />
                   </Box>
                 </Grid>
                 <Grid xs={false} sm={false} md={10} lg={10} xl={10} item />

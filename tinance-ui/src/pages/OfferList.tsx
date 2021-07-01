@@ -309,7 +309,11 @@ const OfferListPage: React.FC = () => {
                   <Typography color="textSecondary" variant="overline">
                     Progress
                   </Typography>
-                  <LinearProgress variant="determinate" value={50} className={classes.progress} />
+                  <LinearProgress
+                    variant="determinate"
+                    value={((offer.fromAmount - offer.remainCryptoAmt) / offer.fromAmount) * 100}
+                    className={classes.progress}
+                  />
                 </Grid>
               </Grid>
             </Paper>

@@ -1,12 +1,12 @@
+export type AppLang = 'en-US' | 'zh-CN' | 'zh-TW';
+
 export const appConfig = {
   title: 'Trade Finance',
   logo: '/logo192.png',
+  lang: 'en-US' as AppLang,
   maxWidth: 'lg' as 'lg' | 'xs' | 'sm' | 'md' | 'xl' | false,
-  privacy: 'https://tinance.techiaz.com/privacy',
-  terms: 'https://tinance.techiaz.com/terms',
   ccyCodes: [] as PublicData.CCYCode[],
   paymentTypes: [] as PublicData.PaymentType[],
-  publicProfile: null as PublicData.UserProfile | null,
 };
 
 export const offerStatusMap: Record<Offer.Status, string> = {

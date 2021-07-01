@@ -22,9 +22,11 @@ import MarketListPage from './pages/MarketList';
 import OfferDetailPage from './pages/OfferDetail';
 import OfferFormPage from './pages/OfferForm';
 import OfferListPage from './pages/OfferList';
+import PrivacyPage from './pages/PrivacyPage';
 import ResetPasswordPage from './pages/ResetPassword';
 import SignInPage from './pages/SignIn';
 import SignUpPage from './pages/SignUp';
+import TermsPage from './pages/TermsPage';
 import TradeDetailPage from './pages/TradeDetail';
 import TradeListPage from './pages/TradeList';
 import UserProfilePage from './pages/UserProfile';
@@ -53,6 +55,8 @@ const App: React.FC = () => {
                     <Route path="/forgot-password" component={ForgotPasswordPage} exact />
                     <Route path="/reset-password" component={ResetPasswordPage} exact />
                     <Route path="/faq" component={FaqPage} exact />
+                    <Route path="/privacy" component={PrivacyPage} exact />
+                    <Route path="/terms" component={TermsPage} exact />
                     <Route path="/markets" component={MarketListPage} exact />
 
                     <AccessControlRoute path="/offers" component={OfferListPage} exact />

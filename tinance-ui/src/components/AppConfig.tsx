@@ -1,17 +1,13 @@
 import Container from '@material-ui/core/Container';
 import { useMount } from 'ahooks';
 import type { Dispatch } from 'react';
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, Suspense, useContext, useReducer } from 'react';
 
 import { appConfig } from '../constants';
-import {
-  GetCCYCodesService,
-  GetPaymentTypesService,
-  GetProfilePublicService,
-  GetUserTradesService,
-} from '../services';
+import { GetCCYCodesService, GetPaymentTypesService } from '../services';
 import { GlobalFooter } from './GlobalFooter';
 import { GlobalHeader } from './GlobalHeader';
+import { I18nextProvider } from './I18nextProvider';
 
 const initialState = appConfig;
 
@@ -27,7 +23,7 @@ const reducer = (state: AppConfigState, action: AppConfigAction): AppConfigState
   switch (action.type) {
     case 'update': {
       return {
-        ...initialState,
+        ...state,
         ...action.payload,
       };
     }
@@ -48,10 +44,9 @@ const reducer = (state: AppConfigState, action: AppConfigAction): AppConfigState
  * @param dispatch - Util for saving public data to config context.
  */
 async function getAndSavePublicData(dispatch: Dispatch<AppConfigAction>) {
-  const [ccyCodes, paymentTypes, publicProfile] = await Promise.all([
+  const [ccyCodes, paymentTypes] = await Promise.all([
     await GetCCYCodesService(),
     await GetPaymentTypesService(),
-    await GetProfilePublicService({ uid: 1 }),
   ]);
 
   dispatch({
@@ -59,7 +54,6 @@ async function getAndSavePublicData(dispatch: Dispatch<AppConfigAction>) {
     payload: {
       ccyCodes,
       paymentTypes,
-      publicProfile,
     },
   });
 }
@@ -71,7 +65,7 @@ export interface AppConfigProviderProps extends Partial<AppConfigState> {
 export const AppConfigProvider: React.FC<AppConfigProviderProps> = (props) => {
   const { children, ...restProps } = props;
   const [state, dispatch] = useReducer(reducer, { ...initialState, ...restProps });
-  const { title, logo, maxWidth, privacy, terms } = state;
+  const { title, lang, logo, maxWidth } = state;
 
   useMount(async () => {
     await getAndSavePublicData(dispatch);
@@ -80,17 +74,21 @@ export const AppConfigProvider: React.FC<AppConfigProviderProps> = (props) => {
   return (
     <AppConfigStateContext.Provider value={state}>
       <AppConfigDispatchContext.Provider value={dispatch}>
-        <GlobalHeader title={title} logo={logo} maxWidth={maxWidth} />
-        <Container component="main" maxWidth={maxWidth} style={{ flex: 1 }}>
-          {children}
-        </Container>
-        <GlobalFooter
-          title={title}
-          startYear={2020}
-          maxWidth={maxWidth}
-          privacy={privacy}
-          terms={terms}
-        />
+        <Suspense fallback="Loading...">
+          <I18nextProvider fallbackLng={state.lang} dispatch={dispatch}>
+            <GlobalHeader title={title} logo={logo} maxWidth={maxWidth} />
+            <Container component="main" maxWidth={maxWidth} style={{ flex: 1 }}>
+              {children}
+            </Container>
+            <GlobalFooter
+              title={title}
+              lang={lang}
+              startYear={2020}
+              maxWidth={maxWidth}
+              dispatch={dispatch}
+            />
+          </I18nextProvider>
+        </Suspense>
       </AppConfigDispatchContext.Provider>
     </AppConfigStateContext.Provider>
   );

@@ -119,8 +119,16 @@ declare namespace Offer {
     procStatus: Status;
     remainCryptoAmt: number;
     updated: number;
+    userDetails: {
+      blurb?: string;
+      cid: number;
+      countryISO: string;
+      feedback: number;
+      token?: string;
+      tradecount: number;
+      username: string;
+    };
     userId: number;
-    userName: string;
   }
 }
 
