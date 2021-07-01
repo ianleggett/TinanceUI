@@ -2,6 +2,7 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
@@ -25,9 +26,20 @@ const useStyles = makeStyles((theme) => {
       padding: 16,
       borderTop: `1px solid ${theme.palette.divider}`,
     },
+    left: {
+      textAlign: 'left',
+      lineHeight: '30px',
+      [theme.breakpoints.down('sm')]: {
+        textAlign: 'center',
+      },
+    },
     right: {
       display: 'flex',
       alignItems: 'center',
+      justifyContent: 'flex-end',
+      [theme.breakpoints.down('sm')]: {
+        justifyContent: 'center',
+      },
     },
     divider: {
       margin: '0 8px',
@@ -100,47 +112,51 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = (props) => {
 
   return (
     <Container component="footer" maxWidth={maxWidth} className={classes.root}>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Typography variant="subtitle2">
-          &copy; {years} {title} {t('All rights reserved')}.
-        </Typography>
-        <Box className={classes.right}>
-          <Button variant="text" color="primary" size="small" onClick={handleGoToPrivacyPage}>
-            {t('Privacy Policy')}
-          </Button>
-          <Divider orientation="vertical" className={classes.divider} />
-          <Button variant="text" color="primary" size="small" onClick={handleGoToTermsPage}>
-            {t('Terms & Conditions')}
-          </Button>
-          <Divider orientation="vertical" className={classes.divider} />
-          <Tooltip title={t('Change Language') as string} enterDelay={300}>
-            <Button
-              variant="text"
-              color="primary"
-              size="small"
-              aria-haspopup="true"
-              aria-owns="language-menu"
-              startIcon={<LanguageOutlinedIcon />}
-              onClick={handleLanguageMenuOpen}
-            >
-              {languages[lang]}
+      <Grid container>
+        <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+          <Typography variant="subtitle2" className={classes.left}>
+            &copy; {years} {title} {t('All rights reserved')}.
+          </Typography>
+        </Grid>
+        <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+          <Box className={classes.right}>
+            <Button variant="text" color="primary" size="small" onClick={handleGoToPrivacyPage}>
+              {t('Privacy Policy')}
             </Button>
-          </Tooltip>
-          <Menu
-            keepMounted
-            id="language-menu"
-            anchorEl={languageMenu}
-            open={Boolean(languageMenu)}
-            onClose={handleLanguageMenuClose}
-          >
-            {Object.entries(languages).map(([key, value]) => (
-              <MenuItem key={key} value={key} onClick={() => handleChangeLanguage(key)}>
-                {value}
-              </MenuItem>
-            ))}
-          </Menu>
-        </Box>
-      </Box>
+            <Divider orientation="vertical" className={classes.divider} />
+            <Button variant="text" color="primary" size="small" onClick={handleGoToTermsPage}>
+              {t('Terms & Conditions')}
+            </Button>
+            <Divider orientation="vertical" className={classes.divider} />
+            <Tooltip title={t('Change Language') as string} enterDelay={300}>
+              <Button
+                variant="text"
+                color="primary"
+                size="small"
+                aria-haspopup="true"
+                aria-owns="language-menu"
+                startIcon={<LanguageOutlinedIcon />}
+                onClick={handleLanguageMenuOpen}
+              >
+                {languages[lang]}
+              </Button>
+            </Tooltip>
+            <Menu
+              keepMounted
+              id="language-menu"
+              anchorEl={languageMenu}
+              open={Boolean(languageMenu)}
+              onClose={handleLanguageMenuClose}
+            >
+              {Object.entries(languages).map(([key, value]) => (
+                <MenuItem key={key} value={key} onClick={() => handleChangeLanguage(key)}>
+                  {value}
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
+        </Grid>
+      </Grid>
     </Container>
   );
 };
