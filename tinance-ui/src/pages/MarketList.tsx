@@ -148,9 +148,9 @@ const MarketListPage: React.FC = () => {
       <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
         <Paper className={classes.paper}>
           <form onSubmit={handleSubmit} onReset={handleReset}>
-            <Grid container direction="column" spacing={1}>
+            <Grid container direction="column" spacing={2}>
               <Grid item xs={12}>
-                <ButtonGroup size="small" color="secondary" fullWidth>
+                <ButtonGroup color="secondary" fullWidth>
                   <Button onClick={() => setIsBuy(true)} variant={isBuy ? 'contained' : 'outlined'}>
                     Buy
                   </Button>
@@ -163,7 +163,7 @@ const MarketListPage: React.FC = () => {
                 </ButtonGroup>
               </Grid>
               <Grid item xs={12}>
-                <FormControl variant="outlined" margin="dense" fullWidth>
+                <FormControl variant="outlined" fullWidth>
                   <InputLabel id="fromccyid-select">Crypto</InputLabel>
                   <Select
                     id="fromccyid"
@@ -187,7 +187,7 @@ const MarketListPage: React.FC = () => {
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <FormControl variant="outlined" margin="dense" fullWidth>
+                <FormControl variant="outlined" fullWidth>
                   <InputLabel id="toccyid-select">Fiat</InputLabel>
                   <Select
                     id="toccyid"
@@ -220,12 +220,11 @@ const MarketListPage: React.FC = () => {
                   placeholder="Volume"
                   value={formik.values.fromamt}
                   onChange={formik.handleChange}
-                  margin="dense"
                   fullWidth
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl variant="outlined" margin="dense" fullWidth>
+                <FormControl variant="outlined" fullWidth>
                   <InputLabel id="paytypes-select">Payment</InputLabel>
                   <Select
                     id="payTypes"

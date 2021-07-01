@@ -187,4 +187,22 @@ declare namespace API {
 
   type GetAllOffersResponse = Offer.Model[];
   type GetMyOffersResponse = Offer.Model[];
+
+  interface GetAddUpdateOrderParams {
+    fromccyid: number;
+    fromamt: number;
+    toccyid: number;
+    toamt: number;
+    expiry: string;
+    payDetail?: {
+      payTypeId: number;
+      field1name: string; // Bank Name
+      field2name: string; // Sort Code
+      field3name: string; // Account Number
+      field4name: string; // IBAN
+      field5name: string; // Country
+    };
+  }
+
+  type GetAddUpdateOrderResponse = Offer.Model;
 }
