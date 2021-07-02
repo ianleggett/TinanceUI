@@ -50,7 +50,13 @@ export const I18nextProvider: React.FC<I18nextProviderProps> = (props) => {
       },
     });
 
-    dayjs.locale(i18n.language.startsWith('en') ? 'en' : i18n.language.toLowerCase());
+    if (i18n.language.startsWith('en')) {
+      dayjs.locale('en');
+    } else if (i18n.language.startsWith('vi')) {
+      dayjs.locale('vi');
+    } else {
+      dayjs.locale(i18n.language.toLowerCase());
+    }
   });
 
   return <BaseI18nextProvider i18n={i18n}>{children}</BaseI18nextProvider>;

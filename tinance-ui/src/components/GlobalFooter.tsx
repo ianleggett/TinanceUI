@@ -104,7 +104,15 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = (props) => {
       });
 
       i18n.changeLanguage(key);
-      dayjs.locale(key.startsWith('en') ? 'en' : key.toLowerCase());
+
+      if (key.startsWith('en')) {
+        dayjs.locale('en');
+      } else if (key.startsWith('vi')) {
+        dayjs.locale('vi');
+      } else {
+        dayjs.locale(key.toLowerCase());
+      }
+
       setLanguageMenu(null);
     },
     [dispatch, i18n],

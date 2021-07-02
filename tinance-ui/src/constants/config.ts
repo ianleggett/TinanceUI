@@ -1,7 +1,7 @@
-export type AppLang = 'en-US' | 'zh-CN' | 'zh-TW';
+export type AppLang = 'en-US' | 'zh-CN' | 'zh-TW' | 'vi-VN';
 
 export const appConfig = {
-  title: 'Trade Finance',
+  title: 'Trusted Finance',
   logo: '/logo192.png',
   lang: 'en-US' as AppLang,
   maxWidth: 'lg' as 'lg' | 'xs' | 'sm' | 'md' | 'xl' | false,
