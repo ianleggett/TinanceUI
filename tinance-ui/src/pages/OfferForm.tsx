@@ -227,10 +227,10 @@ const OfferFormPage: React.FC = () => {
                             <MenuItem value={0}>
                               <em>Select Crypto</em>
                             </MenuItem>
-                            {options.Crypto !== undefined
-                              ? options.Crypto.map((crypto) => (
-                                  <MenuItem key={crypto.id} value={crypto.id}>
-                                    {crypto.name}
+                            {options.ERC20 !== undefined
+                              ? options.ERC20.map((erc20) => (
+                                  <MenuItem key={erc20.id} value={erc20.id}>
+                                    {erc20.name}
                                   </MenuItem>
                                 ))
                               : null}
