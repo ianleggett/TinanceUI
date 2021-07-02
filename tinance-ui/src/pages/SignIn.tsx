@@ -15,7 +15,7 @@ import * as yup from 'yup';
 import { useUserManagerDispatch } from '../components';
 import { SignInService } from '../services';
 import { GetUserDetailsService } from '../services/get-user-details';
-import { clearProfile, clearToken, saveProfile, saveToken } from '../utils';
+import { clearProfile, clearToken, saveProfile, saveToken, saveTokenExpiryTime } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -95,6 +95,7 @@ const SignInPage: React.FC = () => {
 
       if (token) {
         saveToken(token);
+        saveTokenExpiryTime(3_600_000); // Token will be expired in 1 hour
         getUserProfile();
       } else {
         enqueueSnackbar(res.message || 'Sign in failed', {

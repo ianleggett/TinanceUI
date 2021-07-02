@@ -1,9 +1,18 @@
 import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
+import { useSnackbar } from 'notistack';
 import type { Dispatch } from 'react';
 import { createContext, useContext, useReducer } from 'react';
 
 import { GetUserDetailsService } from '../services';
-import { clearProfile, getProfile, getToken, saveProfile } from '../utils';
+import {
+  clearProfile,
+  clearToken,
+  clearTokenExpiryTime,
+  getProfile,
+  getToken,
+  getTokenExpiryTime,
+  saveProfile,
+} from '../utils';
 
 const initialState = {
   isLoggedIn: false,
@@ -71,19 +80,34 @@ export interface UserManagerProviderProps {
 
 export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) => {
   const { loginRequired, children } = props;
+  const { enqueueSnackbar } = useSnackbar();
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useMount(() => {
     const token = getToken();
 
     if (token) {
-      const profile = getProfile();
+      const expiryTime = getTokenExpiryTime();
 
-      if (profile !== undefined) {
-        dispatch({
-          type: 'saveUserInfo',
-          payload: profile,
+      if (expiryTime <= Date.now()) {
+        clearToken();
+        clearTokenExpiryTime();
+        clearProfile();
+        enqueueSnackbar('Access token is expired, please signin', {
+          variant: 'warning',
         });
+        setTimeout(() => {
+          window.location.href = '/signin';
+        }, 3000);
+      } else {
+        const profile = getProfile();
+
+        if (profile !== undefined) {
+          dispatch({
+            type: 'saveUserInfo',
+            payload: profile,
+          });
+        }
       }
     } else {
       clearProfile();
