@@ -8,3 +8,4 @@ export * from './get-user-details';
 export * from './get-user-trades';
 export * from './signin';
 export * from './signout';
+export * from './signup';

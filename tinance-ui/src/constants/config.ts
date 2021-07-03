@@ -20,4 +20,23 @@ export const offerStatusMap: Record<Offer.Status, string> = {
   UNKNOWN: 'Unknown',
 };
 
+export const countryCodes = {
+  US: {
+    name: 'United States',
+    code: '001',
+  },
+  UK: {
+    name: 'United Kingdom',
+    code: '044',
+  },
+  VN: {
+    name: 'Vietnam',
+    code: '084',
+  },
+  CN: {
+    name: 'China',
+    code: '086',
+  },
+};
+
 export type AppConfig = typeof appConfig;

@@ -154,7 +154,26 @@ declare namespace API {
 
   interface SignOutResponse {
     statusCode: number;
-    msg: 'string';
+    msg: string;
+  }
+
+  interface SignUpParams {
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    countryISO: string;
+    phone: string;
+    password: string;
+    country: string;
+    bank?: string;
+    bankAccountNumber?: string;
+    bankBranchNumber?: string;
+  }
+
+  interface SignUpResponse {
+    statusCode: number;
+    msg: string;
   }
 
   interface GetUserTradesParams {

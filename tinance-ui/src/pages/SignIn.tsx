@@ -4,6 +4,7 @@ import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
@@ -21,6 +22,10 @@ const useStyles = makeStyles((theme) => ({
   root: {
     margin: '64px 0',
     padding: '32px 16px',
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: 32,
   },
   form: {
     'display': 'flex',
@@ -65,7 +70,7 @@ const SignInPage: React.FC = () => {
           payload: res,
         });
 
-        enqueueSnackbar('Sign in successful', {
+        enqueueSnackbar(t('Sign in successful'), {
           variant: 'success',
         });
 
@@ -80,7 +85,7 @@ const SignInPage: React.FC = () => {
         clearToken();
         clearProfile();
 
-        enqueueSnackbar('Get user profile failed', {
+        enqueueSnackbar(t('Get user profile failed'), {
           variant: 'warning',
         });
 
@@ -98,7 +103,7 @@ const SignInPage: React.FC = () => {
         saveTokenExpiryTime(3_600_000); // Token will be expired in 1 hour
         getUserProfile();
       } else {
-        enqueueSnackbar(res.message || 'Sign in failed', {
+        enqueueSnackbar(res.message || t('Sign in failed'), {
           variant: 'warning',
         });
       }
@@ -134,6 +139,9 @@ const SignInPage: React.FC = () => {
   return (
     <Container maxWidth="sm" disableGutters>
       <Paper className={classes.root}>
+        <Typography component="h2" variant="h3" color="primary" className={classes.title}>
+          {t('Sign In')}
+        </Typography>
         <form onSubmit={handleSubmit} className={classes.form}>
           <TextField
             id="username"

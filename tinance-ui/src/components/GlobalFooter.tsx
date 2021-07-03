@@ -122,7 +122,7 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = (props) => {
     <Container component="footer" maxWidth={maxWidth} className={classes.root}>
       <Grid container>
         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-          <Typography variant="subtitle2" className={classes.left}>
+          <Typography component="p" variant="subtitle2" className={classes.left}>
             &copy; {years} {title} {t('All rights reserved')}.
           </Typography>
         </Grid>

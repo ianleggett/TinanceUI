@@ -25,7 +25,7 @@ export const AccessControlRoute: React.FC<AccessControlRouteProps> = (props) => 
         path={path}
         to={{
           pathname: loginUrl,
-          search: `redirect=${pathname}`,
+          search: `from=${pathname}`,
         }}
       />
     );

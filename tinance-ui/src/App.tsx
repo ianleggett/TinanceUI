@@ -28,6 +28,7 @@ import PrivacyPage from './pages/PrivacyPage';
 import ResetPasswordPage from './pages/ResetPassword';
 import SignInPage from './pages/SignIn';
 import SignUpPage from './pages/SignUp';
+import SignUpSuccessPage from './pages/SignUpSuccess';
 import TermsPage from './pages/TermsPage';
 import TradeDetailPage from './pages/TradeDetail';
 import TradeListPage from './pages/TradeList';
@@ -55,6 +56,7 @@ const App: React.FC = () => {
                       />
                       <Route path="/signin" component={SignInPage} exact />
                       <Route path="/signup" component={SignUpPage} exact />
+                      <Route path="/signup-success" component={SignUpSuccessPage} exact />
                       <Route path="/forgot-password" component={ForgotPasswordPage} exact />
                       <Route path="/reset-password" component={ResetPasswordPage} exact />
                       <Route path="/faq" component={FaqPage} exact />
