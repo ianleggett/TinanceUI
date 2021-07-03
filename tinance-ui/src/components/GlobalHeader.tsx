@@ -147,6 +147,10 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
     history.push('/signin');
   }, [history]);
 
+  const handleGoToSignUpPage = useCallback(() => {
+    history.push('/signup');
+  }, [history]);
+
   const handleGoToProfilePage = useCallback(() => {
     setUserMenu(null);
     history.push('/account/profile');
@@ -281,8 +285,12 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
                 </Menu>
               </>
             ) : (
-              <Button color="primary" variant="contained" onClick={handleGoToSigninPage}>
-                {t('Sign In')}
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={pathname === '/signin' ? handleGoToSignUpPage : handleGoToSigninPage}
+              >
+                {pathname === '/signin' ? t('Sign Up') : t('Sign In')}
               </Button>
             )}
 

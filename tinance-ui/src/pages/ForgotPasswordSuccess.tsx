@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SignUpSuccessPage: React.FC = () => {
+const ForgotPasswordSuccessPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { search } = useLocation();
@@ -60,7 +60,7 @@ const SignUpSuccessPage: React.FC = () => {
         </Link>
         <Typography component="p" variant="body1">
           {t(
-            'We have sent an verification link to your email, please check your email, then activate your account with the instruction in the email.',
+            'We have sent an reset link to your email, please check your email, then reset password with the instruction in the email.',
           )}
         </Typography>
       </Paper>
@@ -68,4 +68,4 @@ const SignUpSuccessPage: React.FC = () => {
   );
 };
 
-export default SignUpSuccessPage;
+export default ForgotPasswordSuccessPage;

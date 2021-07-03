@@ -19,6 +19,7 @@ import NotFoundPage from './pages/404';
 import ChangePasswordPage from './pages/ChangePassword';
 import FaqPage from './pages/Faq';
 import ForgotPasswordPage from './pages/ForgotPassword';
+import ForgotPasswordSuccessPage from './pages/ForgotPasswordSuccess';
 import HomePage from './pages/Home';
 import MarketListPage from './pages/MarketList';
 import OfferDetailPage from './pages/OfferDetail';
@@ -56,8 +57,13 @@ const App: React.FC = () => {
                       />
                       <Route path="/signin" component={SignInPage} exact />
                       <Route path="/signup" component={SignUpPage} exact />
-                      <Route path="/signup-success" component={SignUpSuccessPage} exact />
+                      <Route path="/signup/success" component={SignUpSuccessPage} exact />
                       <Route path="/forgot-password" component={ForgotPasswordPage} exact />
+                      <Route
+                        path="/forgot-password/success"
+                        component={ForgotPasswordSuccessPage}
+                        exact
+                      />
                       <Route path="/reset-password" component={ResetPasswordPage} exact />
                       <Route path="/faq" component={FaqPage} exact />
                       <Route path="/privacy" component={PrivacyPage} exact />

@@ -176,6 +176,27 @@ declare namespace API {
     msg: string;
   }
 
+  interface ForgotPasswordParams {
+    email: string;
+    username: string;
+  }
+
+  interface ForgotPasswordResponse {
+    statusCode: number;
+    msg: string;
+  }
+
+  interface ResetPasswordParams {
+    code: string;
+    username: string;
+    password: string;
+  }
+
+  interface ResetPasswordResponse {
+    statusCode: number;
+    msg: string;
+  }
+
   interface GetUserTradesParams {
     uid: number;
   }

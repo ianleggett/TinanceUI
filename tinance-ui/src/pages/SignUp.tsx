@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: theme.spacing(4),
   },
   form: {
     'display': 'flex',
@@ -103,10 +103,14 @@ const SignUpPage: React.FC = () => {
 
   const { run: signup, loading } = useRequest(SignUpService, {
     onSuccess(res) {
-      if (res.statusCode) {
-        history.replace(`/signup-success?email=${emailRef.current}`);
+      if (res.statusCode === 0) {
+        history.replace(`/signup/success?email=${emailRef.current}`);
         enqueueSnackbar(t('Sign up successful'), {
           variant: 'success',
+        });
+      } else {
+        enqueueSnackbar(t('Sign up failed'), {
+          variant: 'warning',
         });
       }
     },

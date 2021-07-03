@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: theme.spacing(4),
   },
   form: {
     'display': 'flex',
