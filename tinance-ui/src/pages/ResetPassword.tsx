@@ -143,13 +143,21 @@ const ResetPasswordPage: React.FC = () => {
   }, []);
 
   useMount(() => {
-    if (usernameRef.current) {
-      formik.setFieldValue('username', usernameRef.current);
-    } else {
+    if (!usernameRef.current) {
       enqueueSnackbar(t("Can't find username for verifying your identity"), {
         variant: 'warning',
       });
+      return;
     }
+
+    if (!codeRef.current) {
+      enqueueSnackbar(t("Can't find one time code for verifying your identity"), {
+        variant: 'warning',
+      });
+      return;
+    }
+
+    formik.setFieldValue('username', usernameRef.current);
   });
 
   return (
