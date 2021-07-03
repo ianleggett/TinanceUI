@@ -1,6 +1,8 @@
+import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
@@ -14,7 +16,9 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
+import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -22,6 +26,8 @@ import { useMount, useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 
 import { useAppConfigState } from '../components';
 import { GetAllOffersService } from '../services';
@@ -36,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
   card: {
     padding: 32,
     marginBottom: 16,
+    position: 'relative',
   },
   dashed: {
     borderStyle: 'dashed',
@@ -60,18 +67,44 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 8,
     marginRight: 8,
     pointerEvents: 'none',
+    color: theme.palette.text.hint,
+  },
+  chip: {
+    position: 'absolute',
+    top: theme.spacing(4),
+    left: theme.spacing(4),
+    textTransform: 'uppercase',
+  },
+  empty: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: theme.spacing(4),
+  },
+  inbox: {
+    width: 150,
+    height: 150,
+    color: theme.palette.text.secondary,
+    marginBottom: theme.spacing(2),
+  },
+  button: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
 }));
 
 const initialValues = {
   fromccyid: 0,
   toccyid: 0,
-  fromamt: 0,
+  fromamt: '',
   payTypes: 0,
 };
 
 const MarketListPage: React.FC = () => {
   const classes = useStyles();
+  const history = useHistory();
+  const { t } = useTranslation();
   const { ccyCodes, paymentTypes } = useAppConfigState();
 
   const theme = useTheme();
@@ -105,7 +138,7 @@ const MarketListPage: React.FC = () => {
       run({
         buy: isBuy,
         sell: !isBuy,
-        fromamt: fromamt || undefined,
+        fromamt: fromamt ? Number.parseInt(fromamt, 10) : undefined,
         fromccyid: fromccyid || undefined,
         toccyid: toccyid || undefined,
         payTypes: payTypes === 0 ? undefined : [payTypes],
@@ -141,40 +174,49 @@ const MarketListPage: React.FC = () => {
     [formik, loading],
   );
 
-  useMount(run);
+  const handleGoToCreateOfferPage = useCallback(() => {
+    history.push('/offers/create');
+  }, [history]);
+
+  useMount(() => {
+    run({
+      buy: true,
+      sell: false,
+    });
+  });
 
   return (
     <Grid container direction={direction} spacing={2} className={classes.container}>
       <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
         <Paper className={classes.paper}>
           <form onSubmit={handleSubmit} onReset={handleReset}>
-            <Grid container direction="column" spacing={2}>
+            <Grid container direction="column" spacing={3}>
               <Grid item xs={12}>
                 <ButtonGroup color="secondary" fullWidth>
                   <Button onClick={() => setIsBuy(true)} variant={isBuy ? 'contained' : 'outlined'}>
-                    Buy
+                    {t('Buy')}
                   </Button>
                   <Button
                     onClick={() => setIsBuy(false)}
                     variant={isBuy ? 'outlined' : 'contained'}
                   >
-                    Sell
+                    {t('Sell')}
                   </Button>
                 </ButtonGroup>
               </Grid>
               <Grid item xs={12}>
                 <FormControl variant="outlined" fullWidth>
-                  <InputLabel id="fromccyid-select">Crypto</InputLabel>
+                  <InputLabel id="fromccyid-select">{t('Crypto')}</InputLabel>
                   <Select
                     id="fromccyid"
                     name="fromccyid"
                     labelId="fromccyid-select"
-                    label="Crypto"
+                    label={t('Crypto')}
                     value={formik.values.fromccyid}
                     onChange={formik.handleChange}
                   >
                     <MenuItem value={0}>
-                      <em>Any Crypto</em>
+                      <em>{t('Any Crypto')}</em>
                     </MenuItem>
                     {options.ERC20 !== undefined
                       ? options.ERC20.map((erc20) => (
@@ -188,17 +230,17 @@ const MarketListPage: React.FC = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControl variant="outlined" fullWidth>
-                  <InputLabel id="toccyid-select">Fiat</InputLabel>
+                  <InputLabel id="toccyid-select">{t('Fiat')}</InputLabel>
                   <Select
                     id="toccyid"
                     name="toccyid"
                     labelId="toccyid-select"
-                    label="Fiat"
+                    label={t('Fiat')}
                     value={formik.values.toccyid}
                     onChange={formik.handleChange}
                   >
                     <MenuItem value={0}>
-                      <em>Any Fiat</em>
+                      <em>{t('Any Fiat')}</em>
                     </MenuItem>
                     {options.Fiat !== undefined
                       ? options.Fiat.map((fiat) => (
@@ -215,9 +257,9 @@ const MarketListPage: React.FC = () => {
                   id="fromamt"
                   name="fromamt"
                   variant="outlined"
-                  type="number"
-                  label="Volume"
+                  label={t('Volume')}
                   placeholder="Volume"
+                  inputMode="numeric"
                   value={formik.values.fromamt}
                   onChange={formik.handleChange}
                   fullWidth
@@ -225,23 +267,23 @@ const MarketListPage: React.FC = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControl variant="outlined" fullWidth>
-                  <InputLabel id="paytypes-select">Payment</InputLabel>
+                  <InputLabel id="paytypes-select">{t('Payment')}</InputLabel>
                   <Select
                     id="payTypes"
                     name="payTypes"
                     labelId="paytypes-select"
-                    label="Payment"
+                    label={t('Payment')}
                     value={formik.values.payTypes}
                     onChange={formik.handleChange}
                   >
                     <MenuItem value={0}>
-                      <em>Any Payment</em>
+                      <em>{t('Any Payment')}</em>
                     </MenuItem>
                     {paymentTypes
                       .filter((v) => v.enabled)
                       .map((paymentType) => (
                         <MenuItem key={paymentType.id} value={paymentType.id}>
-                          {paymentType.name}
+                          {t(paymentType.name)}
                         </MenuItem>
                       ))}
                   </Select>
@@ -251,7 +293,7 @@ const MarketListPage: React.FC = () => {
                 <Grid container spacing={1}>
                   <Grid item xs={6}>
                     <Button color="primary" variant="outlined" type="reset" fullWidth>
-                      Reset
+                      {t('Reset')}
                     </Button>
                   </Grid>
                   <Grid item xs={6}>
@@ -262,7 +304,7 @@ const MarketListPage: React.FC = () => {
                       startIcon={<SearchOutlinedIcon />}
                       fullWidth
                     >
-                      Search
+                      {t('Search')}
                     </Button>
                   </Grid>
                 </Grid>
@@ -299,9 +341,31 @@ const MarketListPage: React.FC = () => {
               </Grid>
             </Grid>
           </Paper>
+        ) : offers.length === 0 ? (
+          <Paper className={classes.empty}>
+            <InboxOutlinedIcon className={classes.inbox} />
+            <Typography variant="body1" color="textSecondary">
+              {t('No offer meeting the filter in markets')}
+            </Typography>
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={handleGoToCreateOfferPage}
+              startIcon={<AddOutlinedIcon />}
+              className={classes.button}
+            >
+              {t('Create new offer')}
+            </Button>
+          </Paper>
         ) : (
           offers.map((offer) => (
             <Paper key={offer.id} className={classes.card}>
+              <Chip
+                color="primary"
+                variant="outlined"
+                label={offer.buyer ? t('Sell') : t('Buy')}
+                className={classes.chip}
+              />
               <Grid container spacing={1}>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                   <Typography variant="h5" color="primary" className={classes.title}>
@@ -310,7 +374,7 @@ const MarketListPage: React.FC = () => {
                 </Grid>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item className={classes.values}>
                   <TextField
-                    label="Crypto"
+                    label={t('Crypto')}
                     variant="outlined"
                     value={offer.fromAmount}
                     InputProps={{
@@ -324,7 +388,7 @@ const MarketListPage: React.FC = () => {
                     <DoubleArrowOutlinedIcon />
                   </IconButton>
                   <TextField
-                    label="Fiat"
+                    label={t('Fiat')}
                     variant="outlined"
                     value={offer.toAmount}
                     InputProps={{
@@ -340,27 +404,33 @@ const MarketListPage: React.FC = () => {
                 </Grid>
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Exchange Rate
+                    {t('Exchange Rate')}
                   </Typography>
-                  <Typography color="primary">{offer.exchRate}</Typography>
+                  <Typography color="primary">{offer.exchRate.toFixed(4)}</Typography>
                 </Grid>
                 {offer.paymentDetails[0] ? (
                   <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                     <Typography color="textSecondary" variant="overline">
-                      Payment
+                      {t('Payment')}
                     </Typography>
-                    <Typography color="primary">{offer.paymentDetails[0].payType.name}</Typography>
+                    <Typography color="primary">
+                      {t(offer.paymentDetails[0].payType.name)}
+                    </Typography>
                   </Grid>
                 ) : null}
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Trader One
+                    {t('Trader One')}
                   </Typography>
-                  <Typography color="primary">{offer.userDetails.tradecount} Trades</Typography>
+                  <Typography color="primary">
+                    {t('0 Trades', {
+                      trades: offer.userDetails.tradecount,
+                    })}
+                  </Typography>
                 </Grid>
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Rating
+                    {t('Rating')}
                   </Typography>
                   <Box component="div">
                     <Rating size="small" value={offer.userDetails.feedback} readOnly />
@@ -369,7 +439,7 @@ const MarketListPage: React.FC = () => {
                 <Grid xs={false} sm={false} md={10} lg={10} xl={10} item />
                 <Grid xs={12} sm={12} md={2} lg={2} xl={2} item>
                   <Button color="secondary" variant="outlined" fullWidth>
-                    Trade
+                    {t('Trade')}
                   </Button>
                 </Grid>
               </Grid>

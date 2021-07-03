@@ -141,6 +141,11 @@ declare namespace API {
     message?: string;
   }
 
+  interface BaseResponse {
+    statusCode: number;
+    msg: string;
+  }
+
   interface SignInParams {
     username: string;
     password: string;
@@ -152,10 +157,7 @@ declare namespace API {
     username: string;
   }
 
-  interface SignOutResponse {
-    statusCode: number;
-    msg: string;
-  }
+  interface SignOutResponse extends BaseResponse {}
 
   interface SignUpParams {
     firstName: string;
@@ -171,20 +173,14 @@ declare namespace API {
     bankBranchNumber?: string;
   }
 
-  interface SignUpResponse {
-    statusCode: number;
-    msg: string;
-  }
+  interface SignUpResponse extends BaseResponse {}
 
   interface ForgotPasswordParams {
     email: string;
     username: string;
   }
 
-  interface ForgotPasswordResponse {
-    statusCode: number;
-    msg: string;
-  }
+  interface ForgotPasswordResponse extends BaseResponse {}
 
   interface ResetPasswordParams {
     code: string;
@@ -192,10 +188,7 @@ declare namespace API {
     password: string;
   }
 
-  interface ResetPasswordResponse {
-    statusCode: number;
-    msg: string;
-  }
+  interface ResetPasswordResponse extends BaseResponse {}
 
   interface GetUserTradesParams {
     uid: number;
