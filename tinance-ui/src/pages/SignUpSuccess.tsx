@@ -3,8 +3,9 @@ import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import { useMount } from 'ahooks';
 import { useSnackbar } from 'notistack';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 
@@ -33,14 +34,14 @@ const SignUpSuccessPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const emailRef = useRef(new URLSearchParams(search).get('email') ?? '');
 
-  useEffect(() => {
+  useMount(() => {
     if (!emailRef.current) {
       history.replace('/');
       enqueueSnackbar(t("There's no email url query string in the URL"), {
         variant: 'warning',
       });
     }
-  }, [enqueueSnackbar, history, t]);
+  });
 
   return (
     <Container maxWidth="sm" disableGutters>
