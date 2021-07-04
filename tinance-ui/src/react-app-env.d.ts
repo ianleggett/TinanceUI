@@ -194,7 +194,8 @@ declare namespace API {
     uid: number;
   }
 
-  type GetUserDetailsResponse = User.Model;
+  interface GetUserDetailsResponse extends BaseResponse, User.Model {}
+
   type GetCCYCodesResponse = PublicData.CCYCode[];
   type GetPaymentTypesResponse = PublicData.PaymentType[];
   type GetProfilePublicResponse = PublicData.UserProfile;
@@ -236,5 +237,5 @@ declare namespace API {
     };
   }
 
-  type GetAddUpdateOrderResponse = Offer.Model;
+  interface GetAddUpdateOrderResponse extends BaseResponse, Offer.Model {}
 }

@@ -365,6 +365,7 @@ const MarketListPage: React.FC = () => {
                 variant="outlined"
                 label={offer.buyer ? t('Sell') : t('Buy')}
                 className={classes.chip}
+                style={{ color: '#D97706', borderColor: '#D97706' }}
               />
               <Grid container spacing={1}>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>

@@ -25,8 +25,8 @@ import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import SwapHorizOutlinedIcon from '@material-ui/icons/SwapHorizOutlined';
 import Alert from '@material-ui/lab/Alert';
 import { DateTimePicker } from '@material-ui/pickers';
-import type { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useSnackbar } from 'notistack';
@@ -82,7 +82,6 @@ interface InitialValues {
   fromamt: string;
   toccyid: number;
   toamt: string;
-  expiry: string;
   payDetail: {
     payTypeId: number;
     field1value: string;
@@ -94,11 +93,10 @@ interface InitialValues {
 }
 
 const initialValues: InitialValues = {
-  fromccyid: 0,
+  fromccyid: 9,
   fromamt: '',
-  toccyid: 0,
+  toccyid: 1,
   toamt: '',
-  expiry: '',
   payDetail: {
     payTypeId: 0,
     field1value: '',
@@ -108,6 +106,8 @@ const initialValues: InitialValues = {
     field5value: '',
   },
 };
+
+const formatter = 'YYYY-MM-DD HH:mm';
 
 const OfferFormPage: React.FC = () => {
   const classes = useStyles();
@@ -119,6 +119,7 @@ const OfferFormPage: React.FC = () => {
   const { ccyCodes } = useAppConfigState();
   const [activeStep, setActiveStep] = useState(0);
   const [usingDefault, setUsingDefault] = useState(true);
+  const [expiryTime, setExpiryTime] = useState(dayjs());
 
   const steps = useMemo(() => {
     return [t('Offer Details'), t('Payment Details'), t('Expiry Time')];
@@ -169,10 +170,14 @@ const OfferFormPage: React.FC = () => {
 
   const { run, loading } = useRequest(AddUpdateOrderService, {
     onSuccess(res) {
-      if (res) {
+      if (res.statusCode === 0) {
         history.push('/offers');
         enqueueSnackbar(t('New offer created successful'), {
           variant: 'success',
+        });
+      } else {
+        enqueueSnackbar(t(res.msg || t('New offer created successful')), {
+          variant: 'warning',
         });
       }
     },
@@ -212,12 +217,14 @@ const OfferFormPage: React.FC = () => {
         run({
           fromamt: fromamt ? Number.parseInt(fromamt, 10) : 0,
           toamt: fromamt ? Number.parseInt(toamt, 10) : 0,
+          expiry: expiryTime.format(formatter),
           ...restValues,
         });
       } else {
         run({
           fromamt: fromamt ? Number.parseInt(fromamt, 10) : 0,
           toamt: fromamt ? Number.parseInt(toamt, 10) : 0,
+          expiry: expiryTime.format(formatter),
           payDetail,
           ...restValues,
         });
@@ -232,13 +239,6 @@ const OfferFormPage: React.FC = () => {
   const handleNext = useCallback(() => {
     setActiveStep((prevState) => Math.min(prevState + 1, 2));
   }, []);
-
-  const handleDatePickerChange = useCallback(
-    (date: MaterialUiPickersDate) => {
-      formik.handleChange(date ? date.format('YYYY-MM-DD HH:mm') : '');
-    },
-    [formik],
-  );
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -322,9 +322,6 @@ const OfferFormPage: React.FC = () => {
                             value={formik.values.fromccyid}
                             onChange={formik.handleChange}
                           >
-                            <MenuItem value={0}>
-                              <em>{t('Select Crypto')}</em>
-                            </MenuItem>
                             {options.ERC20 !== undefined
                               ? options.ERC20.map((erc20) => (
                                   <MenuItem key={erc20.id} value={erc20.id}>
@@ -370,9 +367,6 @@ const OfferFormPage: React.FC = () => {
                             value={formik.values.toccyid}
                             onChange={formik.handleChange}
                           >
-                            <MenuItem value={0}>
-                              <em>{t('Select Fiat')}</em>
-                            </MenuItem>
                             {options.Fiat !== undefined
                               ? options.Fiat.map((fiat) => (
                                   <MenuItem key={fiat.id} value={fiat.id}>
@@ -580,15 +574,14 @@ const OfferFormPage: React.FC = () => {
                 <Grid spacing={2} className={classes.picker} container>
                   <Grid xs={12} sm={12} md={6} lg={4} xl={3} item>
                     <DateTimePicker
-                      id="expiry"
-                      name="expiry"
-                      format="YYYY-MM-DD HH:mm"
+                      format={formatter}
                       label={t('Expiry Time')}
-                      value={formik.values.expiry ? new Date(formik.values.expiry) : null}
-                      onChange={handleDatePickerChange}
+                      value={expiryTime}
+                      onChange={(value) => setExpiryTime(value ?? dayjs())}
                       emptyLabel={t('Please Select Date Time')}
                       invalidDateMessage={t('Invalid Date Time Format')}
                       inputVariant="outlined"
+                      disablePast
                       fullWidth
                     />
                   </Grid>

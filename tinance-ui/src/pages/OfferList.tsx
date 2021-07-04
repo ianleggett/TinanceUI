@@ -1,5 +1,6 @@
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
@@ -36,6 +37,7 @@ const useStyles = makeStyles((theme) => ({
   card: {
     padding: 32,
     marginBottom: 16,
+    position: 'relative',
   },
   title: {
     display: 'flex',
@@ -66,6 +68,12 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 16,
     lineHeight: 1.5,
     borderStyle: 'dashed',
+  },
+  chip: {
+    position: 'absolute',
+    top: theme.spacing(4),
+    left: theme.spacing(4),
+    textTransform: 'uppercase',
   },
   empty: {
     display: 'flex',
@@ -244,6 +252,13 @@ const OfferListPage: React.FC = () => {
         ) : (
           offers.map((offer) => (
             <Paper key={offer.id} className={classes.card}>
+              <Chip
+                color="primary"
+                variant="outlined"
+                label={offer.buyer ? t('Sell') : t('Buy')}
+                className={classes.chip}
+                style={{ color: '#D97706', borderColor: '#D97706' }}
+              />
               <Grid container spacing={1}>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                   <Typography variant="h5" color="primary" className={classes.title}>

@@ -105,10 +105,16 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const { title, logo, maxWidth } = props as PropsWithDefault;
 
   const { run: signout } = useRequest(SignOutService, {
-    onSuccess() {
-      enqueueSnackbar('Sign out successful', {
-        variant: 'success',
-      });
+    onSuccess(res) {
+      if (res.statusCode === 0) {
+        enqueueSnackbar(t('Sign out successful'), {
+          variant: 'success',
+        });
+      } else {
+        enqueueSnackbar(res.msg || t('Sign out failed'), {
+          variant: 'warning',
+        });
+      }
     },
   });
 
