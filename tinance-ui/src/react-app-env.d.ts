@@ -214,8 +214,11 @@ declare namespace API {
     keyword?: string;
   }
 
+  interface GetMyTradesParams extends GetAllOffersParams {}
+
   type GetAllOffersResponse = Offer.Model[];
   type GetMyOffersResponse = Offer.Model[];
+  type GetMyTradesResponse = Offer.Model[];
 
   interface GetAddUpdateOrderParams {
     fromccyid: number;

@@ -12,7 +12,7 @@ export async function GetAllOffersService(
   try {
     const res = await request<API.GetAllOffersResponse>('/v1/public/getoffers.json', {
       method: 'POST',
-      data: params,
+      params,
     });
 
     return res;

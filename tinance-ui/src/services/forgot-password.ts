@@ -10,9 +10,9 @@ export async function ForgotPasswordService(
   params: API.ForgotPasswordParams,
 ): Promise<API.ForgotPasswordResponse> {
   try {
-    const res = await request<API.ForgotPasswordResponse>('/v1/public/resetpwd.json', {
+    const res = await request<API.ForgotPasswordResponse>('/v1/public/forgotPwd.json', {
       method: 'POST',
-      data: params,
+      params,
     });
 
     return res;

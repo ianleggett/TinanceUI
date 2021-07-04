@@ -15,12 +15,14 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
+import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useMount, useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
 import { offerStatusMap } from '../constants';
@@ -55,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 8,
     marginRight: 8,
     pointerEvents: 'none',
+    color: theme.palette.text.hint,
   },
   content: {
     padding: 16,
@@ -63,6 +66,19 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 16,
     lineHeight: 1.5,
     borderStyle: 'dashed',
+  },
+  empty: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: theme.spacing(4),
+  },
+  inbox: {
+    width: 150,
+    height: 150,
+    color: theme.palette.text.secondary,
+    marginBottom: theme.spacing(2),
   },
   progress: {
     height: 16,
@@ -79,6 +95,7 @@ const initialValues = {
 const OfferListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
+  const { t } = useTranslation();
   const [offers, setOffers] = useState<Offer.Model[]>([]);
 
   const { run, loading } = useRequest(GetMyOffersService, {
@@ -135,13 +152,13 @@ const OfferListPage: React.FC = () => {
                   startIcon={<AddOutlinedIcon />}
                   onClick={handleGoToCreateOfferPage}
                 >
-                  Create New Offer
+                  {t('Create new offer')}
                 </Button>
               </Grid>
               <Grid xs={false} sm={false} md={false} lg={3} xl={3} item />
               <Grid xs={12} sm={12} md={12} lg={2} xl={2} item>
                 <FormControl variant="outlined" margin="dense" fullWidth>
-                  <InputLabel id="status-select">Status</InputLabel>
+                  <InputLabel id="status-select">{t('Status')}</InputLabel>
                   <Select
                     id="status"
                     name="status"
@@ -151,7 +168,7 @@ const OfferListPage: React.FC = () => {
                     onChange={formik.handleChange}
                   >
                     <MenuItem value="ANY">
-                      <em>Any Status</em>
+                      <em>{t('Any Status')}</em>
                     </MenuItem>
                     {Object.entries(offerStatusMap).map(([value, label]) => (
                       <MenuItem key={value} value={value}>
@@ -166,8 +183,8 @@ const OfferListPage: React.FC = () => {
                   id="keyword"
                   name="keyword"
                   variant="outlined"
-                  label="Keyword"
-                  placeholder="Order or Trasaction ID"
+                  label={t('Keyword')}
+                  placeholder={t('Order or Transaction ID') as string}
                   value={formik.values.keyword}
                   onChange={formik.handleChange}
                   margin="dense"
@@ -182,7 +199,7 @@ const OfferListPage: React.FC = () => {
                   startIcon={<SearchOutlinedIcon />}
                   fullWidth
                 >
-                  Search
+                  {t('Search')}
                 </Button>
               </Grid>
             </Grid>
@@ -217,6 +234,13 @@ const OfferListPage: React.FC = () => {
               </Grid>
             </Grid>
           </Paper>
+        ) : offers.length === 0 ? (
+          <Paper className={classes.empty}>
+            <InboxOutlinedIcon className={classes.inbox} />
+            <Typography variant="body1" color="textSecondary">
+              {t('No offer meeting the filter')}
+            </Typography>
+          </Paper>
         ) : (
           offers.map((offer) => (
             <Paper key={offer.id} className={classes.card}>
@@ -228,7 +252,7 @@ const OfferListPage: React.FC = () => {
                 </Grid>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item className={classes.values}>
                   <TextField
-                    label="Crypto"
+                    label={t('Crypto')}
                     variant="outlined"
                     value={offer.fromAmount}
                     InputProps={{
@@ -242,7 +266,7 @@ const OfferListPage: React.FC = () => {
                     <DoubleArrowOutlinedIcon />
                   </IconButton>
                   <TextField
-                    label="Fiat"
+                    label={t('Fiat')}
                     variant="outlined"
                     value={offer.toAmount}
                     InputProps={{
@@ -259,13 +283,13 @@ const OfferListPage: React.FC = () => {
 
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Order ID
+                    {t('Order ID')}
                   </Typography>
                   <Typography color="primary">{offer.orderId}</Typography>
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Created Time
+                    {t('Created Time')}
                   </Typography>
                   <Typography color="primary">
                     {dayjs(offer.created).format('YYYY-MM-DD HH:mm')}
@@ -273,7 +297,7 @@ const OfferListPage: React.FC = () => {
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Expiry Time
+                    {t('Expiry Time')}
                   </Typography>
                   <Typography color="primary">
                     {dayjs(offer.expiry).format('YYYY-MM-DD HH:mm')}
@@ -281,19 +305,19 @@ const OfferListPage: React.FC = () => {
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Ramaining Time
+                    {t('Remaining Time')}
                   </Typography>
-                  <Typography color="primary">{dayjs().to(dayjs(offer.expiry))}</Typography>
+                  <Typography color="primary">{dayjs().to(dayjs(offer.expiry), true)}</Typography>
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Exchange Rate
+                    {t('Exchange Rate')}
                   </Typography>
-                  <Typography color="primary">{offer.exchRate}</Typography>
+                  <Typography color="primary">{offer.exchRate.toFixed(4)}</Typography>
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Status
+                    {t('Status')}
                   </Typography>
                   <Typography
                     color={
@@ -307,7 +331,7 @@ const OfferListPage: React.FC = () => {
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    Progress
+                    {t('Progress')}
                   </Typography>
                   <LinearProgress
                     variant="determinate"

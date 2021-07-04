@@ -73,7 +73,7 @@ const ForgotPasswordPage: React.FC = () => {
           variant: 'success',
         });
       } else {
-        enqueueSnackbar(t('Sending reset email failed'), {
+        enqueueSnackbar(res.msg || t('Sending reset email failed'), {
           variant: 'warning',
         });
       }
