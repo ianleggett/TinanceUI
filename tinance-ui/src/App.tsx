@@ -22,7 +22,6 @@ import ForgotPasswordPage from './pages/ForgotPassword';
 import ForgotPasswordSuccessPage from './pages/ForgotPasswordSuccess';
 import HomePage from './pages/Home';
 import MarketListPage from './pages/MarketList';
-import OfferDetailPage from './pages/OfferDetail';
 import OfferFormPage from './pages/OfferForm';
 import OfferListPage from './pages/OfferList';
 import PrivacyPage from './pages/PrivacyPage';
@@ -72,7 +71,6 @@ const App: React.FC = () => {
 
                       <AccessControlRoute path="/offers" component={OfferListPage} exact />
                       <AccessControlRoute path="/offers/create" component={OfferFormPage} exact />
-                      <AccessControlRoute path="/offers/:id" component={OfferDetailPage} exact />
                       <AccessControlRoute path="/trades" component={TradeListPage} exact />
                       <AccessControlRoute path="/trades/:id" component={TradeDetailPage} exact />
                       <AccessControlRoute

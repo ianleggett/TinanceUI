@@ -8,6 +8,7 @@ export const appConfig = {
   maxWidth: 'lg' as 'lg' | 'xs' | 'sm' | 'md' | 'xl' | false,
   ccyCodes: [] as PublicData.CCYCode[],
   paymentTypes: [] as PublicData.PaymentType[],
+  feeRate: 0.0015,
 };
 
 export const offerStatusMap: Record<Offer.Status, string> = {

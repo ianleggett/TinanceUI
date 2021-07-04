@@ -228,11 +228,11 @@ declare namespace API {
     expiry: string;
     payDetail?: {
       payTypeId: number;
-      field1name: string; // Bank Name
-      field2name: string; // Sort Code
-      field3name: string; // Account Number
-      field4name: string; // IBAN
-      field5name: string; // Country
+      field1value: string;
+      field2value: string;
+      field3value: string;
+      field4value: string;
+      field5value: string;
     };
   }
 

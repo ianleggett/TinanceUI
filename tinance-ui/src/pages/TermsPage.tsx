@@ -31,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// TODO: We can get terms content from api, provide different language version.
 const terms = {
   'en-US':
     '<h3>Title 01</h3><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur, neque doloribus, cupiditate numquam <strong>dignissimos</strong> laborum fugiat deleniti? Eum quasi quidem quibusdam.</p><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos blanditiis tenetur unde <em>suscipit</em>, quam beatae rerum inventore consectetur, neque <a href="/">doloribus</a>, cupiditate numquam dignissimos laborum fugiat deleniti? Eum quasi quidem quibusdam.</p><h3>Title 02</h3><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur, neque doloribus, cupiditate numquam dignissimos laborum fugiat deleniti? Eum quasi quidem quibusdam.</p><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur, neque doloribus, cupiditate numquam dignissimos laborum fugiat deleniti? Eum quasi quidem quibusdam.</p>',

@@ -18,21 +18,23 @@ import Stepper from '@material-ui/core/Stepper';
 import { makeStyles } from '@material-ui/core/styles';
 import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import SwapHorizOutlinedIcon from '@material-ui/icons/SwapHorizOutlined';
 import Alert from '@material-ui/lab/Alert';
-import { DatePicker } from '@material-ui/pickers';
+import { DateTimePicker } from '@material-ui/pickers';
 import type { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useSnackbar } from 'notistack';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
-import { useAppConfigState } from '../components';
+import { useAppConfigState, useUserManagerState } from '../components';
 import { AddUpdateOrderService } from '../services';
 
 const useStyles = makeStyles((theme) => ({
@@ -77,46 +79,50 @@ const useStyles = makeStyles((theme) => ({
 
 interface InitialValues {
   fromccyid: number;
-  fromamt: number;
+  fromamt: string;
   toccyid: number;
-  toamt: number;
+  toamt: string;
   expiry: string;
-  usingDefault: boolean;
   payDetail: {
     payTypeId: number;
-    field1name: string; // Bank Name
-    field2name: string; // Sort Code
-    field3name: string; // Account Number
-    field4name: string; // IBAN
-    field5name: string; // Country
+    field1value: string;
+    field2value: string;
+    field3value: string;
+    field4value: string;
+    field5value: string;
   };
 }
 
 const initialValues: InitialValues = {
   fromccyid: 0,
-  fromamt: 0,
+  fromamt: '',
   toccyid: 0,
-  toamt: 0,
+  toamt: '',
   expiry: '',
-  usingDefault: true,
   payDetail: {
     payTypeId: 0,
-    field1name: '',
-    field2name: '',
-    field3name: '',
-    field4name: '',
-    field5name: '',
+    field1value: '',
+    field2value: '',
+    field3value: '',
+    field4value: '',
+    field5value: '',
   },
 };
-
-const steps = ['Offer Details', 'Payment Details', 'Expiry Time'];
 
 const OfferFormPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
+  const { t } = useTranslation();
+  const { feeRate } = useAppConfigState();
+  const { profile } = useUserManagerState();
   const { enqueueSnackbar } = useSnackbar();
   const { ccyCodes } = useAppConfigState();
   const [activeStep, setActiveStep] = useState(0);
+  const [usingDefault, setUsingDefault] = useState(true);
+
+  const steps = useMemo(() => {
+    return [t('Offer Details'), t('Payment Details'), t('Expiry Time')];
+  }, [t]);
 
   /** Options of Crypto and Fiat select */
   const options = useMemo(() => {
@@ -126,24 +132,95 @@ const OfferFormPage: React.FC = () => {
     );
   }, [ccyCodes]);
 
+  const defaultPayDetail = useMemo(() => {
+    if (!profile) {
+      return initialValues.payDetail;
+    }
+
+    const { field1value, field2value, field3value, field4value, field5value, payType } =
+      profile.payDetails[0];
+
+    return {
+      field1value,
+      field2value,
+      field3value,
+      field4value,
+      field5value,
+      payTypeId: payType.id,
+    };
+  }, [profile]);
+
+  const payType = useMemo(() => {
+    if (!profile) {
+      return {
+        id: 1,
+        name: 'Bank Transfer',
+        field1name: 'Bank Name',
+        field2name: 'Sort Code',
+        field3name: 'Account Number',
+        field4name: 'IBAN',
+        field5name: 'Country',
+        enabled: true,
+      };
+    }
+
+    return profile.payDetails[0].payType;
+  }, [profile]);
+
   const { run, loading } = useRequest(AddUpdateOrderService, {
     onSuccess(res) {
-      history.push('/offers');
-      enqueueSnackbar('New offer created successful', {
-        variant: 'success',
-      });
+      if (res) {
+        history.push('/offers');
+        enqueueSnackbar(t('New offer created successful'), {
+          variant: 'success',
+        });
+      }
     },
   });
+
+  const calcExchangeRate = useCallback((fromamt: string, toamt: string): string => {
+    const from = fromamt === '' ? 0 : Number.parseInt(fromamt, 10);
+    const to = toamt === '' ? 0 : Number.parseInt(toamt, 10);
+
+    if (from !== 0 && to !== 0) {
+      return (to / from).toFixed(4);
+    }
+
+    return '--';
+  }, []);
+
+  const calcFees = useCallback(
+    (fromamt: string, toamt: string): string => {
+      const from = fromamt === '' ? 0 : Number.parseInt(fromamt, 10);
+      const to = toamt === '' ? 0 : Number.parseInt(toamt, 10);
+
+      if (from !== 0 && to !== 0) {
+        return (from * feeRate).toFixed(4);
+      }
+
+      return '--';
+    },
+    [feeRate],
+  );
 
   const formik = useFormik({
     initialValues,
     onSubmit(values) {
-      const { usingDefault, payDetail, ...restValues } = values;
+      const { fromamt, toamt, payDetail, ...restValues } = values;
 
       if (usingDefault) {
-        run(restValues);
+        run({
+          fromamt: fromamt ? Number.parseInt(fromamt, 10) : 0,
+          toamt: fromamt ? Number.parseInt(toamt, 10) : 0,
+          ...restValues,
+        });
       } else {
-        run({ payDetail, ...restValues });
+        run({
+          fromamt: fromamt ? Number.parseInt(fromamt, 10) : 0,
+          toamt: fromamt ? Number.parseInt(toamt, 10) : 0,
+          payDetail,
+          ...restValues,
+        });
       }
     },
   });
@@ -158,7 +235,7 @@ const OfferFormPage: React.FC = () => {
 
   const handleDatePickerChange = useCallback(
     (date: MaterialUiPickersDate) => {
-      formik.handleChange(date ? date.format('YYYY-MM-DD') : '');
+      formik.handleChange(date ? date.format('YYYY-MM-DD HH:mm') : '');
     },
     [formik],
   );
@@ -173,6 +250,27 @@ const OfferFormPage: React.FC = () => {
     },
     [formik, loading],
   );
+
+  const handleToggleSwitch = useCallback(() => {
+    setUsingDefault((prevState) => !prevState);
+  }, []);
+
+  const handleSwitchCryptoAndFiat = useCallback(() => {
+    const from = formik.values.fromamt;
+    const to = formik.values.toamt;
+
+    formik.setFieldValue('fromamt', to);
+    formik.setFieldValue('toamt', from);
+  }, [formik]);
+
+  useEffect(() => {
+    if (usingDefault) {
+      formik.setFieldValue('payDetail', defaultPayDetail);
+    } else {
+      formik.setFieldValue('payDetail', initialValues.payDetail);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usingDefault]);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -206,7 +304,7 @@ const OfferFormPage: React.FC = () => {
                   color="textPrimary"
                   className={classes.title}
                 >
-                  Create an offer
+                  {t('Create new offer')}
                 </Typography>
 
                 <Grid spacing={2} className={classes.main} container>
@@ -215,17 +313,17 @@ const OfferFormPage: React.FC = () => {
                     <Grid spacing={2} container>
                       <Grid xs={12} sm={12} md={12} lg={5} xl={5} item>
                         <FormControl variant="outlined" fullWidth>
-                          <InputLabel id="fromccyid-select">Crypto</InputLabel>
+                          <InputLabel id="fromccyid-select">{t('Crypto')}</InputLabel>
                           <Select
                             id="fromccyid"
                             name="fromccyid"
                             labelId="fromccyid-select"
-                            label="Crypto"
+                            label={t('Crypto')}
                             value={formik.values.fromccyid}
                             onChange={formik.handleChange}
                           >
                             <MenuItem value={0}>
-                              <em>Select Crypto</em>
+                              <em>{t('Select Crypto')}</em>
                             </MenuItem>
                             {options.ERC20 !== undefined
                               ? options.ERC20.map((erc20) => (
@@ -243,7 +341,8 @@ const OfferFormPage: React.FC = () => {
                           name="fromamt"
                           variant="outlined"
                           type="number"
-                          label="You'll send"
+                          inputMode="numeric"
+                          label={t("You'll send")}
                           value={formik.values.fromamt}
                           onChange={formik.handleChange}
                           fullWidth
@@ -252,25 +351,27 @@ const OfferFormPage: React.FC = () => {
                     </Grid>
                   </Grid>
                   <Grid xs={2} className={classes.arrow} item>
-                    <IconButton>
-                      <SwapHorizOutlinedIcon />
-                    </IconButton>
+                    <Tooltip title={t('Switch Crypto and Fiat') as string}>
+                      <IconButton color="primary" onClick={handleSwitchCryptoAndFiat}>
+                        <SwapHorizOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
                   </Grid>
                   <Grid xs={4} item>
                     <Grid spacing={2} container>
                       <Grid xs={12} sm={12} md={12} lg={5} xl={5} item>
                         <FormControl variant="outlined" fullWidth>
-                          <InputLabel id="toccyid-select">Fiat</InputLabel>
+                          <InputLabel id="toccyid-select">{t('Fiat')}</InputLabel>
                           <Select
                             id="toccyid"
                             name="toccyid"
                             labelId="toccyid-select"
-                            label="Fiat"
+                            label={t('Fiat')}
                             value={formik.values.toccyid}
                             onChange={formik.handleChange}
                           >
                             <MenuItem value={0}>
-                              <em>Select Fiat</em>
+                              <em>{t('Select Fiat')}</em>
                             </MenuItem>
                             {options.Fiat !== undefined
                               ? options.Fiat.map((fiat) => (
@@ -288,7 +389,8 @@ const OfferFormPage: React.FC = () => {
                           name="toamt"
                           variant="outlined"
                           type="number"
-                          label="You'll receive"
+                          inputMode="numeric"
+                          label={t("You'll receive")}
                           value={formik.values.toamt}
                           onChange={formik.handleChange}
                           fullWidth
@@ -305,8 +407,13 @@ const OfferFormPage: React.FC = () => {
                   justifyContent="space-around"
                   marginBottom={1}
                 >
-                  <Typography variant="subtitle1">Exchange Rate: 5.3837</Typography>
-                  <Typography variant="subtitle1">Fees: 1.5</Typography>
+                  <Typography variant="subtitle1">
+                    {t('Exchange Rate')}:{' '}
+                    {calcExchangeRate(formik.values.fromamt, formik.values.toamt)}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    {t('Fees')}: {calcFees(formik.values.fromamt, formik.values.toamt)}
+                  </Typography>
                 </Box>
               </CardContent>
               <Divider />
@@ -318,7 +425,7 @@ const OfferFormPage: React.FC = () => {
                     onClick={handlePrev}
                     className={classes.left}
                   >
-                    Prev
+                    {t('Prev')}
                   </Button>
                 ) : null}
                 <Button
@@ -327,7 +434,7 @@ const OfferFormPage: React.FC = () => {
                   onClick={handleNext}
                   className={classes.right}
                 >
-                  Next
+                  {t('Next')}
                 </Button>
               </CardActions>
             </Card>
@@ -340,70 +447,103 @@ const OfferFormPage: React.FC = () => {
                 <Grid spacing={2} container>
                   <Grid xs={12} item>
                     <FormControlLabel
-                      label="Using default blank details"
+                      label={t('Using default blank details')}
                       control={
                         <Switch
                           color="primary"
                           id="usingDefault"
                           name="usingDefault"
-                          checked={formik.values.usingDefault}
-                          onChange={formik.handleChange}
+                          checked={usingDefault}
+                          onChange={handleToggleSwitch}
                         />
                       }
                     />
                   </Grid>
-                  <Grid xs={12} sm={12} md={6} item>
-                    <TextField
-                      id="payDetail.field1name"
-                      name="payDetail.field1name"
-                      variant="outlined"
-                      label="Bank Name"
-                      placeholder="Bank Name"
-                      disabled={formik.values.usingDefault}
-                      value={formik.values.payDetail.field1name}
-                      onChange={formik.handleChange}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid xs={12} sm={12} md={6} item>
-                    <TextField
-                      id="payDetail.field2name"
-                      name="payDetail.field2name"
-                      variant="outlined"
-                      label="Branch Number"
-                      placeholder="Branch Number"
-                      disabled={formik.values.usingDefault}
-                      value={formik.values.payDetail.field2name}
-                      onChange={formik.handleChange}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid xs={12} sm={12} md={6} item>
-                    <TextField
-                      id="payDetail.field3name"
-                      name="payDetail.field3name"
-                      variant="outlined"
-                      label="Account Number"
-                      placeholder="Account Number"
-                      disabled={formik.values.usingDefault}
-                      value={formik.values.payDetail.field3name}
-                      onChange={formik.handleChange}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid xs={12} sm={12} md={6} item>
-                    <TextField
-                      id="payDetail.field4name"
-                      name="payDetail.field4name"
-                      variant="outlined"
-                      label="Account Name"
-                      placeholder="Account Name"
-                      disabled={formik.values.usingDefault}
-                      value={formik.values.payDetail.field4name}
-                      onChange={formik.handleChange}
-                      fullWidth
-                    />
-                  </Grid>
+                  {payType.field1name ? (
+                    <Grid xs={12} sm={12} md={6} item>
+                      <TextField
+                        id="payDetail.field1value"
+                        name="payDetail.field1value"
+                        variant="outlined"
+                        label={payType.field1name}
+                        placeholder={payType.field1name}
+                        value={formik.values.payDetail.field1value}
+                        onChange={formik.handleChange}
+                        fullWidth
+                        InputProps={{
+                          readOnly: usingDefault,
+                        }}
+                      />
+                    </Grid>
+                  ) : null}
+                  {payType.field2name ? (
+                    <Grid xs={12} sm={12} md={6} item>
+                      <TextField
+                        id="payDetail.field2value"
+                        name="payDetail.field2value"
+                        variant="outlined"
+                        label={payType.field2name}
+                        placeholder={payType.field2name}
+                        value={formik.values.payDetail.field2value}
+                        onChange={formik.handleChange}
+                        fullWidth
+                        InputProps={{
+                          readOnly: usingDefault,
+                        }}
+                      />
+                    </Grid>
+                  ) : null}
+                  {payType.field3name ? (
+                    <Grid xs={12} sm={12} md={6} item>
+                      <TextField
+                        id="payDetail.field3value"
+                        name="payDetail.field3value"
+                        variant="outlined"
+                        label={payType.field3name}
+                        placeholder={payType.field3name}
+                        value={formik.values.payDetail.field3value}
+                        onChange={formik.handleChange}
+                        fullWidth
+                        InputProps={{
+                          readOnly: usingDefault,
+                        }}
+                      />
+                    </Grid>
+                  ) : null}
+                  {payType.field4name ? (
+                    <Grid xs={12} sm={12} md={6} item>
+                      <TextField
+                        id="payDetail.field4value"
+                        name="payDetail.field4value"
+                        variant="outlined"
+                        label={payType.field4name}
+                        placeholder={payType.field4name}
+                        value={formik.values.payDetail.field4value}
+                        onChange={formik.handleChange}
+                        fullWidth
+                        InputProps={{
+                          readOnly: usingDefault,
+                        }}
+                      />
+                    </Grid>
+                  ) : null}
+                  {payType.field5name ? (
+                    <Grid xs={12} sm={12} md={6} item>
+                      <TextField
+                        id="payDetail.field5value"
+                        name="payDetail.field5value"
+                        variant="outlined"
+                        label={payType.field5name}
+                        placeholder={payType.field5name}
+                        value={formik.values.payDetail.field5value}
+                        onChange={formik.handleChange}
+                        fullWidth
+                        InputProps={{
+                          readOnly: usingDefault,
+                        }}
+                      />
+                    </Grid>
+                  ) : null}
                 </Grid>
               </CardContent>
               <Divider />
@@ -414,7 +554,7 @@ const OfferFormPage: React.FC = () => {
                   onClick={handlePrev}
                   className={classes.left}
                 >
-                  Prev
+                  {t('Prev')}
                 </Button>
                 <Button
                   color="primary"
@@ -422,7 +562,7 @@ const OfferFormPage: React.FC = () => {
                   onClick={handleNext}
                   className={classes.right}
                 >
-                  Next
+                  {t('Next')}
                 </Button>
               </CardActions>
             </Card>
@@ -433,20 +573,21 @@ const OfferFormPage: React.FC = () => {
             <Card className={classes.card}>
               <CardContent>
                 <Alert severity="info">
-                  After expiry time, if the trade is not complete, the crypto will return to your
-                  wallet.
+                  {t(
+                    'After expiry time, if the trade is not complete, the crypto will return to your wallet',
+                  )}
                 </Alert>
                 <Grid spacing={2} className={classes.picker} container>
                   <Grid xs={12} sm={12} md={6} lg={4} xl={3} item>
-                    <DatePicker
+                    <DateTimePicker
                       id="expiry"
                       name="expiry"
-                      format="YYYY-MM-DD"
-                      label="Expiry Time"
+                      format="YYYY-MM-DD HH:mm"
+                      label={t('Expiry Time')}
                       value={formik.values.expiry ? new Date(formik.values.expiry) : null}
                       onChange={handleDatePickerChange}
-                      emptyLabel="Please Select Date"
-                      invalidDateMessage="Invalid Date Format"
+                      emptyLabel={t('Please Select Date Time')}
+                      invalidDateMessage={t('Invalid Date Time Format')}
                       inputVariant="outlined"
                       fullWidth
                     />
@@ -462,7 +603,7 @@ const OfferFormPage: React.FC = () => {
                   onClick={handlePrev}
                   className={classes.left}
                 >
-                  Prev
+                  {t('Prev')}
                 </Button>
                 <Button
                   type="submit"
@@ -471,7 +612,7 @@ const OfferFormPage: React.FC = () => {
                   onClick={handleNext}
                   className={classes.right}
                 >
-                  {loading ? 'Creating...' : 'Create Offer'}
+                  {loading ? t('Creating...') : t('Create Offer')}
                 </Button>
               </CardActions>
             </Card>
