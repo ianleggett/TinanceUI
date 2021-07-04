@@ -3,8 +3,6 @@ import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
@@ -12,8 +10,6 @@ import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import VisibilityOffOutlinedIcon from '@material-ui/icons/VisibilityOffOutlined';
-import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
@@ -24,6 +20,7 @@ import * as yup from 'yup';
 
 import { countryCodes } from '../constants';
 import { SignUpService } from '../services';
+import { formatCountryCodeOption } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,18 +50,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialValues = {
-  username: '',
-  firstName: '',
-  lastName: '',
+  countryISO: 'USA',
   email: '',
-  countryISO: '001',
   phone: '',
-  password: '',
-  password2: '',
-  country: 'US',
-  bank: '',
-  bankAccountNumber: '',
-  bankBranchNumber: '',
+  username: '',
 };
 
 const SignUpPage: React.FC = () => {
@@ -72,32 +61,18 @@ const SignUpPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const [showPassword, setShowPassword] = useState(false);
+  const [telCode, setTelCode] = useState('+1');
   const emailRef = useRef('');
 
   const validationSchema = useMemo(() => {
     return yup.object({
-      firstName: yup.string().required(t('First name is required')),
-      lastName: yup.string().required(t('Last name is required')),
-      username: yup.string().required(t('Username is required')),
+      countryISO: yup.string().required(t('Country is required')),
+      phone: yup.string().required(t('Phone number is required')),
       email: yup
         .string()
         .email(t('Invalid email adrress format'))
         .required(t('Email address is Required')),
-      countryISO: yup.string(),
-      phone: yup.string().required(t('Phone number is required')),
-      password: yup
-        .string()
-        .min(6, t('Password should be at least 6 chars'))
-        .required(t('Password is required')),
-      password2: yup
-        .string()
-        .min(6, t('Password should be at least 6 chars'))
-        .required(t('Password is required')),
-      country: yup.string(),
-      bank: yup.string(),
-      bankAccountNumber: yup.string(),
-      bankBranchNumber: yup.string(),
+      username: yup.string().required(t('Username is required')),
     });
   }, [t]);
 
@@ -109,7 +84,7 @@ const SignUpPage: React.FC = () => {
           variant: 'success',
         });
       } else {
-        enqueueSnackbar(t('Sign up failed'), {
+        enqueueSnackbar(res.msg || t('Sign up failed'), {
           variant: 'warning',
         });
       }
@@ -120,16 +95,12 @@ const SignUpPage: React.FC = () => {
     initialValues,
     validationSchema,
     onSubmit(values) {
-      const { password2, ...restValues } = values;
-
-      if (password2 === values.password) {
-        signup(restValues);
-        emailRef.current = values.email;
-      } else {
-        enqueueSnackbar(t('Password should the same as confirm password'), {
-          variant: 'warning',
-        });
-      }
+      const { phone, ...restValues } = values;
+      signup({
+        phone: `${telCode} ${phone}`,
+        ...restValues,
+      });
+      emailRef.current = values.email;
     },
   });
 
@@ -143,9 +114,32 @@ const SignUpPage: React.FC = () => {
     [formik, loading],
   );
 
-  const handleToggleShowPassword = useCallback(() => {
-    setShowPassword((prevState) => !prevState);
-  }, []);
+  const handleCountryISOChange = useCallback(
+    (
+      event: React.ChangeEvent<{
+        name?: string | undefined;
+        value: unknown;
+      }>,
+    ) => {
+      const countryCode = countryCodes.find((v) => v.tripleCode === event.target.value);
+
+      if (countryCode) {
+        setTelCode(countryCode.telCode);
+      }
+
+      formik.handleChange(event);
+    },
+    [formik],
+  );
+
+  const handleTelCodeChange = useCallback(
+    (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      if (/^[\d+]{1,8}$/.test(event.currentTarget.value)) {
+        setTelCode(event.currentTarget.value);
+      }
+    },
+    [],
+  );
 
   const handleGoToForgotPasswordPage = useCallback(() => {
     history.push('/forgot-password');
@@ -162,85 +156,45 @@ const SignUpPage: React.FC = () => {
           {t('Sign Up')}
         </Typography>
         <form onSubmit={handleSubmit} className={classes.form}>
-          <TextField
-            id="username"
-            name="username"
-            label={t('Username')}
-            variant="outlined"
-            disabled={loading}
-            autoComplete="username"
-            value={formik.values.username}
-            onChange={formik.handleChange}
-            error={formik.touched.username && Boolean(formik.errors.username)}
-            helperText={formik.touched.username && formik.errors.username}
-            fullWidth
-          />
-          <TextField
-            id="firstName"
-            name="firstName"
-            label={t('First Name')}
-            variant="outlined"
-            disabled={loading}
-            autoComplete="given-name"
-            value={formik.values.firstName}
-            onChange={formik.handleChange}
-            error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-            helperText={formik.touched.firstName && formik.errors.firstName}
-            fullWidth
-          />
-          <TextField
-            id="lastName"
-            name="lastName"
-            label={t('Last Name')}
-            variant="outlined"
-            disabled={loading}
-            autoComplete="family-name"
-            value={formik.values.lastName}
-            onChange={formik.handleChange}
-            error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-            helperText={formik.touched.lastName && formik.errors.lastName}
-            fullWidth
-          />
-          <TextField
-            id="email"
-            name="email"
-            type="email"
-            label={t('Email Address')}
-            variant="outlined"
-            disabled={loading}
-            autoComplete="email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
-            fullWidth
-          />
+          <FormControl variant="outlined" fullWidth>
+            <InputLabel id="country-select">{t('Country')}</InputLabel>
+            <Select
+              id="countryISO"
+              name="countryISO"
+              label={t('Country')}
+              labelId="country-select"
+              value={formik.values.countryISO}
+              onChange={handleCountryISOChange}
+              disabled={loading}
+              fullWidth
+            >
+              {countryCodes.map((countryCode) => (
+                <MenuItem key={countryCode.tripleCode} value={countryCode.tripleCode}>
+                  {formatCountryCodeOption(countryCode)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <Grid spacing={1} container>
             <Grid xs={3} item>
-              <Select
-                id="countryISO"
-                name="countryISO"
+              <TextField
+                id="telCode"
+                name="telCode"
                 variant="outlined"
-                value={formik.values.countryISO}
-                onChange={formik.handleChange}
                 disabled={loading}
+                inputMode="numeric"
                 autoComplete="tel-country-code"
+                value={telCode}
+                onChange={handleTelCodeChange}
                 fullWidth
-              >
-                {Object.entries(countryCodes).map(([key, value]) => (
-                  <MenuItem key={key} value={value.code}>
-                    <Typography variant="button" className={classes.country}>
-                      {key} ({value.code})
-                    </Typography>
-                  </MenuItem>
-                ))}
-              </Select>
+              />
             </Grid>
             <Grid xs={9} item>
               <TextField
                 id="phone"
                 name="phone"
                 type="tel"
+                inputMode="tel"
                 label={t('Phone Number')}
                 variant="outlined"
                 disabled={loading}
@@ -254,117 +208,34 @@ const SignUpPage: React.FC = () => {
             </Grid>
           </Grid>
           <TextField
-            id="password"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            label={t('Password')}
+            id="email"
+            name="email"
+            type="email"
+            label={t('Email Address')}
             variant="outlined"
             disabled={loading}
-            autoComplete="new-password"
-            value={formik.values.password}
+            inputMode="email"
+            autoComplete="email"
+            value={formik.values.email}
             onChange={formik.handleChange}
-            error={formik.touched.password && Boolean(formik.errors.password)}
-            helperText={formik.touched.password && formik.errors.password}
-            fullWidth
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    edge="end"
-                    tabIndex={-1}
-                    onClick={handleToggleShowPassword}
-                    aria-label={t('Toggle password visibility')}
-                  >
-                    {showPassword ? <VisibilityOutlinedIcon /> : <VisibilityOffOutlinedIcon />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <TextField
-            id="password2"
-            name="password2"
-            type={showPassword ? 'text' : 'password'}
-            label={t('Confirm Password')}
-            variant="outlined"
-            disabled={loading}
-            autoComplete="new-password"
-            value={formik.values.password2}
-            onChange={formik.handleChange}
-            error={formik.touched.password2 && Boolean(formik.errors.password2)}
-            helperText={formik.touched.password2 && formik.errors.password2}
-            fullWidth
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    edge="end"
-                    tabIndex={-1}
-                    onClick={handleToggleShowPassword}
-                    aria-label={t('Toggle password visibility')}
-                  >
-                    {showPassword ? <VisibilityOutlinedIcon /> : <VisibilityOffOutlinedIcon />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <FormControl variant="outlined" fullWidth>
-            <InputLabel id="country-select">{t('Country')}</InputLabel>
-            <Select
-              id="country"
-              name="country"
-              label={t('Country')}
-              labelId="country-select"
-              value={formik.values.country}
-              onChange={formik.handleChange}
-              disabled={loading}
-              autoComplete="country-code"
-              fullWidth
-            >
-              {Object.entries(countryCodes).map(([key, value]) => (
-                <MenuItem key={key} value={key}>
-                  {value.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            id="bank"
-            name="bank"
-            label={t('Bank')}
-            variant="outlined"
-            disabled={loading}
-            value={formik.values.bank}
-            onChange={formik.handleChange}
-            error={formik.touched.bank && Boolean(formik.errors.bank)}
-            helperText={formik.touched.bank && formik.errors.bank}
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helperText={formik.touched.email && formik.errors.email}
             fullWidth
           />
           <TextField
-            id="bankAccountNumber"
-            name="bankAccountNumber"
-            label={t('Bank Account Number')}
+            id="username"
+            name="username"
+            label={t('Username')}
             variant="outlined"
             disabled={loading}
-            value={formik.values.bankAccountNumber}
+            autoComplete="username"
+            value={formik.values.username}
             onChange={formik.handleChange}
-            error={formik.touched.bankAccountNumber && Boolean(formik.errors.bankAccountNumber)}
-            helperText={formik.touched.bankAccountNumber && formik.errors.bankAccountNumber}
+            error={formik.touched.username && Boolean(formik.errors.username)}
+            helperText={formik.touched.username && formik.errors.username}
             fullWidth
           />
-          <TextField
-            id="bankBranchNumber"
-            name="bankBranchNumber"
-            label={t('Bank Branch Number')}
-            variant="outlined"
-            disabled={loading}
-            value={formik.values.bankBranchNumber}
-            onChange={formik.handleChange}
-            error={formik.touched.bankBranchNumber && Boolean(formik.errors.bankBranchNumber)}
-            helperText={formik.touched.bankBranchNumber && formik.errors.bankBranchNumber}
-            fullWidth
-          />
+
           <Button
             type="submit"
             color="primary"

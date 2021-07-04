@@ -10,7 +10,7 @@ export async function SignUpService(params: API.SignUpParams): Promise<API.SignU
   try {
     const res = await request<API.SignUpResponse>('/v1/public/usersignup.json', {
       method: 'POST',
-      data: params,
+      params,
     });
 
     return res;

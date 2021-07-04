@@ -160,17 +160,13 @@ declare namespace API {
   interface SignOutResponse extends BaseResponse {}
 
   interface SignUpParams {
-    firstName: string;
-    lastName: string;
-    username: string;
-    email: string;
     countryISO: string;
+    email: string;
     phone: string;
-    password: string;
-    country: string;
-    bank?: string;
-    bankAccountNumber?: string;
-    bankBranchNumber?: string;
+    username: string;
+    validCountry?: boolean;
+    validEmail?: boolean;
+    validPhone?: boolean;
   }
 
   interface SignUpResponse extends BaseResponse {}
