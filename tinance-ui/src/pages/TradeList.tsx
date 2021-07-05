@@ -344,15 +344,7 @@ const TradeListPage: React.FC = () => {
                   <Typography color="textSecondary" variant="overline">
                     {t('Status')}
                   </Typography>
-                  <Typography
-                    color={
-                      ['CANCELLED', 'EXPIRED', 'DELETED'].includes(trade.status)
-                        ? 'secondary'
-                        : 'primary'
-                    }
-                  >
-                    {trade.status}
-                  </Typography>
+                  <Typography color="primary">{trade.status}</Typography>
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Button

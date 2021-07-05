@@ -134,13 +134,14 @@ declare namespace Offer {
 
 declare namespace Trade {
   type Status =
+    | 'ARBITRATE'
     | 'CREATED'
     | 'CANCELLED'
-    | 'COMPLETE'
-    | 'DELETED'
-    | 'EDIT'
-    | 'EXPIRED'
-    | 'IN_PROGRESS'
+    | 'COMPLETED'
+    | 'CANCEL_REQ'
+    | 'ERROR'
+    | 'DEPOSIT'
+    | 'FIATSENT'
     | 'UNKNOWN';
 
   interface Model {

@@ -24,12 +24,14 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import { useMount, useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
+import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
+import { createTracing } from 'trace_events';
 
-import { useAppConfigState } from '../components';
-import { GetAllOffersService } from '../services';
+import { useAppConfigState, useUserManagerState } from '../components';
+import { GetAllOffersService, TakeOrderService } from '../services';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -104,6 +106,8 @@ const MarketListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
+  const { isLoggedIn } = useUserManagerState();
   const { ccyCodes, paymentTypes } = useAppConfigState();
 
   const theme = useTheme();
@@ -112,6 +116,7 @@ const MarketListPage: React.FC = () => {
 
   const [isBuy, setIsBuy] = useState(true);
   const [offers, setOffers] = useState<Offer.Model[]>([]);
+  const [currentOrderId, setCurrentOrderId] = useState('');
 
   /** Options of Crypto and Fiat select */
   const options = useMemo(() => {
@@ -125,6 +130,21 @@ const MarketListPage: React.FC = () => {
     onSuccess(res) {
       if (res) {
         setOffers(res);
+      }
+    },
+  });
+
+  const { run: createTrade, loading: creating } = useRequest(TakeOrderService, {
+    onSuccess(res) {
+      if (res.statusCode === 0) {
+        history.push('/trades');
+        enqueueSnackbar(t('Take over offer successful'), {
+          variant: 'success',
+        });
+      } else {
+        enqueueSnackbar(res.msg || t('Take over offer failed'), {
+          variant: 'warning',
+        });
       }
     },
   });
@@ -172,6 +192,30 @@ const MarketListPage: React.FC = () => {
       }
     },
     [formik, loading],
+  );
+
+  const handleTakeOverOffer = useCallback(
+    (oid: string) => {
+      if (!isLoggedIn) {
+        history.push('/signin?from=/markets');
+        enqueueSnackbar(t('Please login in first'), {
+          variant: 'warning',
+        });
+        return;
+      }
+
+      if (!creating) {
+        setCurrentOrderId(oid);
+
+        createTrade({
+          cryptFee: 0, // TODO: figure out how to get cryptFee
+          cryptQty: 0, // TODO: figure out how to get cryptQty
+          usrpayid: 0, // TODO: figure out how to get usrpayid
+          ordid: oid,
+        });
+      }
+    },
+    [createTrade, creating, enqueueSnackbar, history, isLoggedIn, t],
   );
 
   const handleGoToCreateOfferPage = useCallback(() => {
@@ -439,8 +483,13 @@ const MarketListPage: React.FC = () => {
                 </Grid>
                 <Grid xs={false} sm={false} md={10} lg={10} xl={10} item />
                 <Grid xs={12} sm={12} md={2} lg={2} xl={2} item>
-                  <Button color="secondary" variant="outlined" fullWidth>
-                    {t('Trade')}
+                  <Button
+                    color="secondary"
+                    variant="outlined"
+                    onClick={() => handleTakeOverOffer(offer.orderId)}
+                    fullWidth
+                  >
+                    {creating && offer.orderId === currentOrderId ? t('Trading...') : t('Trade')}
                   </Button>
                 </Grid>
               </Grid>
