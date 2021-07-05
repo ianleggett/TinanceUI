@@ -33,6 +33,7 @@ import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
+import * as yup from 'yup';
 
 import { useAppConfigState, useUserManagerState } from '../components';
 import { AddUpdateOrderService } from '../services';
@@ -82,7 +83,7 @@ interface InitialValues {
   fromamt: string;
   toccyid: number;
   toamt: string;
-  payDetail: {
+  payType: {
     payTypeId: number;
     field1value: string;
     field2value: string;
@@ -97,7 +98,7 @@ const initialValues: InitialValues = {
   fromamt: '',
   toccyid: 1,
   toamt: '',
-  payDetail: {
+  payType: {
     payTypeId: 0,
     field1value: '',
     field2value: '',
@@ -107,7 +108,7 @@ const initialValues: InitialValues = {
   },
 };
 
-const formatter = 'YYYY-MM-DD HH:mm';
+const formatter = 'YYYY-MM-DDTHH:mm';
 
 const OfferFormPage: React.FC = () => {
   const classes = useStyles();
@@ -117,6 +118,7 @@ const OfferFormPage: React.FC = () => {
   const { profile } = useUserManagerState();
   const { enqueueSnackbar } = useSnackbar();
   const { ccyCodes } = useAppConfigState();
+  const [invert, setInvert] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [usingDefault, setUsingDefault] = useState(true);
   const [expiryTime, setExpiryTime] = useState(dayjs());
@@ -127,15 +129,27 @@ const OfferFormPage: React.FC = () => {
 
   /** Options of Crypto and Fiat select */
   const options = useMemo(() => {
-    return groupBy(
+    const { ERC20, Fiat } = groupBy(
       ccyCodes.filter((v) => v.enable),
       'ccyType',
     );
-  }, [ccyCodes]);
+
+    return {
+      fromccyid: invert ? Fiat : ERC20,
+      toccyid: invert ? ERC20 : Fiat,
+    };
+  }, [ccyCodes, invert]);
+
+  const labels = useMemo(() => {
+    return {
+      fromccyid: invert ? t('Fiat') : t('Crypto'),
+      toccyid: invert ? t('Crypto') : t('Fiat'),
+    };
+  }, [invert, t]);
 
   const defaultPayDetail = useMemo(() => {
     if (!profile) {
-      return initialValues.payDetail;
+      return initialValues.payType;
     }
 
     const { field1value, field2value, field3value, field4value, field5value, payType } =
@@ -151,7 +165,7 @@ const OfferFormPage: React.FC = () => {
     };
   }, [profile]);
 
-  const payType = useMemo(() => {
+  const defaultPayType = useMemo(() => {
     if (!profile) {
       return {
         id: 1,
@@ -168,6 +182,13 @@ const OfferFormPage: React.FC = () => {
     return profile.payDetails[0].payType;
   }, [profile]);
 
+  const validationSchema = useMemo(() => {
+    return yup.object({
+      fromamt: yup.number().required(t('From amount is required')),
+      toamt: yup.number().required(t('To amount is required')),
+    });
+  }, [t]);
+
   const { run, loading } = useRequest(AddUpdateOrderService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
@@ -176,7 +197,7 @@ const OfferFormPage: React.FC = () => {
           variant: 'success',
         });
       } else {
-        enqueueSnackbar(t(res.msg || t('New offer created successful')), {
+        enqueueSnackbar(t(res.msg || t('New offer created failed')), {
           variant: 'warning',
         });
       }
@@ -200,18 +221,19 @@ const OfferFormPage: React.FC = () => {
       const to = toamt === '' ? 0 : Number.parseInt(toamt, 10);
 
       if (from !== 0 && to !== 0) {
-        return (from * feeRate).toFixed(4);
+        return ((invert ? to : from) * feeRate).toFixed(4);
       }
 
       return '--';
     },
-    [feeRate],
+    [feeRate, invert],
   );
 
   const formik = useFormik({
     initialValues,
+    validationSchema,
     onSubmit(values) {
-      const { fromamt, toamt, payDetail, ...restValues } = values;
+      const { fromamt, toamt, payType, ...restValues } = values;
 
       if (usingDefault) {
         run({
@@ -221,11 +243,13 @@ const OfferFormPage: React.FC = () => {
           ...restValues,
         });
       } else {
+        payType.payTypeId = defaultPayDetail.payTypeId;
+
         run({
           fromamt: fromamt ? Number.parseInt(fromamt, 10) : 0,
           toamt: fromamt ? Number.parseInt(toamt, 10) : 0,
           expiry: expiryTime.format(formatter),
-          payDetail,
+          payType,
           ...restValues,
         });
       }
@@ -256,18 +280,23 @@ const OfferFormPage: React.FC = () => {
   }, []);
 
   const handleSwitchCryptoAndFiat = useCallback(() => {
-    const from = formik.values.fromamt;
-    const to = formik.values.toamt;
+    setInvert((prevState) => {
+      const { fromccyid, fromamt, toamt, toccyid } = formik.values;
 
-    formik.setFieldValue('fromamt', to);
-    formik.setFieldValue('toamt', from);
+      formik.setFieldValue('fromccyid', toccyid);
+      formik.setFieldValue('fromamt', toamt);
+      formik.setFieldValue('toccyid', fromccyid);
+      formik.setFieldValue('toamt', fromamt);
+
+      return !prevState;
+    });
   }, [formik]);
 
   useEffect(() => {
     if (usingDefault) {
       formik.setFieldValue('payDetail', defaultPayDetail);
     } else {
-      formik.setFieldValue('payDetail', initialValues.payDetail);
+      formik.setFieldValue('payDetail', initialValues.payType);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usingDefault]);
@@ -313,19 +342,19 @@ const OfferFormPage: React.FC = () => {
                     <Grid spacing={2} container>
                       <Grid xs={12} sm={12} md={12} lg={5} xl={5} item>
                         <FormControl variant="outlined" fullWidth>
-                          <InputLabel id="fromccyid-select">{t('Crypto')}</InputLabel>
+                          <InputLabel id="fromccyid-select">{labels.fromccyid}</InputLabel>
                           <Select
                             id="fromccyid"
                             name="fromccyid"
                             labelId="fromccyid-select"
-                            label={t('Crypto')}
+                            label={labels.fromccyid}
                             value={formik.values.fromccyid}
                             onChange={formik.handleChange}
                           >
-                            {options.ERC20 !== undefined
-                              ? options.ERC20.map((erc20) => (
-                                  <MenuItem key={erc20.id} value={erc20.id}>
-                                    {erc20.name}
+                            {options.fromccyid !== undefined
+                              ? options.fromccyid.map((option) => (
+                                  <MenuItem key={option.id} value={option.id}>
+                                    {option.name}
                                   </MenuItem>
                                 ))
                               : null}
@@ -342,6 +371,8 @@ const OfferFormPage: React.FC = () => {
                           label={t("You'll send")}
                           value={formik.values.fromamt}
                           onChange={formik.handleChange}
+                          error={formik.touched.fromamt && Boolean(formik.errors.fromamt)}
+                          helperText={formik.touched.fromamt && formik.errors.fromamt}
                           fullWidth
                         />
                       </Grid>
@@ -358,19 +389,19 @@ const OfferFormPage: React.FC = () => {
                     <Grid spacing={2} container>
                       <Grid xs={12} sm={12} md={12} lg={5} xl={5} item>
                         <FormControl variant="outlined" fullWidth>
-                          <InputLabel id="toccyid-select">{t('Fiat')}</InputLabel>
+                          <InputLabel id="toccyid-select">{labels.toccyid}</InputLabel>
                           <Select
                             id="toccyid"
                             name="toccyid"
                             labelId="toccyid-select"
-                            label={t('Fiat')}
+                            label={labels.toccyid}
                             value={formik.values.toccyid}
                             onChange={formik.handleChange}
                           >
-                            {options.Fiat !== undefined
-                              ? options.Fiat.map((fiat) => (
-                                  <MenuItem key={fiat.id} value={fiat.id}>
-                                    {fiat.name}
+                            {options.toccyid !== undefined
+                              ? options.toccyid.map((option) => (
+                                  <MenuItem key={option.id} value={option.id}>
+                                    {option.name}
                                   </MenuItem>
                                 ))
                               : null}
@@ -387,6 +418,8 @@ const OfferFormPage: React.FC = () => {
                           label={t("You'll receive")}
                           value={formik.values.toamt}
                           onChange={formik.handleChange}
+                          error={formik.touched.toamt && Boolean(formik.errors.toamt)}
+                          helperText={formik.touched.toamt && formik.errors.toamt}
                           fullWidth
                         />
                       </Grid>
@@ -453,15 +486,15 @@ const OfferFormPage: React.FC = () => {
                       }
                     />
                   </Grid>
-                  {payType.field1name ? (
+
+                  {defaultPayType.field1name ? (
                     <Grid xs={12} sm={12} md={6} item>
                       <TextField
-                        id="payDetail.field1value"
-                        name="payDetail.field1value"
+                        id="payType.field1value"
+                        name="payType.field1value"
                         variant="outlined"
-                        label={payType.field1name}
-                        placeholder={payType.field1name}
-                        value={formik.values.payDetail.field1value}
+                        label={defaultPayType.field1name}
+                        value={formik.values.payType.field1value}
                         onChange={formik.handleChange}
                         fullWidth
                         InputProps={{
@@ -470,15 +503,14 @@ const OfferFormPage: React.FC = () => {
                       />
                     </Grid>
                   ) : null}
-                  {payType.field2name ? (
+                  {defaultPayType.field2name ? (
                     <Grid xs={12} sm={12} md={6} item>
                       <TextField
-                        id="payDetail.field2value"
-                        name="payDetail.field2value"
+                        id="payType.field2value"
+                        name="payType.field2value"
                         variant="outlined"
-                        label={payType.field2name}
-                        placeholder={payType.field2name}
-                        value={formik.values.payDetail.field2value}
+                        label={defaultPayType.field2name}
+                        value={formik.values.payType.field2value}
                         onChange={formik.handleChange}
                         fullWidth
                         InputProps={{
@@ -487,15 +519,14 @@ const OfferFormPage: React.FC = () => {
                       />
                     </Grid>
                   ) : null}
-                  {payType.field3name ? (
+                  {defaultPayType.field3name ? (
                     <Grid xs={12} sm={12} md={6} item>
                       <TextField
-                        id="payDetail.field3value"
-                        name="payDetail.field3value"
+                        id="payType.field3value"
+                        name="payType.field3value"
                         variant="outlined"
-                        label={payType.field3name}
-                        placeholder={payType.field3name}
-                        value={formik.values.payDetail.field3value}
+                        label={defaultPayType.field3name}
+                        value={formik.values.payType.field3value}
                         onChange={formik.handleChange}
                         fullWidth
                         InputProps={{
@@ -504,15 +535,14 @@ const OfferFormPage: React.FC = () => {
                       />
                     </Grid>
                   ) : null}
-                  {payType.field4name ? (
+                  {defaultPayType.field4name ? (
                     <Grid xs={12} sm={12} md={6} item>
                       <TextField
-                        id="payDetail.field4value"
-                        name="payDetail.field4value"
+                        id="payType.field4value"
+                        name="payType.field4value"
                         variant="outlined"
-                        label={payType.field4name}
-                        placeholder={payType.field4name}
-                        value={formik.values.payDetail.field4value}
+                        label={defaultPayType.field4name}
+                        value={formik.values.payType.field4value}
                         onChange={formik.handleChange}
                         fullWidth
                         InputProps={{
@@ -521,15 +551,14 @@ const OfferFormPage: React.FC = () => {
                       />
                     </Grid>
                   ) : null}
-                  {payType.field5name ? (
+                  {defaultPayType.field5name ? (
                     <Grid xs={12} sm={12} md={6} item>
                       <TextField
-                        id="payDetail.field5value"
-                        name="payDetail.field5value"
+                        id="payType.field5value"
+                        name="payType.field5value"
                         variant="outlined"
-                        label={payType.field5name}
-                        placeholder={payType.field5name}
-                        value={formik.values.payDetail.field5value}
+                        label={defaultPayType.field5name}
+                        value={formik.values.payType.field5value}
                         onChange={formik.handleChange}
                         fullWidth
                         InputProps={{

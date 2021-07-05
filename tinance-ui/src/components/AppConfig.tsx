@@ -77,7 +77,14 @@ export const AppConfigProvider: React.FC<AppConfigProviderProps> = (props) => {
         <Suspense fallback="Loading...">
           <I18nextProvider fallbackLng={state.lang} dispatch={dispatch}>
             <GlobalHeader title={title} logo={logo} maxWidth={maxWidth} />
-            <Container component="main" maxWidth={maxWidth} style={{ flex: 1 }}>
+            <Container
+              component="main"
+              maxWidth={maxWidth}
+              style={{
+                flex: 1,
+                marginBottom: 32,
+              }}
+            >
               {children}
             </Container>
             <GlobalFooter

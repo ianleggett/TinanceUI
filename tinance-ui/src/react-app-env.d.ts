@@ -227,7 +227,7 @@ declare namespace API {
     toccyid: number;
     toamt: number;
     expiry: string;
-    payDetail?: {
+    payType?: {
       payTypeId: number;
       field1value: string;
       field2value: string;

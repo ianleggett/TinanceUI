@@ -141,7 +141,8 @@ const MarketListPage: React.FC = () => {
         fromamt: fromamt ? Number.parseInt(fromamt, 10) : undefined,
         fromccyid: fromccyid || undefined,
         toccyid: toccyid || undefined,
-        payTypes: payTypes === 0 ? undefined : [payTypes],
+        payTypes: payTypes === 0 ? [] : [payTypes],
+        status: [],
       });
     },
     onReset() {

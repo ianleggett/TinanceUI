@@ -10,11 +10,9 @@ export async function GetMyOffersService(
   params: API.GetMyOffersParams = {},
 ): Promise<API.GetMyOffersResponse> {
   try {
-    const { keyword, ...restParams } = params;
     const res = await request<API.GetMyOffersResponse>('/v1/getmyoffers.json', {
       method: 'POST',
-      params: { keyword },
-      data: restParams,
+      data: params,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },

@@ -117,18 +117,31 @@ const OfferListPage: React.FC = () => {
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
-      const { status, keyword } = values;
+      const { keyword } = values;
 
-      if (keyword) {
-        run({ keyword });
-        formik.setFieldValue('status', 'ANY');
-      } else if (status === 'ANY') {
-        run();
-      } else {
-        run({ status: [status] });
-      }
+      formik.setFieldValue('status', 'ANY');
+      run({ keyword });
     },
   });
+
+  const handleStatusSelectChange = useCallback(
+    (
+      event: React.ChangeEvent<{
+        name?: string | undefined;
+        value: unknown;
+      }>,
+    ) => {
+      const selectedStatus = event.target.value as Offer.Status | 'ANY';
+
+      formik.handleChange(event);
+      formik.setFieldValue('keyword', '');
+
+      run({
+        status: selectedStatus === 'ANY' ? [] : [selectedStatus],
+      });
+    },
+    [formik, run],
+  );
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -173,7 +186,7 @@ const OfferListPage: React.FC = () => {
                     labelId="status-select"
                     label="Status"
                     value={formik.values.status}
-                    onChange={formik.handleChange}
+                    onChange={handleStatusSelectChange}
                   >
                     <MenuItem value="ANY">
                       <em>{t('Any Status')}</em>
