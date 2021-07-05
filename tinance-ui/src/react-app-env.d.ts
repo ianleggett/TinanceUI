@@ -132,6 +132,44 @@ declare namespace Offer {
   }
 }
 
+declare namespace Trade {
+  type Status =
+    | 'CREATED'
+    | 'CANCELLED'
+    | 'COMPLETE'
+    | 'DELETED'
+    | 'EDIT'
+    | 'EXPIRED'
+    | 'IN_PROGRESS'
+    | 'UNKNOWN';
+
+  interface Model {
+    id: number;
+    contractId: string;
+    numericOrderId: number;
+    parentOrderId: string;
+    buyerId: number;
+    buyerAddress: string;
+    sellerId: number;
+    sellerAddress: string;
+    fromccy: PublicData.CCYCode;
+    fromAmount: number;
+    toccy: PublicData.CCYCode;
+    toAmount: number;
+    cryptoAmount: number;
+    cryptoFee: number;
+    fee: number;
+    status: Status;
+    archive?: any;
+    auditList: any[];
+    bankfundflag?: any;
+    cancelRequest?: any;
+    completedHash?: any;
+    depositHash?: any;
+    created: string;
+  }
+}
+
 declare namespace API {
   interface ErrorResponse {
     path: string;
@@ -215,11 +253,13 @@ declare namespace API {
     keyword?: string;
   }
 
-  interface GetMyTradesParams extends GetAllOffersParams {}
+  interface GetMyTradesParams extends GetAllOffersParams {
+    keyword?: string;
+  }
 
   type GetAllOffersResponse = Offer.Model[];
   type GetMyOffersResponse = Offer.Model[];
-  type GetMyTradesResponse = Offer.Model[];
+  type GetMyTradesResponse = Trade.Model[];
 
   interface GetAddUpdateOrderParams {
     fromccyid: number;
