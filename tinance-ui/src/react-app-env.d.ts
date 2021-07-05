@@ -238,4 +238,41 @@ declare namespace API {
   }
 
   interface GetAddUpdateOrderResponse extends BaseResponse, Offer.Model {}
+
+  interface AcceptCancelParams {}
+  interface AcceptCancelResponse extends BaseResponse {}
+
+  interface CancelTradeParams {
+    oid: string;
+  }
+
+  interface CancelTradeResponse extends BaseResponse {}
+
+  interface DepositCryptoParams {
+    oid: string;
+  }
+
+  interface DepositCryptoResponse extends BaseResponse {}
+
+  interface FlagCompleteParams {
+    oid: string;
+    txn: string;
+  }
+
+  interface FlagCompleteResponse extends BaseResponse {}
+
+  interface FlagFundsSentParams {
+    oid: string;
+  }
+
+  interface FlagFundsSentResponse extends BaseResponse {}
+
+  interface TakeOrderParams {
+    cryptFee: number;
+    cryptQty: number;
+    ordid: string;
+    usrpayid: number;
+  }
+
+  interface TakeOrderResponse extends BaseResponse {}
 }
