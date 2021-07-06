@@ -22,4 +22,16 @@ export const offerStatusMap: Record<Offer.Status, string> = {
   UNKNOWN: 'Unknown',
 };
 
+export const tradeStatusMap: Record<Trade.Status, string> = {
+  ARBITRATE: 'Arbitrate',
+  CREATED: 'Created',
+  CANCELLED: 'Cancelled',
+  CANCEL_REQ: 'Cancelled Request',
+  ERROR: 'Error',
+  DEPOSIT: 'Deposit',
+  FIATSENT: 'Fiat Sent',
+  COMPLETED: 'Completed',
+  UNKNOWN: 'Unknown',
+};
+
 export type AppConfig = typeof appConfig;

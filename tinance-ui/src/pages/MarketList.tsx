@@ -16,6 +16,8 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import CheckOutlinedIcon from '@material-ui/icons/CheckOutlined';
+import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
@@ -28,7 +30,6 @@ import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import { createTracing } from 'trace_events';
 
 import { useAppConfigState, useUserManagerState } from '../components';
 import { GetAllOffersService, TakeOrderService } from '../services';
@@ -117,6 +118,7 @@ const MarketListPage: React.FC = () => {
   const [isBuy, setIsBuy] = useState(true);
   const [offers, setOffers] = useState<Offer.Model[]>([]);
   const [currentOrderId, setCurrentOrderId] = useState('');
+  const [confirming, setConfirming] = useState(false);
 
   /** Options of Crypto and Fiat select */
   const options = useMemo(() => {
@@ -206,17 +208,21 @@ const MarketListPage: React.FC = () => {
 
       if (!creating) {
         setCurrentOrderId(oid);
-
-        createTrade({
-          cryptFee: 0, // TODO: figure out how to get cryptFee
-          cryptQty: 0, // TODO: figure out how to get cryptQty
-          usrpayid: 0, // TODO: figure out how to get usrpayid
-          ordid: oid,
-        });
+        setConfirming(true);
       }
     },
-    [createTrade, creating, enqueueSnackbar, history, isLoggedIn, t],
+    [creating, enqueueSnackbar, history, isLoggedIn, t],
   );
+
+  const handleAccept = useCallback(() => {
+    createTrade({
+      ordid: currentOrderId,
+    });
+  }, [createTrade, currentOrderId]);
+
+  const handleReject = useCallback(() => {
+    setConfirming(false);
+  }, []);
 
   const handleGoToCreateOfferPage = useCallback(() => {
     history.push('/offers/create');
@@ -465,7 +471,7 @@ const MarketListPage: React.FC = () => {
                 ) : null}
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    {t('Trader One')}
+                    {offer.userDetails.username}
                   </Typography>
                   <Typography color="primary">
                     {t('0 Trades', {
@@ -481,17 +487,116 @@ const MarketListPage: React.FC = () => {
                     <Rating size="small" value={offer.userDetails.feedback} readOnly />
                   </Box>
                 </Grid>
-                <Grid xs={false} sm={false} md={10} lg={10} xl={10} item />
-                <Grid xs={12} sm={12} md={2} lg={2} xl={2} item>
-                  <Button
-                    color="secondary"
-                    variant="outlined"
-                    onClick={() => handleTakeOverOffer(offer.orderId)}
-                    fullWidth
-                  >
-                    {creating && offer.orderId === currentOrderId ? t('Trading...') : t('Trade')}
-                  </Button>
-                </Grid>
+                {confirming && offer.orderId === currentOrderId ? (
+                  <>
+                    <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                      <Divider className={classes.divider} />
+                    </Grid>
+                    {offer.buyer ? (
+                      <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                        <Typography component="h2" variant="h5" color="primary">
+                          You are the buyer, the trading process is:
+                        </Typography>
+                        <ol>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              You accept this offer
+                            </Typography>
+                          </li>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              The seller will escrow the USDT
+                            </Typography>
+                          </li>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              You send money via bank transfer
+                            </Typography>
+                          </li>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              The seller confirms and release the USDT
+                            </Typography>
+                          </li>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              We are both happy and trade again in the future
+                            </Typography>
+                          </li>
+                        </ol>
+                      </Grid>
+                    ) : (
+                      <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                        <Typography component="h2" variant="h5" color="primary">
+                          You are the seller, the trading process is:
+                        </Typography>
+                        <ol>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              You accept this offer
+                            </Typography>
+                          </li>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              You escrow the USDT
+                            </Typography>
+                          </li>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              The buyer sends money via bank transfer
+                            </Typography>
+                          </li>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              You confirm and release the USDT
+                            </Typography>
+                          </li>
+                          <li>
+                            <Typography component="p" variant="body1">
+                              We are both happy and trade again in the future
+                            </Typography>
+                          </li>
+                        </ol>
+                      </Grid>
+                    )}
+                    <Grid xs={false} sm={false} md={8} lg={8} xl={8} item />
+                    <Grid xs={12} sm={12} md={2} lg={2} xl={2} item>
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        onClick={handleAccept}
+                        startIcon={<CheckOutlinedIcon />}
+                        fullWidth
+                      >
+                        {creating ? t('Creating...') : t('Accept')}
+                      </Button>
+                    </Grid>
+                    <Grid xs={12} sm={12} md={2} lg={2} xl={2} onClick={handleReject} item>
+                      <Button
+                        color="secondary"
+                        variant="outlined"
+                        startIcon={<CloseOutlinedIcon />}
+                        fullWidth
+                      >
+                        {t('Reject')}
+                      </Button>
+                    </Grid>
+                  </>
+                ) : (
+                  <>
+                    <Grid xs={false} sm={false} md={10} lg={10} xl={10} item />
+                    <Grid xs={12} sm={12} md={2} lg={2} xl={2} item>
+                      <Button
+                        color="secondary"
+                        variant="outlined"
+                        onClick={() => handleTakeOverOffer(offer.orderId)}
+                        fullWidth
+                      >
+                        {t('Trade')}
+                      </Button>
+                    </Grid>
+                  </>
+                )}
               </Grid>
             </Paper>
           ))

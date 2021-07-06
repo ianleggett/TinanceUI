@@ -254,7 +254,8 @@ declare namespace API {
     keyword?: string;
   }
 
-  interface GetMyTradesParams extends GetAllOffersParams {
+  interface GetMyTradesParams {
+    status?: Trade.Status[];
     keyword?: string;
   }
 
@@ -309,10 +310,10 @@ declare namespace API {
   interface FlagFundsSentResponse extends BaseResponse {}
 
   interface TakeOrderParams {
-    cryptFee: number;
-    cryptQty: number;
+    cryptFee?: number;
+    cryptQty?: number;
     ordid: string;
-    usrpayid: number;
+    usrpayid?: number;
   }
 
   interface TakeOrderResponse extends BaseResponse {}
