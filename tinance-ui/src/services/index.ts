@@ -1,6 +1,7 @@
 export * from './accept-cancel';
 export * from './add-update-order';
 export * from './cancel-trade';
+export * from './change-pwd';
 export * from './deposit-crypto';
 export * from './flag-complete';
 export * from './flag-funds-sent';
@@ -18,3 +19,4 @@ export * from './signin';
 export * from './signout';
 export * from './signup';
 export * from './take-order';
+export * from './update-user';

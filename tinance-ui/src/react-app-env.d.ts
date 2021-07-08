@@ -46,6 +46,7 @@ declare namespace User {
     blurb?: string;
     username: string;
     email: string;
+    countryISO: string;
     phone?: string;
     role: 'ROLE_USER' | 'ROLE_ADMIN';
     verified: boolean;
@@ -317,4 +318,22 @@ declare namespace API {
   }
 
   interface TakeOrderResponse extends BaseResponse {}
+
+  interface ChangePasswordParams {
+    userid: number;
+    oldpwd: string;
+    newpwd: string;
+  }
+
+  interface ChangePasswordResponse extends BaseResponse {}
+
+  interface UpdateUserParams {
+    userid: number;
+    countryISO?: string;
+    phone?: string;
+    email?: string;
+    username?: string;
+  }
+
+  interface UpdateUserResponse extends BaseResponse {}
 }
