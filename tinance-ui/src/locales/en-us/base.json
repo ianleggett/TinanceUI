@@ -1,5 +1,6 @@
 {
   "0 Trades": "{{trades}} Trades",
+  "Accept": "Accept",
   "After expiry time, if the trade is not complete, the crypto will return to your wallet": "After expiry time, if the trade is not complete, the crypto will return to your wallet",
   "All rights reserved": "All rights reserved",
   "Already found my password? Sign in!": "Already found my password? Sign in!",
@@ -85,6 +86,7 @@
   "Profile": "Profile",
   "Progress": "Progress",
   "Rating": "Rating",
+  "Reject": "Reject",
   "Remaining Time": "Remaining Time",
   "Reset": "Reset",
   "Reset Password": "Reset Password",

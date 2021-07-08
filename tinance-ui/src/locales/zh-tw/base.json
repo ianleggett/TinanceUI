@@ -1,5 +1,6 @@
 {
   "0 Trades": "{{trades}} 筆",
+  "Accept": "接受",
   "After expiry time,if the trade is not complete,the crypto will return to your wallet": "在到達過期時間時，如果交易沒有完成，所有虛擬貨幣將退回到你的錢包",
   "All rights reserved": "版權所有",
   "Already found my password? Sign in!": "已經找回密碼了？立即登入！",
@@ -85,6 +86,7 @@
   "Profile": "個人資料",
   "Progress": "交易進度",
   "Rating": "評估",
+  "Reject": "拒絕",
   "Remaining Time": "剩餘時間",
   "Reset": "重置",
   "Reset Password": "重置密碼",
