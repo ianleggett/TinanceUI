@@ -13,6 +13,7 @@ export async function CancelTradeService(
     const res = await request<API.CancelTradeResponse>('/v1/canceltrade.json', {
       method: 'POST',
       params,
+      data: {},
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },

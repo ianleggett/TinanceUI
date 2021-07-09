@@ -13,6 +13,7 @@ export async function FlagFundsSentService(
     const res = await request<API.FlagFundsSentResponse>('/v1/flagfundssent.json', {
       method: 'POST',
       params,
+      data: {},
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },

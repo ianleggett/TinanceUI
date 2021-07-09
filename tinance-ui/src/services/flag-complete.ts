@@ -13,6 +13,7 @@ export async function FlagCompleteService(
     const res = await request<API.FlagCompleteResponse>('/v1/flagcomplete.json', {
       method: 'POST',
       params,
+      data: {},
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },

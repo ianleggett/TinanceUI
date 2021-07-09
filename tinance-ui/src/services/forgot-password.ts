@@ -12,7 +12,7 @@ export async function ForgotPasswordService(
   try {
     const res = await request<API.ForgotPasswordResponse>('/v1/public/forgotPwd.json', {
       method: 'POST',
-      params,
+      data: params,
     });
 
     return res;

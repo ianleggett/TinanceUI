@@ -13,6 +13,7 @@ export async function AcceptCancelService(
     const res = await request<API.AcceptCancelResponse>('/v1/acceptcancel.json', {
       method: 'POST',
       params,
+      data: {},
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },

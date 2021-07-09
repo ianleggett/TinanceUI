@@ -13,6 +13,7 @@ export async function DepositCryptoService(
     const res = await request<API.DepositCryptoResponse>('/v1/depositcrypto.json', {
       method: 'POST',
       params,
+      data: {},
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
