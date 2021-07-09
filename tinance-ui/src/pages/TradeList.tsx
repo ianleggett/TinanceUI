@@ -402,22 +402,33 @@ const TradeListPage: React.FC = () => {
                     <Divider className={classes.divider} />
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                    <Typography align="center" component="p" variant="body1">
-                      {`You are selling ${trade.fromAmount.toFixed(4)} ${
-                        trade.fromccy.name
-                      } for ${trade.toAmount.toFixed(4)} ${
-                        trade.toccy.name
-                      } at an exchange rate of ${calcExchangeRate(
-                        trade.fromAmount.toString(),
-                        trade.toAmount.toString(),
-                      )} to Buyer
-                      ${trade.buyerId}.`}
+                    <Typography align="center" color="primary" component="p" variant="h5">
+                      {profile && trade.sellerId === profile.id
+                        ? t('Great, please deposit the funds')
+                        : t('Waiting for seller to deposit funds')}
                     </Typography>
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" component="p" variant="body1">
-                      The buyer has accepted the offer, now you need to deposit 1000 USDT to proceed
-                      with the transaction.
+                      {profile && trade.sellerId === profile.id
+                        ? `You are selling ${trade.fromAmount.toFixed(4)} ${
+                            trade.fromccy.name
+                          } for ${trade.toAmount.toFixed(4)} ${
+                            trade.toccy.name
+                          } at an exchange rate of ${calcExchangeRate(
+                            trade.fromAmount.toString(),
+                            trade.toAmount.toString(),
+                          )} to Buyer
+                      ${trade.buyerId}.`
+                        : `You are buying ${trade.toAmount.toFixed(4)} ${
+                            trade.toccy.name
+                          } for ${trade.fromAmount.toFixed(4)} ${
+                            trade.fromccy.name
+                          } at an exchange rate of ${calcExchangeRate(
+                            trade.fromAmount.toString(),
+                            trade.toAmount.toString(),
+                          )} from Seller
+                      ${trade.sellerId}.`}
                     </Typography>
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
@@ -427,7 +438,7 @@ const TradeListPage: React.FC = () => {
                     <Typography color="textSecondary" variant="overline">
                       {t('Offer Accepted')}
                     </Typography>
-                    <Typography color="primary">{dayjs().from(dayjs(trade.created))}</Typography>
+                    <Typography color="primary">{dayjs().to(dayjs(trade.created))}</Typography>
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                     <Typography color="textSecondary" variant="overline">
@@ -437,24 +448,26 @@ const TradeListPage: React.FC = () => {
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                     <Button
-                      variant="contained"
-                      color="primary"
-                      startIcon={<AttachMoneyOutlinedIcon />}
-                      onClick={() => handleCryptoDeposit(trade.parentOrderId)}
+                      color="secondary"
+                      variant="outlined"
+                      onClick={() => handleAlertDialogOpen(trade.parentOrderId)}
                     >
-                      {depositing && trade.parentOrderId === selectedOrderId
-                        ? t('Depositing...')
-                        : t('Deposit')}
+                      {t('Cancel transaction')}
                     </Button>
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                    <Button
-                      color="secondary"
-                      variant="contained"
-                      onClick={() => handleAlertDialogOpen(trade.parentOrderId)}
-                    >
-                      {t('Cancel this trade')}
-                    </Button>
+                    {profile && trade.sellerId === profile.id ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AttachMoneyOutlinedIcon />}
+                        onClick={() => handleCryptoDeposit(trade.parentOrderId)}
+                      >
+                        {depositing && trade.parentOrderId === selectedOrderId
+                          ? t('Depositing...')
+                          : t('Deposit')}
+                      </Button>
+                    ) : null}
                   </Grid>
                 </Grid>
               </Paper>
@@ -468,7 +481,9 @@ const TradeListPage: React.FC = () => {
         aria-labelledby="cancel-dialog-title"
         aria-describedby="cancel-dialog-description"
       >
-        <DialogTitle id="cancel-dialog-title">{t('Are you sure to cancel the trade?')}</DialogTitle>
+        <DialogTitle id="cancel-dialog-title">
+          {t('Are you sure to cancel this transaction?')}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="cancel-dialog-description">
             {t(
@@ -480,8 +495,8 @@ const TradeListPage: React.FC = () => {
           <Button onClick={handleAlertDialogClose} color="primary">
             {t('Cancel')}
           </Button>
-          <Button color="primary" variant="contained" onClick={handleCancelTrade} autoFocus>
-            {cancelling ? t('Cancelling...') : t('Confirm')}
+          <Button color="secondary" variant="contained" onClick={handleCancelTrade} autoFocus>
+            {cancelling ? t('Cancelling...') : t('Cancel')}
           </Button>
         </DialogActions>
       </Dialog>
