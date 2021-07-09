@@ -374,7 +374,7 @@ const TradeListPage: React.FC = () => {
                     <Typography color="textSecondary" variant="overline">
                       {t('Order ID')}
                     </Typography>
-                    <Typography color="primary">{trade.parentOrderId}</Typography>
+                    <Typography color="primary">{trade.contractId}</Typography>
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                     <Typography color="textSecondary" variant="overline">
@@ -450,7 +450,7 @@ const TradeListPage: React.FC = () => {
                     <Button
                       color="secondary"
                       variant="outlined"
-                      onClick={() => handleAlertDialogOpen(trade.parentOrderId)}
+                      onClick={() => handleAlertDialogOpen(trade.contractId)}
                     >
                       {t('Cancel transaction')}
                     </Button>
@@ -461,9 +461,9 @@ const TradeListPage: React.FC = () => {
                         variant="contained"
                         color="primary"
                         startIcon={<AttachMoneyOutlinedIcon />}
-                        onClick={() => handleCryptoDeposit(trade.parentOrderId)}
+                        onClick={() => handleCryptoDeposit(trade.contractId)}
                       >
-                        {depositing && trade.parentOrderId === selectedOrderId
+                        {depositing && trade.contractId === selectedOrderId
                           ? t('Depositing...')
                           : t('Deposit')}
                       </Button>
