@@ -10,7 +10,7 @@ import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import { useRequest } from 'ahooks';
+import { useRequest, useUnmount } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -107,7 +107,11 @@ const SignUpPage: React.FC = () => {
     );
   }, [countryPattern, phonePattern, t, usernamePattern]);
 
-  const { run: signup, loading } = useRequest(SignUpService, {
+  const {
+    run: signup,
+    loading,
+    cancel,
+  } = useRequest(SignUpService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.replace(`/signup/success?email=${emailRef.current}`);
@@ -179,6 +183,10 @@ const SignUpPage: React.FC = () => {
   const handleGoToSignInPage = useCallback(() => {
     history.push('/signin');
   }, [history]);
+
+  useUnmount(() => {
+    cancel();
+  });
 
   return (
     <Container maxWidth="sm" disableGutters>

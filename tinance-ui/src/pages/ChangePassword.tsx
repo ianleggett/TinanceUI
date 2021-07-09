@@ -15,7 +15,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import VisibilityOffOutlinedIcon from '@material-ui/icons/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
-import { useMount, useRequest } from 'ahooks';
+import { useMount, useRequest, useUnmount } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
@@ -109,8 +109,12 @@ const ChangePasswordPage: React.FC = () => {
     );
   }, [passwordPattern, t]);
 
-  const { run: signout } = useRequest(SignOutService);
-  const { run: changePassword, loading } = useRequest(ChangePasswordService, {
+  const { run: signout, cancel: cancelLogout } = useRequest(SignOutService);
+  const {
+    run: changePassword,
+    loading,
+    cancel,
+  } = useRequest(ChangePasswordService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.push('/account/password');
@@ -195,6 +199,11 @@ const ChangePasswordPage: React.FC = () => {
         variant: 'warning',
       });
     }
+  });
+
+  useUnmount(() => {
+    cancel();
+    cancelLogout();
   });
 
   return (

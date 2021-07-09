@@ -147,7 +147,9 @@ declare namespace Trade {
 
   interface Model {
     id: number;
+    // TODO: Should be replaced with `tradeId` in the future
     contractId: string;
+    tradeId: string;
     numericOrderId: number;
     parentOrderId: string;
     buyerId: number;

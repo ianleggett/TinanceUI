@@ -65,17 +65,20 @@ const reducer = (state: UserManagerState, action: UserManagerAction): UserManage
  * @param dispatch - Util for saving user profile to context.
  */
 async function requestRemoteUserProfile(dispatch: Dispatch<UserManagerAction>) {
-  const { statusCode, msg, ...profile } = await GetUserDetailsService();
+  try {
+    const { statusCode, msg, ...profile } = await GetUserDetailsService();
+    if (statusCode === 0) {
+      saveProfile(profile);
 
-  if (statusCode === 0) {
-    saveProfile(profile);
-
-    dispatch({
-      type: 'saveUserInfo',
-      payload: profile,
-    });
-  } else {
-    snackbar.warning(msg || 'Get user profile failed');
+      dispatch({
+        type: 'saveUserInfo',
+        payload: profile,
+      });
+    } else {
+      snackbar.warning(msg || 'Get user profile failed');
+    }
+  } catch {
+    snackbar.warning('Get user profile failed');
   }
 }
 

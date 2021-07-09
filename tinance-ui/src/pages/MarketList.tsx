@@ -23,7 +23,7 @@ import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { useMount, useRequest } from 'ahooks';
+import { useMount, useRequest, useUnmount } from 'ahooks';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useSnackbar } from 'notistack';
@@ -128,7 +128,7 @@ const MarketListPage: React.FC = () => {
     );
   }, [ccyCodes]);
 
-  const { run, loading } = useRequest(GetAllOffersService, {
+  const { run, loading, cancel } = useRequest(GetAllOffersService, {
     onSuccess(res) {
       if (res) {
         setOffers(res);
@@ -136,7 +136,11 @@ const MarketListPage: React.FC = () => {
     },
   });
 
-  const { run: createTrade, loading: creating } = useRequest(TakeOrderService, {
+  const {
+    run: createTrade,
+    loading: creating,
+    cancel: cancelCreate,
+  } = useRequest(TakeOrderService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.push('/trades');
@@ -176,24 +180,26 @@ const MarketListPage: React.FC = () => {
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
+      cancelCreate();
       event.preventDefault();
 
       if (!loading) {
         formik.handleSubmit();
       }
     },
-    [formik, loading],
+    [cancelCreate, formik, loading],
   );
 
   const handleReset = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
+      cancelCreate();
       event.preventDefault();
 
       if (!loading) {
         formik.resetForm();
       }
     },
-    [formik, loading],
+    [cancelCreate, formik, loading],
   );
 
   const handleTakeOverOffer = useCallback(
@@ -233,6 +239,11 @@ const MarketListPage: React.FC = () => {
       buy: true,
       sell: false,
     });
+  });
+
+  useUnmount(() => {
+    cancel();
+    cancelCreate();
   });
 
   return (

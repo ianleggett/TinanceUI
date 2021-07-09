@@ -15,7 +15,7 @@ import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-import { useMount, useRequest } from 'ahooks';
+import { useMount, useRequest, useUnmount } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
@@ -147,7 +147,11 @@ const UserProfilePage: React.FC = () => {
     },
   });
 
-  const { run: updateUser, loading } = useRequest(UpdateUserService, {
+  const {
+    run: updateUser,
+    loading,
+    cancel,
+  } = useRequest(UpdateUserService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserDetails();
@@ -236,6 +240,10 @@ const UserProfilePage: React.FC = () => {
         variant: 'warning',
       });
     }
+  });
+
+  useUnmount(() => {
+    cancel();
   });
 
   return (

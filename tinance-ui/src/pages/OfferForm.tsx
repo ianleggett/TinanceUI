@@ -25,7 +25,7 @@ import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import SwapHorizOutlinedIcon from '@material-ui/icons/SwapHorizOutlined';
 import Alert from '@material-ui/lab/Alert';
 import { DateTimePicker } from '@material-ui/pickers';
-import { useRequest } from 'ahooks';
+import { useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
@@ -189,7 +189,7 @@ const OfferFormPage: React.FC = () => {
     });
   }, [t]);
 
-  const { run, loading } = useRequest(AddUpdateOrderService, {
+  const { run, loading, cancel } = useRequest(AddUpdateOrderService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.push('/offers');
@@ -298,6 +298,10 @@ const OfferFormPage: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usingDefault]);
+
+  useUnmount(() => {
+    cancel();
+  });
 
   return (
     <form onSubmit={handleSubmit}>

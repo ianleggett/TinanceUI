@@ -2,8 +2,6 @@ import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Divider from '@material-ui/core/Divider';
 import FormControl from '@material-ui/core/FormControl';
@@ -16,13 +14,14 @@ import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import AttachMoneyOutlinedIcon from '@material-ui/icons/AttachMoneyOutlined';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { useMount, useRequest } from 'ahooks';
+import { useMount, useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
@@ -113,7 +112,7 @@ const TradeListPage: React.FC = () => {
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
 
-  const { run, loading } = useRequest(GetMyTradesService, {
+  const { run, loading, cancel } = useRequest(GetMyTradesService, {
     onSuccess(res) {
       if (res) {
         setTrades(res);
@@ -121,7 +120,11 @@ const TradeListPage: React.FC = () => {
     },
   });
 
-  const { run: cancelTrade, loading: cancelling } = useRequest(CancelTradeService, {
+  const {
+    run: cancelTrade,
+    loading: cancelling,
+    cancel: cancelCancel,
+  } = useRequest(CancelTradeService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         setOpenAlertDialog(false);
@@ -133,7 +136,11 @@ const TradeListPage: React.FC = () => {
     },
   });
 
-  const { run: depositCrypto, loading: depositing } = useRequest(DepositCryptoService, {
+  const {
+    run: depositCrypto,
+    loading: depositing,
+    cancel: cancelDeposit,
+  } = useRequest(DepositCryptoService, {
     onSuccess(res) {
       setSelectedOrderId('');
 
@@ -206,16 +213,18 @@ const TradeListPage: React.FC = () => {
   }, []);
 
   const handleAlertDialogClose = useCallback(() => {
+    cancelCancel();
     setSelectedOrderId('');
     setOpenAlertDialog(false);
-  }, []);
+  }, [cancelCancel]);
 
   const handleCryptoDeposit = useCallback(
     (oid: string) => {
+      cancelDeposit();
       depositCrypto({ oid });
       setSelectedOrderId(oid);
     },
-    [depositCrypto],
+    [cancelDeposit, depositCrypto],
   );
 
   const handleCancelTrade = useCallback(() => {
@@ -227,6 +236,12 @@ const TradeListPage: React.FC = () => {
   }, [cancelTrade, cancelling, selectedOrderId]);
 
   useMount(run);
+
+  useUnmount(() => {
+    cancel();
+    cancelCancel();
+    cancelDeposit();
+  });
 
   return (
     <>
@@ -330,7 +345,11 @@ const TradeListPage: React.FC = () => {
                     color="primary"
                     variant="outlined"
                     className={classes.chip}
-                    label={trade.buyerId === profile.id ? t('You are Buyer') : t('You are Seller')}
+                    label={
+                      trade.buyerId === profile.id
+                        ? t('You are the Buyer')
+                        : t('You are the Seller')
+                    }
                     style={{ color: '#D97706', borderColor: '#D97706' }}
                   />
                 ) : null}
@@ -374,7 +393,9 @@ const TradeListPage: React.FC = () => {
                     <Typography color="textSecondary" variant="overline">
                       {t('Order ID')}
                     </Typography>
-                    <Typography color="primary">{trade.contractId}</Typography>
+                    <Tooltip title={trade.contractId}>
+                      <Typography color="primary">{trade.contractId.slice(0, 24)}...</Typography>
+                    </Tooltip>
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                     <Typography color="textSecondary" variant="overline">
@@ -402,13 +423,6 @@ const TradeListPage: React.FC = () => {
                     <Divider className={classes.divider} />
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                    <Typography align="center" color="primary" component="p" variant="h5">
-                      {profile && trade.sellerId === profile.id
-                        ? t('Great, please deposit the funds')
-                        : t('Waiting for seller to deposit funds')}
-                    </Typography>
-                  </Grid>
-                  <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" component="p" variant="body1">
                       {profile && trade.sellerId === profile.id
                         ? `You are selling ${trade.fromAmount.toFixed(4)} ${
@@ -420,15 +434,22 @@ const TradeListPage: React.FC = () => {
                             trade.toAmount.toString(),
                           )} to Buyer
                       ${trade.buyerId}.`
-                        : `You are buying ${trade.toAmount.toFixed(4)} ${
-                            trade.toccy.name
-                          } for ${trade.fromAmount.toFixed(4)} ${
+                        : `You are buying ${trade.fromAmount.toFixed(4)} ${
                             trade.fromccy.name
+                          } for ${trade.toAmount.toFixed(4)} ${
+                            trade.toccy.name
                           } at an exchange rate of ${calcExchangeRate(
                             trade.fromAmount.toString(),
                             trade.toAmount.toString(),
                           )} from Seller
                       ${trade.sellerId}.`}
+                    </Typography>
+                  </Grid>
+                  <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                    <Typography align="center" color="primary" component="p" variant="h5">
+                      {profile && trade.sellerId === profile.id
+                        ? t('Great, please deposit the crypto')
+                        : t('Waiting for seller to deposit crypto')}
                     </Typography>
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
@@ -484,19 +505,12 @@ const TradeListPage: React.FC = () => {
         <DialogTitle id="cancel-dialog-title">
           {t('Are you sure to cancel this transaction?')}
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="cancel-dialog-description">
-            {t(
-              'Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running',
-            )}
-          </DialogContentText>
-        </DialogContent>
         <DialogActions>
           <Button onClick={handleAlertDialogClose} color="primary">
             {t('Cancel')}
           </Button>
           <Button color="secondary" variant="contained" onClick={handleCancelTrade} autoFocus>
-            {cancelling ? t('Cancelling...') : t('Cancel')}
+            {cancelling ? t('Cancelling...') : t('Confirm')}
           </Button>
         </DialogActions>
       </Dialog>

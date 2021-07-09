@@ -18,7 +18,7 @@ import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { useMount, useRequest } from 'ahooks';
+import { useMount, useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
@@ -105,7 +105,7 @@ const OfferListPage: React.FC = () => {
   const { t } = useTranslation();
   const [offers, setOffers] = useState<Offer.Model[]>([]);
 
-  const { run, loading } = useRequest(GetMyOffersService, {
+  const { run, loading, cancel } = useRequest(GetMyOffersService, {
     onSuccess(res) {
       if (res) {
         setOffers(res);
@@ -158,6 +158,10 @@ const OfferListPage: React.FC = () => {
   }, [history]);
 
   useMount(run);
+
+  useUnmount(() => {
+    cancel();
+  });
 
   return (
     <Grid spacing={2} container>
