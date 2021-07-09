@@ -294,9 +294,7 @@ const OfferFormPage: React.FC = () => {
 
   useEffect(() => {
     if (usingDefault) {
-      formik.setFieldValue('payDetail', defaultPayDetail);
-    } else {
-      formik.setFieldValue('payDetail', initialValues.payType);
+      formik.setFieldValue('payType', defaultPayDetail);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usingDefault]);
