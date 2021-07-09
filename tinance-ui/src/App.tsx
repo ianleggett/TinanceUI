@@ -39,7 +39,13 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <SnackbarProvider>
+      <SnackbarProvider
+        autoHideDuration={3000}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
         <SnackbarUtilsConfigurator />
         <UseRequestProvider value={{ manual: true }}>
           <MuiPickersUtilsProvider utils={DayjsUtils} locale="en">

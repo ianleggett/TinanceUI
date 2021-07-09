@@ -13,9 +13,6 @@ import { snackbar } from './snackbar';
 function errorHandler(error: ResponseError<Response>): Response {
   const { data, response } = error;
 
-  // @ts-expect-error message key existed
-  snackbar.warning(data.message);
-
   if (response && response.status) {
     if (response.status === 401) {
       localStorage.clear();
