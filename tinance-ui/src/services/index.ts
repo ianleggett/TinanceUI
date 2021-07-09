@@ -14,6 +14,7 @@ export * from './get-payment-types';
 export * from './get-profile-public';
 export * from './get-user-details';
 export * from './get-user-trades';
+export * from './get-validation-regex';
 export * from './reset-password';
 export * from './signin';
 export * from './signout';

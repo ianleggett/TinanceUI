@@ -23,9 +23,9 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
-import { useUserManager } from '../components';
+import { useAppConfigState, useUserManager } from '../components';
 import { ChangePasswordService, SignOutService } from '../services';
-import { clearProfile, clearToken, clearTokenExpiryTime } from '../utils';
+import { clearProfile, clearToken, clearTokenExpiryTime, fixRegex } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -74,6 +74,7 @@ const ChangePasswordPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { validationRegex } = useAppConfigState();
   const [{ profile }, dispatch] = useUserManager();
 
   const theme = useTheme();
@@ -82,20 +83,31 @@ const ChangePasswordPage: React.FC = () => {
   const [showPassword, setShowPassowrd] = useState(false);
   const [showNewPassword, setShowNewPassowrd] = useState(false);
 
-  const validationSchema = useMemo(() => {
-    return yup.object({
-      userid: yup.number().required(t('User ID is required')),
-      oldpwd: yup.string().required(t('Old password is required')),
-      newpwd: yup
-        .string()
-        .min(6, t('Password should be at least 6 chars'))
-        .required(t('New password is required')),
-      newpwd2: yup
-        .string()
-        .min(6, t('Password should be at least 6 chars'))
-        .required(t('New password is required')),
-    });
-  }, [t]);
+  const passwordPattern = useMemo(() => {
+    return fixRegex(validationRegex.password);
+  }, [validationRegex.password]);
+
+  const validationSchema = useCallback(() => {
+    return yup.lazy((values: typeof initialValues) =>
+      yup.object({
+        userid: yup.number().required(t('User ID is required')),
+        oldpwd: yup.string().required(t('Old password is required')),
+        newpwd: yup
+          .string()
+          .required(t('New password is required'))
+          .matches(new RegExp(passwordPattern), `Password should match pattern: ${passwordPattern}`)
+          .not([yup.ref('oldpwd')], t('New password should not be the same as old password')),
+        newpwd2: yup
+          .string()
+          .required(t('New password is required'))
+          .matches(new RegExp(passwordPattern), `Password should match pattern: ${passwordPattern}`)
+          .oneOf(
+            [yup.ref('newpwd'), null],
+            t('Confirm new password should be the same as new password'),
+          ),
+      }),
+    );
+  }, [passwordPattern, t]);
 
   const { run: signout } = useRequest(SignOutService);
   const { run: changePassword, loading } = useRequest(ChangePasswordService, {

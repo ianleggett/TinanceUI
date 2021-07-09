@@ -8,6 +8,7 @@ export const appConfig = {
   maxWidth: 'lg' as 'lg' | 'xs' | 'sm' | 'md' | 'xl' | false,
   ccyCodes: [] as PublicData.CCYCode[],
   paymentTypes: [] as PublicData.PaymentType[],
+  validationRegex: {} as Record<string, string>,
   feeRate: 0.0015,
 };
 

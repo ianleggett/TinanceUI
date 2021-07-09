@@ -240,6 +240,7 @@ declare namespace API {
   type GetPaymentTypesResponse = PublicData.PaymentType[];
   type GetProfilePublicResponse = PublicData.UserProfile;
   type GetUserTradesResponse = PublicData.UserTrade[];
+  type GetValidationRegexResponse = Record<string, string>;
 
   interface GetAllOffersParams {
     buy?: boolean;

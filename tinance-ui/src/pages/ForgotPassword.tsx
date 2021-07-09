@@ -13,7 +13,9 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
+import { useAppConfigState } from '../components';
 import { ForgotPasswordService } from '../services';
+import { fixRegex } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,17 +55,30 @@ const ForgotPasswordPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { validationRegex } = useAppConfigState();
   const emailRef = useRef('');
 
-  const validationSchema = useMemo(() => {
-    return yup.object({
-      username: yup.string().required(t('Username is required')),
-      email: yup
-        .string()
-        .email(t('Invalid email adrress format'))
-        .required(t('Email address is Required')),
-    });
-  }, [t]);
+  const usernamePattern = useMemo(() => {
+    return fixRegex(validationRegex.username);
+  }, [validationRegex.username]);
+
+  const validationSchema = useCallback(() => {
+    return yup.lazy((values: typeof initialValues) =>
+      yup.object({
+        username: yup
+          .string()
+          .required(t('Username is required'))
+          .matches(
+            new RegExp(usernamePattern),
+            `Username should match pattern: ${usernamePattern}`,
+          ),
+        email: yup
+          .string()
+          .required(t('Email address is Required'))
+          .email(t('Invalid email adrress format')),
+      }),
+    );
+  }, [t, usernamePattern]);
 
   const { run: forgotPassword, loading } = useRequest(ForgotPasswordService, {
     onSuccess(res) {

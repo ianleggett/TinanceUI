@@ -17,7 +17,9 @@ import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
 
+import { useAppConfigState } from '../components';
 import { ResetPasswordService } from '../services';
+import { fixRegex } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,8 +52,8 @@ const useStyles = makeStyles((theme) => ({
 const initialValues = {
   code: '',
   username: '',
-  password: '',
-  password2: '',
+  newpwd: '',
+  newpwd2: '',
 };
 
 const ResetPasswordPage: React.FC = () => {
@@ -60,23 +62,50 @@ const ResetPasswordPage: React.FC = () => {
   const { search } = useLocation();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { validationRegex } = useAppConfigState();
   const [showPassword, setShowPassword] = useState(false);
   const codeRef = useRef(new URLSearchParams(search).get('code') ?? '');
   const usernameRef = useRef(new URLSearchParams(search).get('username') ?? '');
 
-  const validationSchema = useMemo(() => {
-    return yup.object({
-      username: yup.string().required(t('Username is required')),
-      password: yup
-        .string()
-        .min(6, t('Password should be at least 6 chars'))
-        .required(t('Password is required')),
-      password2: yup
-        .string()
-        .min(6, t('Password should be at least 6 chars'))
-        .required(t('Password is required')),
-    });
-  }, [t]);
+  const passwordPattern = useMemo(() => {
+    return fixRegex(validationRegex.password);
+  }, [validationRegex.password]);
+
+  const usernamePattern = useMemo(() => {
+    return fixRegex(validationRegex.username);
+  }, [validationRegex.username]);
+
+  const validationSchema = useCallback(() => {
+    return yup.lazy((values: typeof initialValues) =>
+      yup.object({
+        username: yup
+          .string()
+          .required(t('Username is required'))
+          .matches(
+            new RegExp(usernamePattern),
+            `Username should match pattern: ${usernamePattern}`,
+          ),
+        newpwd: yup
+          .string()
+          .required(t('New password is required'))
+          .matches(
+            new RegExp(passwordPattern),
+            `New password should match pattern: ${passwordPattern}`,
+          ),
+        newpwd2: yup
+          .string()
+          .required(t('New password is required'))
+          .matches(
+            new RegExp(passwordPattern),
+            `New password should match pattern: ${passwordPattern}`,
+          )
+          .oneOf(
+            [yup.ref('password'), null],
+            t('Confirm new password should be the same as new password'),
+          ),
+      }),
+    );
+  }, [passwordPattern, t, usernamePattern]);
 
   const { run: resetPassword, loading } = useRequest(ResetPasswordService, {
     onSuccess(res) {
@@ -97,7 +126,7 @@ const ResetPasswordPage: React.FC = () => {
     initialValues,
     validationSchema,
     onSubmit(values) {
-      const { username, password, password2 } = values;
+      const { username, newpwd } = values;
 
       if (!codeRef.current) {
         enqueueSnackbar(t("Can't find one time code for verifying your identity"), {
@@ -113,18 +142,11 @@ const ResetPasswordPage: React.FC = () => {
         return;
       }
 
-      if (password !== password2) {
-        enqueueSnackbar(t('Password should the same as confirm password'), {
-          variant: 'warning',
-        });
-        return;
-      }
-
       // TODO: change the params
       resetPassword({
         v: codeRef.current,
         n: username,
-        p: password,
+        p: newpwd,
       });
     },
   });
@@ -187,17 +209,17 @@ const ResetPasswordPage: React.FC = () => {
             }}
           />
           <TextField
-            id="password"
-            name="password"
+            id="newpwd"
+            name="newpwd"
             type={showPassword ? 'text' : 'password'}
             label={t('New Password')}
             variant="outlined"
             disabled={loading}
             autoComplete="new-password"
-            value={formik.values.password}
+            value={formik.values.newpwd}
             onChange={formik.handleChange}
-            error={formik.touched.password && Boolean(formik.errors.password)}
-            helperText={formik.touched.password && formik.errors.password}
+            error={formik.touched.newpwd && Boolean(formik.errors.newpwd)}
+            helperText={formik.touched.newpwd && formik.errors.newpwd}
             fullWidth
             InputProps={{
               endAdornment: (
@@ -215,17 +237,17 @@ const ResetPasswordPage: React.FC = () => {
             }}
           />
           <TextField
-            id="password2"
-            name="password2"
+            id="newpwd2"
+            name="newpwd2"
             type={showPassword ? 'text' : 'password'}
             label={t('Confirm New Password')}
             variant="outlined"
             disabled={loading}
             autoComplete="new-password"
-            value={formik.values.password2}
+            value={formik.values.newpwd2}
             onChange={formik.handleChange}
-            error={formik.touched.password2 && Boolean(formik.errors.password2)}
-            helperText={formik.touched.password2 && formik.errors.password2}
+            error={formik.touched.newpwd2 && Boolean(formik.errors.newpwd2)}
+            helperText={formik.touched.newpwd2 && formik.errors.newpwd2}
             fullWidth
             InputProps={{
               endAdornment: (

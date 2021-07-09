@@ -18,9 +18,10 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
+import { useAppConfigState } from '../components';
 import { countryCodes } from '../constants';
 import { SignUpService } from '../services';
-import { formatCountryCodeOption } from '../utils';
+import { fixRegex, formatCountryCodeOption } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,20 +62,50 @@ const SignUpPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { validationRegex } = useAppConfigState();
   const [telCode, setTelCode] = useState('+1');
   const emailRef = useRef('');
 
-  const validationSchema = useMemo(() => {
-    return yup.object({
-      countryISO: yup.string().required(t('Country is required')),
-      phone: yup.string().required(t('Phone number is required')),
-      email: yup
-        .string()
-        .email(t('Invalid email adrress format'))
-        .required(t('Email address is Required')),
-      username: yup.string().required(t('Username is required')),
-    });
-  }, [t]);
+  const countryPattern = useMemo(() => {
+    return fixRegex(validationRegex.country);
+  }, [validationRegex.country]);
+
+  const phonePattern = useMemo(() => {
+    return fixRegex(validationRegex.phone);
+  }, [validationRegex.phone]);
+
+  const usernamePattern = useMemo(() => {
+    return fixRegex(validationRegex.username);
+  }, [validationRegex.username]);
+
+  const validationSchema = useCallback(() => {
+    return yup.lazy((values: typeof initialValues) =>
+      yup.object({
+        countryISO: yup
+          .string()
+          .required(t('Country is required'))
+          .matches(
+            new RegExp(countryPattern),
+            `Country code should match pattern: ${countryPattern}`,
+          ),
+        phone: yup
+          .string()
+          .required(t('Phone number is required'))
+          .matches(new RegExp(phonePattern), `Phone name should match pattern: ${phonePattern}`),
+        email: yup
+          .string()
+          .required(t('Email address is Required'))
+          .email(t('Invalid email adrress format')),
+        username: yup
+          .string()
+          .required(t('Username is required'))
+          .matches(
+            new RegExp(usernamePattern),
+            `Username should match pattern: ${usernamePattern}`,
+          ),
+      }),
+    );
+  }, [countryPattern, phonePattern, t, usernamePattern]);
 
   const { run: signup, loading } = useRequest(SignUpService, {
     onSuccess(res) {
@@ -210,7 +241,6 @@ const SignUpPage: React.FC = () => {
           <TextField
             id="email"
             name="email"
-            type="email"
             label={t('Email Address')}
             variant="outlined"
             disabled={loading}

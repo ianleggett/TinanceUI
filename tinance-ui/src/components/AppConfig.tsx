@@ -4,7 +4,8 @@ import type { Dispatch } from 'react';
 import { createContext, Suspense, useContext, useReducer } from 'react';
 
 import { appConfig } from '../constants';
-import { GetCCYCodesService, GetPaymentTypesService } from '../services';
+import { GetCCYCodesService, GetPaymentTypesService, GetValidationRegexService } from '../services';
+import { snackbar } from '../utils';
 import { GlobalFooter } from './GlobalFooter';
 import { GlobalHeader } from './GlobalHeader';
 import { I18nextProvider } from './I18nextProvider';
@@ -44,18 +45,24 @@ const reducer = (state: AppConfigState, action: AppConfigAction): AppConfigState
  * @param dispatch - Util for saving public data to config context.
  */
 async function getAndSavePublicData(dispatch: Dispatch<AppConfigAction>) {
-  const [ccyCodes, paymentTypes] = await Promise.all([
-    await GetCCYCodesService(),
-    await GetPaymentTypesService(),
-  ]);
+  try {
+    const [ccyCodes, paymentTypes, validationRegex] = await Promise.all([
+      await GetCCYCodesService(),
+      await GetPaymentTypesService(),
+      await GetValidationRegexService(),
+    ]);
 
-  dispatch({
-    type: 'update',
-    payload: {
-      ccyCodes,
-      paymentTypes,
-    },
-  });
+    dispatch({
+      type: 'update',
+      payload: {
+        ccyCodes,
+        paymentTypes,
+        validationRegex,
+      },
+    });
+  } catch {
+    snackbar.warning('Get public data failed');
+  }
 }
 
 export interface AppConfigProviderProps extends Partial<AppConfigState> {
