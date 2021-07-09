@@ -9,6 +9,7 @@ export const appConfig = {
   ccyCodes: [] as PublicData.CCYCode[],
   paymentTypes: [] as PublicData.PaymentType[],
   validationRegex: {} as Record<string, string>,
+  relativeExpiryTime: 2, // in hours
   feeRate: 0.0015,
 };
 

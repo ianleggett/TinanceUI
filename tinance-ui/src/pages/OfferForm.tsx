@@ -117,11 +117,11 @@ const OfferFormPage: React.FC = () => {
   const { feeRate } = useAppConfigState();
   const { profile } = useUserManagerState();
   const { enqueueSnackbar } = useSnackbar();
-  const { ccyCodes } = useAppConfigState();
+  const { ccyCodes, relativeExpiryTime } = useAppConfigState();
   const [invert, setInvert] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [usingDefault, setUsingDefault] = useState(true);
-  const [expiryTime, setExpiryTime] = useState(dayjs());
+  const [expiryTime, setExpiryTime] = useState(dayjs().add(relativeExpiryTime, 'hours'));
 
   const steps = useMemo(() => {
     return [t('Offer Details'), t('Payment Details'), t('Expiry Time')];
@@ -605,10 +605,12 @@ const OfferFormPage: React.FC = () => {
                 <Grid spacing={2} className={classes.picker} container>
                   <Grid xs={12} sm={12} md={6} lg={4} xl={3} item>
                     <DateTimePicker
-                      format={formatter}
+                      format="YYYY-MM-DD HH:mm"
                       label={t('Expiry Time')}
                       value={expiryTime}
-                      onChange={(value) => setExpiryTime(value ?? dayjs())}
+                      onChange={(value) =>
+                        setExpiryTime(value ?? dayjs().add(relativeExpiryTime, 'hours'))
+                      }
                       emptyLabel={t('Please Select Date Time')}
                       invalidDateMessage={t('Invalid Date Time Format')}
                       inputVariant="outlined"
