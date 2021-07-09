@@ -10,7 +10,7 @@ export async function ResetPasswordService(
   params: API.ResetPasswordParams,
 ): Promise<API.ResetPasswordResponse> {
   try {
-    const res = await request<API.ResetPasswordResponse>('/v1/public/resetpwd.json', {
+    const res = await request<API.ResetPasswordResponse>('/v1/public/publicsetpwd.json', {
       method: 'POST',
       data: params,
     });

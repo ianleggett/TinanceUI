@@ -120,10 +120,11 @@ const ResetPasswordPage: React.FC = () => {
         return;
       }
 
+      // TODO: change the params
       resetPassword({
-        code: codeRef.current,
-        username,
-        password,
+        v: codeRef.current,
+        n: username,
+        p: password,
       });
     },
   });

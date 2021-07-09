@@ -219,9 +219,9 @@ declare namespace API {
   interface ForgotPasswordResponse extends BaseResponse {}
 
   interface ResetPasswordParams {
-    code: string;
-    username: string;
-    password: string;
+    v: string;
+    p: string;
+    n?: string;
   }
 
   interface ResetPasswordResponse extends BaseResponse {}
