@@ -1,8 +1,10 @@
 export type AppLang = 'en-US' | 'zh-CN' | 'zh-TW' | 'vi-VN';
 
+const publicUrl = process.env.PUBLIC_URL;
+
 export const appConfig = {
   title: 'Trusted Finance',
-  logo: '/logo192.png',
+  logo: publicUrl && publicUrl !== '/' ? `${publicUrl}/logo192.png` : '/logo192.png',
   lang: 'en-US' as AppLang,
   videoUrl: 'https://s0.easynm.cn/uploads/test-video.mp4',
   maxWidth: 'lg' as 'lg' | 'xs' | 'sm' | 'md' | 'xl' | false,
