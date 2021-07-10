@@ -5,7 +5,7 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import { useRequest, useUnmount } from 'ahooks';
+import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useRef } from 'react';
@@ -80,11 +80,7 @@ const ForgotPasswordPage: React.FC = () => {
     );
   }, [t, usernamePattern]);
 
-  const {
-    run: forgotPassword,
-    loading,
-    cancel,
-  } = useRequest(ForgotPasswordService, {
+  const { run: forgotPassword, loading } = useRequest(ForgotPasswordService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.replace(`/forgot-password/success?email=${emailRef.current}`);
@@ -120,10 +116,6 @@ const ForgotPasswordPage: React.FC = () => {
   const handleGoToSignInPage = useCallback(() => {
     history.push('/signin');
   }, [history]);
-
-  useUnmount(() => {
-    cancel();
-  });
 
   return (
     <Container maxWidth="sm" disableGutters>

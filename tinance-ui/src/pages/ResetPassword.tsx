@@ -9,7 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import VisibilityOffOutlinedIcon from '@material-ui/icons/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
-import { useMount, useRequest, useUnmount } from 'ahooks';
+import { useMount, useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -107,11 +107,7 @@ const ResetPasswordPage: React.FC = () => {
     );
   }, [passwordPattern, t, usernamePattern]);
 
-  const {
-    run: resetPassword,
-    loading,
-    cancel,
-  } = useRequest(ResetPasswordService, {
+  const { run: resetPassword, loading } = useRequest(ResetPasswordService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.replace(`/signin`);
@@ -185,10 +181,6 @@ const ResetPasswordPage: React.FC = () => {
     }
 
     formik.setFieldValue('username', usernameRef.current);
-  });
-
-  useUnmount(() => {
-    cancel();
   });
 
   return (

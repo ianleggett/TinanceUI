@@ -13,9 +13,11 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
+import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-import { useMount, useRequest, useUnmount } from 'ahooks';
+import { useMount, useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
@@ -147,11 +149,7 @@ const UserProfilePage: React.FC = () => {
     },
   });
 
-  const {
-    run: updateUser,
-    loading,
-    cancel,
-  } = useRequest(UpdateUserService, {
+  const { run: updateUser, loading } = useRequest(UpdateUserService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserDetails();
@@ -217,6 +215,14 @@ const UserProfilePage: React.FC = () => {
     history.push('/account/password');
   }, [history]);
 
+  const handleGoToUserWalletPage = useCallback(() => {
+    history.push('/account/wallet');
+  }, [history]);
+
+  const handleGoToBankDetailsPage = useCallback(() => {
+    history.push('/account/bank-details');
+  }, [history]);
+
   useMount(() => {
     if (profile) {
       const { id, countryISO, phone, email, username } = profile;
@@ -242,10 +248,6 @@ const UserProfilePage: React.FC = () => {
     }
   });
 
-  useUnmount(() => {
-    cancel();
-  });
-
   return (
     <Grid container direction={direction} spacing={2} className={classes.container}>
       <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
@@ -255,7 +257,19 @@ const UserProfilePage: React.FC = () => {
               <ListItemIcon>
                 <PersonOutlineIcon color="primary" />
               </ListItemIcon>
-              <ListItemText primary={t('Profile')} />
+              <ListItemText primary={t('User Profile')} />
+            </ListItem>
+            <ListItem onClick={handleGoToUserWalletPage} button>
+              <ListItemIcon>
+                <AccountBalanceWalletOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary={t('User Wallet')} />
+            </ListItem>
+            <ListItem onClick={handleGoToBankDetailsPage} button>
+              <ListItemIcon>
+                <AccountBalanceOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary={t('Bank Details')} />
             </ListItem>
             <ListItem onClick={handleGoToChangePasswordPage} button>
               <ListItemIcon>
@@ -270,7 +284,7 @@ const UserProfilePage: React.FC = () => {
       <Grid item xs={12} sm={12} md={9} lg={9} xl={9}>
         <Paper className={classes.card}>
           <Typography component="h2" variant="h3" color="primary" className={classes.title}>
-            {t('Profile')}
+            {t('User Profile')}
           </Typography>
           <form onSubmit={handleSubmit} className={classes.form}>
             <TextField
@@ -352,6 +366,9 @@ const UserProfilePage: React.FC = () => {
               onChange={formik.handleChange}
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
+              InputProps={{
+                readOnly: true,
+              }}
               fullWidth
             />
             <TextField
@@ -365,6 +382,9 @@ const UserProfilePage: React.FC = () => {
               onChange={formik.handleChange}
               error={formik.touched.username && Boolean(formik.errors.username)}
               helperText={formik.touched.username && formik.errors.username}
+              InputProps={{
+                readOnly: true,
+              }}
               fullWidth
             />
             <Button

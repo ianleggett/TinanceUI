@@ -5,7 +5,7 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import { useRequest, useUnmount } from 'ahooks';
+import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo } from 'react';
@@ -61,11 +61,7 @@ const SignInPage: React.FC = () => {
     });
   }, [t]);
 
-  const {
-    run: getUserProfile,
-    loading,
-    cancel,
-  } = useRequest(GetUserDetailsService, {
+  const { run: getUserProfile, loading } = useRequest(GetUserDetailsService, {
     onSuccess(res) {
       if (res) {
         saveProfile(res);
@@ -139,10 +135,6 @@ const SignInPage: React.FC = () => {
   const handleGoToSignUpPage = useCallback(() => {
     history.push('/signup');
   }, [history]);
-
-  useUnmount(() => {
-    cancel();
-  });
 
   return (
     <Container maxWidth="sm" disableGutters>

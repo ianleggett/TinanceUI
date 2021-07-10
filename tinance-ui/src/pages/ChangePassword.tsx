@@ -11,11 +11,13 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
+import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import VisibilityOffOutlinedIcon from '@material-ui/icons/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
-import { useMount, useRequest, useUnmount } from 'ahooks';
+import { useMount, useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
@@ -109,12 +111,8 @@ const ChangePasswordPage: React.FC = () => {
     );
   }, [passwordPattern, t]);
 
-  const { run: signout, cancel: cancelLogout } = useRequest(SignOutService);
-  const {
-    run: changePassword,
-    loading,
-    cancel,
-  } = useRequest(ChangePasswordService, {
+  const { run: signout } = useRequest(SignOutService);
+  const { run: changePassword, loading } = useRequest(ChangePasswordService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.push('/account/password');
@@ -183,6 +181,14 @@ const ChangePasswordPage: React.FC = () => {
     history.push('/account/profile');
   }, [history]);
 
+  const handleGoToUserWalletPage = useCallback(() => {
+    history.push('/account/wallet');
+  }, [history]);
+
+  const handleGoToBankDetailsPage = useCallback(() => {
+    history.push('/account/bank-details');
+  }, [history]);
+
   const handleToggleShowPassword = useCallback(() => {
     setShowPassowrd((prevState) => !prevState);
   }, []);
@@ -201,11 +207,6 @@ const ChangePasswordPage: React.FC = () => {
     }
   });
 
-  useUnmount(() => {
-    cancel();
-    cancelLogout();
-  });
-
   return (
     <Grid container direction={direction} spacing={2} className={classes.container}>
       <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
@@ -215,7 +216,19 @@ const ChangePasswordPage: React.FC = () => {
               <ListItemIcon>
                 <PersonOutlineIcon />
               </ListItemIcon>
-              <ListItemText primary={t('Profile')} />
+              <ListItemText primary={t('User Profile')} />
+            </ListItem>
+            <ListItem onClick={handleGoToUserWalletPage} button>
+              <ListItemIcon>
+                <AccountBalanceWalletOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary={t('User Wallet')} />
+            </ListItem>
+            <ListItem onClick={handleGoToBankDetailsPage} button>
+              <ListItemIcon>
+                <AccountBalanceOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary={t('Bank Details')} />
             </ListItem>
             <ListItem className={classes.active} button>
               <ListItemIcon>

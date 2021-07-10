@@ -21,7 +21,7 @@ import AttachMoneyOutlinedIcon from '@material-ui/icons/AttachMoneyOutlined';
 import ExpandMoreOutlinedIcon from '@material-ui/icons/ExpandMoreOutlined';
 import MenuOutlinedIcon from '@material-ui/icons/MenuOutlined';
 import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined';
-import { useRequest, useUnmount } from 'ahooks';
+import { useRequest } from 'ahooks';
 import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,7 +104,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const [userMenu, setUserMenu] = useState<HTMLButtonElement | null>(null);
   const { title, logo, maxWidth } = props as PropsWithDefault;
 
-  const { run: signout, cancel } = useRequest(SignOutService, {
+  const { run: signout } = useRequest(SignOutService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         enqueueSnackbar(t('Sign out successful'), {
@@ -181,10 +181,6 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
 
     history.replace('/');
   }, [dispatch, history, signout]);
-
-  useUnmount(() => {
-    cancel();
-  });
 
   return (
     <AppBar position="static" color="transparent" variant="outlined" className={classes.root}>
@@ -284,7 +280,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
                   onClose={handleUserMenuClose}
                 >
                   <MenuItem key="profile" onClick={handleGoToProfilePage}>
-                    {t('Profile')}
+                    {t('User Profile')}
                   </MenuItem>
                   <MenuItem key="password" onClick={handleGoToChangePasswordPage}>
                     {t('Change Password')}

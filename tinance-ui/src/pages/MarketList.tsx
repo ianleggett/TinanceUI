@@ -243,7 +243,6 @@ const MarketListPage: React.FC = () => {
 
   useUnmount(() => {
     cancel();
-    cancelCreate();
   });
 
   return (

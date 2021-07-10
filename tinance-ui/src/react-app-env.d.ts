@@ -339,4 +339,26 @@ declare namespace API {
   }
 
   interface UpdateUserResponse extends BaseResponse {}
+
+  interface GetBankDetailsResponse extends BaseResponse {}
+  interface UpdateBankDetailsParams {}
+  interface UpdateBankDetailsResponse extends BaseResponse {}
+
+  interface GetUserCoinsParams {
+    cid: number;
+  }
+
+  interface GetUserCoinsResponse extends BaseResponse {
+    id: number;
+    coinprecision: number;
+    walletAddress: string;
+    coinType: PublicData.CCYCode;
+  }
+
+  interface SetUserCoinsParams {
+    coinid: number;
+    walletAddr: string;
+  }
+
+  interface SetUserCoinsResponse extends BaseResponse {}
 }

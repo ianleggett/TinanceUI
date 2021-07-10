@@ -239,8 +239,6 @@ const TradeListPage: React.FC = () => {
 
   useUnmount(() => {
     cancel();
-    cancelCancel();
-    cancelDeposit();
   });
 
   return (

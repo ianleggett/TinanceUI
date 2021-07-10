@@ -16,6 +16,7 @@ import {
 import { theme } from './constants';
 import ForbiddenPage from './pages/403';
 import NotFoundPage from './pages/404';
+import BankDetailsPage from './pages/BankDetails';
 import ChangePasswordPage from './pages/ChangePassword';
 import FaqPage from './pages/Faq';
 import ForgotPasswordPage from './pages/ForgotPassword';
@@ -33,6 +34,7 @@ import TermsPage from './pages/TermsPage';
 import TradeDetailPage from './pages/TradeDetail';
 import TradeListPage from './pages/TradeList';
 import UserProfilePage from './pages/UserProfile';
+import UserWalletPage from './pages/UserWallet';
 import { SnackbarUtilsConfigurator } from './utils';
 
 const App: React.FC = () => {
@@ -82,6 +84,12 @@ const App: React.FC = () => {
                       <AccessControlRoute
                         path="/account/profile"
                         component={UserProfilePage}
+                        exact
+                      />
+                      <AccessControlRoute path="/account/wallet" component={UserWalletPage} exact />
+                      <AccessControlRoute
+                        path="/account/bank-details"
+                        component={BankDetailsPage}
                         exact
                       />
                       <AccessControlRoute
