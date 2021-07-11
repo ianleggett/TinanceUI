@@ -16,7 +16,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-import AttachMoneyOutlinedIcon from '@material-ui/icons/AttachMoneyOutlined';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
@@ -27,10 +26,16 @@ import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 
 import { useUserManagerState } from '../components';
 import { tradeStatusMap } from '../constants';
-import { CancelTradeService, DepositCryptoService, GetMyTradesService } from '../services';
+import {
+  CancelTradeService,
+  DepositCryptoService,
+  FlagFundsSentService,
+  GetMyTradesService,
+} from '../services';
 
 const useStyles = makeStyles((theme) => ({
   filter: {
@@ -103,6 +108,30 @@ const initialValues = {
   keyword: '' as string,
 };
 
+const buyerInfo: Record<Trade.Status, string> = {
+  ARBITRATE: '',
+  CREATED: 'Waiting for seller to deposit crypto',
+  CANCELLED: '',
+  COMPLETED: 'Transfer successful, we have released funds to the seller',
+  CANCEL_REQ: '',
+  ERROR: '',
+  DEPOSIT: 'The seller has sent funds, please send bank funds now',
+  FIATSENT: 'Transfer successful, we will release funds to the seller',
+  UNKNOWN: '',
+};
+
+const sellerInfo: Record<Trade.Status, string> = {
+  ARBITRATE: '',
+  CREATED: 'Great, please deposit the crypto',
+  CANCELLED: '',
+  COMPLETED: 'Transfer successful, we have released funds to the seller',
+  CANCEL_REQ: '',
+  ERROR: '',
+  DEPOSIT: 'The seller has sent funds, please send bank funds now',
+  FIATSENT: 'The buyer has confimred bank funds',
+  UNKNOWN: '',
+};
+
 const TradeListPage: React.FC = () => {
   const classes = useStyles();
   const { t } = useTranslation();
@@ -127,6 +156,7 @@ const TradeListPage: React.FC = () => {
   } = useRequest(CancelTradeService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
+        run();
         setOpenAlertDialog(false);
       } else {
         enqueueSnackbar(res.msg || t('Cancel trade failed'), {
@@ -145,11 +175,33 @@ const TradeListPage: React.FC = () => {
       setSelectedOrderId('');
 
       if (res.statusCode === 0) {
-        enqueueSnackbar(res.msg || t('Deposit crypto successful'), {
+        run();
+        enqueueSnackbar(t('Deposit crypto successful'), {
           variant: 'success',
         });
       } else {
         enqueueSnackbar(res.msg || t('Deposit crypto failed'), {
+          variant: 'warning',
+        });
+      }
+    },
+  });
+
+  const {
+    run: flagFundsSent,
+    loading: flagging,
+    cancel: cancelFlagFundsSent,
+  } = useRequest(FlagFundsSentService, {
+    onSuccess(res) {
+      setSelectedOrderId('');
+
+      if (res.statusCode === 0) {
+        run();
+        enqueueSnackbar(t('Flag funds sent successful'), {
+          variant: 'success',
+        });
+      } else {
+        enqueueSnackbar(res.msg || t('Flag funds sent failed'), {
           variant: 'warning',
         });
       }
@@ -227,6 +279,15 @@ const TradeListPage: React.FC = () => {
     [cancelDeposit, depositCrypto],
   );
 
+  const handleFlagFundsSent = useCallback(
+    (oid: string) => {
+      cancelCancel();
+      flagFundsSent({ oid });
+      setSelectedOrderId(oid);
+    },
+    [cancelCancel, flagFundsSent],
+  );
+
   const handleCancelTrade = useCallback(() => {
     if (!cancelling && selectedOrderId) {
       cancelTrade({
@@ -234,6 +295,68 @@ const TradeListPage: React.FC = () => {
       });
     }
   }, [cancelTrade, cancelling, selectedOrderId]);
+
+  const getPrimaryButton = useCallback(
+    (trade: Trade.Model) => {
+      const isSeller = !!profile && trade.sellerId === profile.id;
+      switch (trade.status) {
+        case 'CREATED': {
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleCryptoDeposit(trade.contractId)}
+            >
+              {depositing && trade.contractId === selectedOrderId
+                ? t('Depositing...')
+                : t('Deposit')}
+            </Button>
+          );
+        }
+
+        case 'DEPOSIT': {
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleFlagFundsSent(trade.contractId)}
+            >
+              {flagging && trade.contractId === selectedOrderId
+                ? t('Flagging...')
+                : t('I have sent bank funds')}
+            </Button>
+          );
+        }
+
+        default:
+          return null;
+      }
+    },
+    [depositing, flagging, handleCryptoDeposit, handleFlagFundsSent, profile, selectedOrderId, t],
+  );
+
+  const getSecondaryButton = useCallback(
+    (trade: Trade.Model) => {
+      switch (trade.status) {
+        case 'CREATED':
+        case 'DEPOSIT': {
+          return (
+            <Button
+              color="secondary"
+              variant="outlined"
+              onClick={() => handleAlertDialogOpen(trade.contractId)}
+            >
+              {t('Cancel transaction')}
+            </Button>
+          );
+        }
+
+        default:
+          return null;
+      }
+    },
+    [handleAlertDialogOpen, t],
+  );
 
   useMount(run);
 
@@ -446,8 +569,8 @@ const TradeListPage: React.FC = () => {
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" color="primary" component="p" variant="h5">
                       {profile && trade.sellerId === profile.id
-                        ? t('Great, please deposit the crypto')
-                        : t('Waiting for seller to deposit crypto')}
+                        ? t(sellerInfo[trade.status])
+                        : t(buyerInfo[trade.status])}
                     </Typography>
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
@@ -466,27 +589,10 @@ const TradeListPage: React.FC = () => {
                     <Typography color="primary">{trade.status}</Typography>
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                    <Button
-                      color="secondary"
-                      variant="outlined"
-                      onClick={() => handleAlertDialogOpen(trade.contractId)}
-                    >
-                      {t('Cancel transaction')}
-                    </Button>
+                    {getSecondaryButton(trade)}
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                    {profile && trade.sellerId === profile.id ? (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<AttachMoneyOutlinedIcon />}
-                        onClick={() => handleCryptoDeposit(trade.contractId)}
-                      >
-                        {depositing && trade.contractId === selectedOrderId
-                          ? t('Depositing...')
-                          : t('Deposit')}
-                      </Button>
-                    ) : null}
+                    {getPrimaryButton(trade)}
                   </Grid>
                 </Grid>
               </Paper>

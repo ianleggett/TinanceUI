@@ -31,7 +31,6 @@ import SignInPage from './pages/SignIn';
 import SignUpPage from './pages/SignUp';
 import SignUpSuccessPage from './pages/SignUpSuccess';
 import TermsPage from './pages/TermsPage';
-import TradeDetailPage from './pages/TradeDetail';
 import TradeListPage from './pages/TradeList';
 import UserProfilePage from './pages/UserProfile';
 import UserWalletPage from './pages/UserWallet';
@@ -80,7 +79,6 @@ const App: React.FC = () => {
                       <AccessControlRoute path="/offers" component={OfferListPage} exact />
                       <AccessControlRoute path="/offers/create" component={OfferFormPage} exact />
                       <AccessControlRoute path="/trades" component={TradeListPage} exact />
-                      <AccessControlRoute path="/trades/:id" component={TradeDetailPage} exact />
                       <AccessControlRoute
                         path="/account/profile"
                         component={UserProfilePage}

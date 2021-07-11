@@ -10,7 +10,7 @@ export const appConfig = {
   maxWidth: 'lg' as 'lg' | 'xs' | 'sm' | 'md' | 'xl' | false,
   ccyCodes: [] as PublicData.CCYCode[],
   paymentTypes: [] as PublicData.PaymentType[],
-  validationRegex: {} as Record<string, string>,
+  validationRegex: {} as Record<string, PublicData.Regex>,
   relativeExpiryTime: 2, // in hours
   feeRate: 0.0015,
 };

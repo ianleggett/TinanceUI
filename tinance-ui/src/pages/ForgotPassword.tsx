@@ -59,7 +59,7 @@ const ForgotPasswordPage: React.FC = () => {
   const emailRef = useRef('');
 
   const usernamePattern = useMemo(() => {
-    return fixRegex(validationRegex.username);
+    return fixRegex(validationRegex.username.key);
   }, [validationRegex.username]);
 
   const validationSchema = useCallback(() => {
@@ -68,17 +68,14 @@ const ForgotPasswordPage: React.FC = () => {
         username: yup
           .string()
           .required(t('Username is required'))
-          .matches(
-            new RegExp(usernamePattern),
-            `Username should match pattern: ${usernamePattern}`,
-          ),
+          .matches(new RegExp(usernamePattern), validationRegex.username.value),
         email: yup
           .string()
           .required(t('Email address is Required'))
           .email(t('Invalid email adrress format')),
       }),
     );
-  }, [t, usernamePattern]);
+  }, [t, usernamePattern, validationRegex.username.value]);
 
   const { run: forgotPassword, loading } = useRequest(ForgotPasswordService, {
     onSuccess(res) {

@@ -68,11 +68,11 @@ const ResetPasswordPage: React.FC = () => {
   const usernameRef = useRef(new URLSearchParams(search).get('username') ?? '');
 
   const passwordPattern = useMemo(() => {
-    return fixRegex(validationRegex.password);
+    return fixRegex(validationRegex.password.key);
   }, [validationRegex.password]);
 
   const usernamePattern = useMemo(() => {
-    return fixRegex(validationRegex.username);
+    return fixRegex(validationRegex.username.key);
   }, [validationRegex.username]);
 
   const validationSchema = useCallback(() => {
@@ -81,31 +81,28 @@ const ResetPasswordPage: React.FC = () => {
         username: yup
           .string()
           .required(t('Username is required'))
-          .matches(
-            new RegExp(usernamePattern),
-            `Username should match pattern: ${usernamePattern}`,
-          ),
+          .matches(new RegExp(usernamePattern), validationRegex.username.value),
         newpwd: yup
           .string()
           .required(t('New password is required'))
-          .matches(
-            new RegExp(passwordPattern),
-            `New password should match pattern: ${passwordPattern}`,
-          ),
+          .matches(new RegExp(passwordPattern), validationRegex.password.value),
         newpwd2: yup
           .string()
           .required(t('New password is required'))
-          .matches(
-            new RegExp(passwordPattern),
-            `New password should match pattern: ${passwordPattern}`,
-          )
+          .matches(new RegExp(passwordPattern), validationRegex.password.value)
           .oneOf(
             [yup.ref('password'), null],
             t('Confirm new password should be the same as new password'),
           ),
       }),
     );
-  }, [passwordPattern, t, usernamePattern]);
+  }, [
+    passwordPattern,
+    t,
+    usernamePattern,
+    validationRegex.password.value,
+    validationRegex.username.value,
+  ]);
 
   const { run: resetPassword, loading } = useRequest(ResetPasswordService, {
     onSuccess(res) {

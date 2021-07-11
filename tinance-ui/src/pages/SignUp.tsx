@@ -67,15 +67,15 @@ const SignUpPage: React.FC = () => {
   const emailRef = useRef('');
 
   const countryPattern = useMemo(() => {
-    return fixRegex(validationRegex.country);
+    return fixRegex(validationRegex.country.key);
   }, [validationRegex.country]);
 
   const phonePattern = useMemo(() => {
-    return fixRegex(validationRegex.phone);
+    return fixRegex(validationRegex.phone.key);
   }, [validationRegex.phone]);
 
   const usernamePattern = useMemo(() => {
-    return fixRegex(validationRegex.username);
+    return fixRegex(validationRegex.username.key);
   }, [validationRegex.username]);
 
   const validationSchema = useCallback(() => {
@@ -84,14 +84,11 @@ const SignUpPage: React.FC = () => {
         countryISO: yup
           .string()
           .required(t('Country is required'))
-          .matches(
-            new RegExp(countryPattern),
-            `Country code should match pattern: ${countryPattern}`,
-          ),
+          .matches(new RegExp(countryPattern), validationRegex.country.value),
         phone: yup
           .string()
           .required(t('Phone number is required'))
-          .matches(new RegExp(phonePattern), `Phone name should match pattern: ${phonePattern}`),
+          .matches(new RegExp(phonePattern), validationRegex.phone.value),
         email: yup
           .string()
           .required(t('Email address is Required'))
@@ -99,13 +96,18 @@ const SignUpPage: React.FC = () => {
         username: yup
           .string()
           .required(t('Username is required'))
-          .matches(
-            new RegExp(usernamePattern),
-            `Username should match pattern: ${usernamePattern}`,
-          ),
+          .matches(new RegExp(usernamePattern), validationRegex.username.value),
       }),
     );
-  }, [countryPattern, phonePattern, t, usernamePattern]);
+  }, [
+    countryPattern,
+    phonePattern,
+    t,
+    usernamePattern,
+    validationRegex.country.value,
+    validationRegex.phone.value,
+    validationRegex.username.value,
+  ]);
 
   const { run: signup, loading } = useRequest(SignUpService, {
     onSuccess(res) {

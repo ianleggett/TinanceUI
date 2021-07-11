@@ -38,6 +38,11 @@ declare namespace PublicData {
   }
 
   interface UserTrade extends Reacord<string, any> {}
+
+  interface Regex {
+    key: string;
+    value: string;
+  }
 }
 
 declare namespace User {
@@ -242,7 +247,7 @@ declare namespace API {
   type GetPaymentTypesResponse = PublicData.PaymentType[];
   type GetProfilePublicResponse = PublicData.UserProfile;
   type GetUserTradesResponse = PublicData.UserTrade[];
-  type GetValidationRegexResponse = Record<string, string>;
+  type GetValidationRegexResponse = Record<string, PublicData.Regex>;
 
   interface GetAllOffersParams {
     buy?: boolean;

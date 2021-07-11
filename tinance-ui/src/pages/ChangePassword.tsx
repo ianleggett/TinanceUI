@@ -86,7 +86,7 @@ const ChangePasswordPage: React.FC = () => {
   const [showNewPassword, setShowNewPassowrd] = useState(false);
 
   const passwordPattern = useMemo(() => {
-    return fixRegex(validationRegex.password);
+    return fixRegex(validationRegex.password.key);
   }, [validationRegex.password]);
 
   const validationSchema = useCallback(() => {
@@ -97,19 +97,19 @@ const ChangePasswordPage: React.FC = () => {
         newpwd: yup
           .string()
           .required(t('New password is required'))
-          .matches(new RegExp(passwordPattern), `Password should match pattern: ${passwordPattern}`)
+          .matches(new RegExp(passwordPattern), validationRegex.password.value)
           .not([yup.ref('oldpwd')], t('New password should not be the same as old password')),
         newpwd2: yup
           .string()
           .required(t('New password is required'))
-          .matches(new RegExp(passwordPattern), `Password should match pattern: ${passwordPattern}`)
+          .matches(new RegExp(passwordPattern), validationRegex.password.value)
           .oneOf(
             [yup.ref('newpwd'), null],
             t('Confirm new password should be the same as new password'),
           ),
       }),
     );
-  }, [passwordPattern, t]);
+  }, [passwordPattern, t, validationRegex.password.value]);
 
   const { run: signout } = useRequest(SignOutService);
   const { run: changePassword, loading } = useRequest(ChangePasswordService, {
