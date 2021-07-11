@@ -7,8 +7,8 @@ declare namespace PublicData {
     enable: boolean;
     ccyType: string;
     description: string;
-    timestamp: number;
     tokenCtrAddress: string;
+    updated: string;
   }
 
   interface PaymentType {
@@ -152,7 +152,6 @@ declare namespace Trade {
 
   interface Model {
     id: number;
-    // TODO: Should be replaced with `tradeId` in the future
     contractId: string;
     tradeId: string;
     numericOrderId: number;
@@ -198,10 +197,8 @@ declare namespace API {
     password: string;
   }
 
-  interface SignInResponse extends ErrorResponse {
+  interface SignInResponse extends ErrorResponse, User.Model {
     token: string;
-    userId: number;
-    username: string;
   }
 
   interface SignOutResponse extends BaseResponse {}
@@ -241,7 +238,7 @@ declare namespace API {
     uid: number;
   }
 
-  interface GetUserDetailsResponse extends BaseResponse, User.Model {}
+  interface GetUserDetailsResponse extends User.Model {}
 
   type GetCCYCodesResponse = PublicData.CCYCode[];
   type GetPaymentTypesResponse = PublicData.PaymentType[];
@@ -307,7 +304,7 @@ declare namespace API {
 
   interface FlagCompleteParams {
     oid: string;
-    txn: string;
+    txn?: string;
   }
 
   interface FlagCompleteResponse extends BaseResponse {}
@@ -335,7 +332,7 @@ declare namespace API {
 
   interface ChangePasswordResponse extends BaseResponse {}
 
-  interface UpdateUserParams {
+  interface UpdateUserDetailsParams {
     userid: number;
     countryISO?: string;
     phone?: string;
@@ -343,27 +340,51 @@ declare namespace API {
     username?: string;
   }
 
-  interface UpdateUserResponse extends BaseResponse {}
+  interface UpdateUserDetailsResponse extends BaseResponse {}
 
-  interface GetBankDetailsResponse extends BaseResponse {}
-  interface UpdateBankDetailsParams {}
-  interface UpdateBankDetailsResponse extends BaseResponse {}
-
-  interface GetUserCoinsParams {
-    cid: number;
-  }
-
-  interface GetUserCoinsResponse extends BaseResponse {
+  interface GetUserBankResponse extends BaseResponse {
     id: number;
-    coinprecision: number;
-    walletAddress: string;
-    coinType: PublicData.CCYCode;
+    field1value: string;
+    field2value: string;
+    field3value: string;
+    field4value: string;
+    field5value: string;
+    payType: {
+      id: number;
+      name: string;
+      enabled: boolean;
+      field1name: string;
+      field2name: string;
+      field3name: string;
+      field4name: string;
+      field5name: string;
+    };
+    timesUsed: number;
+    updated: string;
+    usernotes?: string;
   }
 
-  interface SetUserCoinsParams {
+  interface UpdateUserBankParams {
+    payTypeId: number;
+    field1value: string;
+    field2value: string;
+    field3value: string;
+    field4value: string;
+    field5value: string;
+    usernotes?: string;
+  }
+
+  interface UpdateUserBankResponse extends BaseResponse {}
+
+  interface GetUserWalletResponse extends BaseResponse {
     coinid: number;
     walletAddr: string;
   }
 
-  interface SetUserCoinsResponse extends BaseResponse {}
+  interface SetUserWalletParams {
+    coinid: number;
+    walletAddr: string;
+  }
+
+  interface SetUserWalletResponse extends BaseResponse {}
 }

@@ -38,5 +38,5 @@
     "@testing-library/user-event": "^13.1.9",
     "react-scripts": "4.0.3"
   },
-  "proxy": "https://demo.tinance.io"
+  "proxy": "https://tinance.io"
 }

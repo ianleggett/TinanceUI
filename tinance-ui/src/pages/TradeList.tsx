@@ -26,13 +26,14 @@ import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
 
 import { useUserManagerState } from '../components';
 import { tradeStatusMap } from '../constants';
 import {
+  AcceptCancelService,
   CancelTradeService,
   DepositCryptoService,
+  FlagCompleteService,
   FlagFundsSentService,
   GetMyTradesService,
 } from '../services';
@@ -109,26 +110,28 @@ const initialValues = {
 };
 
 const buyerInfo: Record<Trade.Status, string> = {
-  ARBITRATE: '',
-  CREATED: 'Waiting for seller to deposit crypto',
-  CANCELLED: '',
-  COMPLETED: 'Transfer successful, we have released funds to the seller',
-  CANCEL_REQ: '',
-  ERROR: '',
-  DEPOSIT: 'The seller has sent funds, please send bank funds now',
-  FIATSENT: 'Transfer successful, we will release funds to the seller',
+  ARBITRATE: 'Arbitration is in process, please forward evidence to support bank payments',
+  CREATED: 'Waiting for seller to deposit crypto funds',
+  CANCELLED: 'Trade was cancelled',
+  COMPLETED: 'Transfer successful',
+  CANCEL_REQ: 'Please send the bank funds',
+  ERROR: 'This trade has a process error, we are investigating the issue',
+  DEPOSIT:
+    'The seller has deposited crypto, please check the transaction and send Fiat bank funds now',
+  FIATSENT: 'Waiting for the seller to recieve Bank funds',
   UNKNOWN: '',
 };
 
 const sellerInfo: Record<Trade.Status, string> = {
-  ARBITRATE: '',
-  CREATED: 'Great, please deposit the crypto',
-  CANCELLED: '',
-  COMPLETED: 'Transfer successful, we have released funds to the seller',
-  CANCEL_REQ: '',
-  ERROR: '',
-  DEPOSIT: 'The seller has sent funds, please send bank funds now',
-  FIATSENT: 'The buyer has confimred bank funds',
+  ARBITRATE: 'Arbitration is in process, please forward evidence to support bank issues',
+  CREATED: 'Great, please deposit the crypto funds',
+  CANCELLED: 'Trade was cancelled',
+  COMPLETED: 'Transfer successful',
+  CANCEL_REQ:
+    'The buyer is deciding to accept or reject your cancel request. The trade will still occur if the buyer rejects',
+  ERROR: 'This trade has a process error, we are investigating the issue',
+  DEPOSIT: 'The buyer is sending the bank funds, please check your bank',
+  FIATSENT: 'The buyer has sent bank funds, please check your bank and confirm',
   UNKNOWN: '',
 };
 
@@ -187,11 +190,7 @@ const TradeListPage: React.FC = () => {
     },
   });
 
-  const {
-    run: flagFundsSent,
-    loading: flagging,
-    cancel: cancelFlagFundsSent,
-  } = useRequest(FlagFundsSentService, {
+  const { run: flagFundsSent, loading: flagging } = useRequest(FlagFundsSentService, {
     onSuccess(res) {
       setSelectedOrderId('');
 
@@ -202,6 +201,40 @@ const TradeListPage: React.FC = () => {
         });
       } else {
         enqueueSnackbar(res.msg || t('Flag funds sent failed'), {
+          variant: 'warning',
+        });
+      }
+    },
+  });
+
+  const { run: flagComplete, loading: flagging2 } = useRequest(FlagCompleteService, {
+    onSuccess(res) {
+      setSelectedOrderId('');
+
+      if (res.statusCode === 0) {
+        run();
+        enqueueSnackbar(t('Flag complete successful'), {
+          variant: 'success',
+        });
+      } else {
+        enqueueSnackbar(res.msg || t('Flag complete failed'), {
+          variant: 'warning',
+        });
+      }
+    },
+  });
+
+  const { run: acceptCancel, loading: acceptting } = useRequest(AcceptCancelService, {
+    onSuccess(res) {
+      setSelectedOrderId('');
+
+      if (res.statusCode === 0) {
+        run();
+        enqueueSnackbar(t('Accpet cancel successful'), {
+          variant: 'success',
+        });
+      } else {
+        enqueueSnackbar(res.msg || t('Accept cancel failed'), {
           variant: 'warning',
         });
       }
@@ -288,6 +321,23 @@ const TradeListPage: React.FC = () => {
     [cancelCancel, flagFundsSent],
   );
 
+  const handleFlagComplete = useCallback(
+    (oid: string) => {
+      cancelCancel();
+      flagComplete({ oid });
+      setSelectedOrderId(oid);
+    },
+    [cancelCancel, flagComplete],
+  );
+
+  const handleAcceptCancel = useCallback(
+    (oid: string) => {
+      acceptCancel({ oid });
+      setSelectedOrderId(oid);
+    },
+    [acceptCancel],
+  );
+
   const handleCancelTrade = useCallback(() => {
     if (!cancelling && selectedOrderId) {
       cancelTrade({
@@ -299,9 +349,10 @@ const TradeListPage: React.FC = () => {
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
       const isSeller = !!profile && trade.sellerId === profile.id;
+
       switch (trade.status) {
         case 'CREATED': {
-          return (
+          return isSeller ? (
             <Button
               variant="contained"
               color="primary"
@@ -311,18 +362,46 @@ const TradeListPage: React.FC = () => {
                 ? t('Depositing...')
                 : t('Deposit')}
             </Button>
-          );
+          ) : null;
         }
 
         case 'DEPOSIT': {
-          return (
+          return isSeller ? null : (
             <Button
               variant="contained"
               color="primary"
               onClick={() => handleFlagFundsSent(trade.contractId)}
             >
               {flagging && trade.contractId === selectedOrderId
-                ? t('Flagging...')
+                ? t('Confirming...')
+                : t('I have sent bank funds')}
+            </Button>
+          );
+        }
+
+        case 'FIATSENT': {
+          return isSeller ? (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleFlagComplete(trade.contractId)}
+            >
+              {flagging2 && trade.contractId === selectedOrderId
+                ? t('Confirming...')
+                : t('I have received bank funds')}
+            </Button>
+          ) : null;
+        }
+
+        case 'CANCEL_REQ': {
+          return isSeller ? null : (
+            <Button
+              color="secondary"
+              variant="outlined"
+              onClick={() => handleFlagFundsSent(trade.contractId)}
+            >
+              {flagging && trade.contractId === selectedOrderId
+                ? t('Confirming...')
                 : t('I have sent bank funds')}
             </Button>
           );
@@ -332,13 +411,36 @@ const TradeListPage: React.FC = () => {
           return null;
       }
     },
-    [depositing, flagging, handleCryptoDeposit, handleFlagFundsSent, profile, selectedOrderId, t],
+    [
+      depositing,
+      flagging,
+      flagging2,
+      handleCryptoDeposit,
+      handleFlagComplete,
+      handleFlagFundsSent,
+      profile,
+      selectedOrderId,
+      t,
+    ],
   );
 
   const getSecondaryButton = useCallback(
     (trade: Trade.Model) => {
+      const isSeller = !!profile && trade.sellerId === profile.id;
+
       switch (trade.status) {
-        case 'CREATED':
+        case 'CREATED': {
+          return (
+            <Button
+              color="secondary"
+              variant="outlined"
+              onClick={() => handleAlertDialogOpen(trade.contractId)}
+            >
+              {t('Cancel transaction')}
+            </Button>
+          );
+        }
+
         case 'DEPOSIT': {
           return (
             <Button
@@ -351,11 +453,25 @@ const TradeListPage: React.FC = () => {
           );
         }
 
+        case 'CANCEL_REQ': {
+          return isSeller ? null : (
+            <Button
+              color="secondary"
+              variant="outlined"
+              onClick={() => handleAcceptCancel(trade.contractId)}
+            >
+              {acceptting && trade.contractId === selectedOrderId
+                ? t('Acceptting...')
+                : t('Accept Cancel')}
+            </Button>
+          );
+        }
+
         default:
           return null;
       }
     },
-    [handleAlertDialogOpen, t],
+    [acceptting, handleAcceptCancel, handleAlertDialogOpen, profile, selectedOrderId, t],
   );
 
   useMount(run);

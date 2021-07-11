@@ -66,10 +66,6 @@ const SignUpPage: React.FC = () => {
   const [telCode, setTelCode] = useState('+1');
   const emailRef = useRef('');
 
-  const countryPattern = useMemo(() => {
-    return fixRegex(validationRegex.country.key);
-  }, [validationRegex.country]);
-
   const phonePattern = useMemo(() => {
     return fixRegex(validationRegex.phone.key);
   }, [validationRegex.phone]);
@@ -81,10 +77,7 @@ const SignUpPage: React.FC = () => {
   const validationSchema = useCallback(() => {
     return yup.lazy((values: typeof initialValues) =>
       yup.object({
-        countryISO: yup
-          .string()
-          .required(t('Country is required'))
-          .matches(new RegExp(countryPattern), validationRegex.country.value),
+        countryISO: yup.string().required(t('Country is required')),
         phone: yup
           .string()
           .required(t('Phone number is required'))
@@ -100,11 +93,9 @@ const SignUpPage: React.FC = () => {
       }),
     );
   }, [
-    countryPattern,
     phonePattern,
     t,
     usernamePattern,
-    validationRegex.country.value,
     validationRegex.phone.value,
     validationRegex.username.value,
   ]);

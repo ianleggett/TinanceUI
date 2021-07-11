@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
-import { GetBankDetailsService, UpdateBankDetailsService } from '../services';
+import { GetUserBankService, UpdateUserBankService } from '../services';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -57,7 +57,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const initialValues = {};
+const initialValues = {
+  payTypeId: 0,
+  field1value: '',
+  field2value: '',
+  field3value: '',
+  field4value: '',
+  field5value: '',
+};
 
 const BankDetailsPage: React.FC = () => {
   const classes = useStyles();
@@ -74,24 +81,24 @@ const BankDetailsPage: React.FC = () => {
     return yup.lazy((values: typeof initialValues) => yup.object({}));
   }, []);
 
-  const { run: getBankDetails } = useRequest(GetBankDetailsService, {
+  const { run: getUserBank } = useRequest(GetUserBankService, {
     onSuccess(res) {
-      if (res.statusCode === 0) {
+      if (res.id) {
         setBankDetails(res);
       } else {
-        enqueueSnackbar(res.msg || t('Get bank details failed'), {
+        enqueueSnackbar(res.msg || t('Get user bank failed'), {
           variant: 'warning',
         });
       }
     },
   });
 
-  const { run: updateBankDetails, loading } = useRequest(UpdateBankDetailsService, {
+  const { run: updateUserBank, loading } = useRequest(UpdateUserBankService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
-        getBankDetails();
+        getUserBank();
       } else {
-        enqueueSnackbar(res.msg || t('Update bank details failed'), {
+        enqueueSnackbar(res.msg || t('Update user bank failed'), {
           variant: 'warning',
         });
       }
@@ -102,7 +109,7 @@ const BankDetailsPage: React.FC = () => {
     initialValues,
     validationSchema,
     onSubmit(values) {
-      updateBankDetails();
+      updateUserBank(values);
     },
   });
 
@@ -130,7 +137,7 @@ const BankDetailsPage: React.FC = () => {
   }, [history]);
 
   useMount(() => {
-    getBankDetails();
+    getUserBank();
   });
 
   return (

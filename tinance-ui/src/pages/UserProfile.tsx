@@ -27,7 +27,7 @@ import * as yup from 'yup';
 
 import { useAppConfigState, useUserManager } from '../components';
 import { countryCodes } from '../constants';
-import { GetUserDetailsService, UpdateUserService } from '../services';
+import { GetUserDetailsService, UpdateUserDetailsService } from '../services';
 import { fixRegex, formatCountryCodeOption, saveProfile } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
@@ -86,10 +86,6 @@ const UserProfilePage: React.FC = () => {
   const direction = useMemo(() => (matches ? 'row' : 'column'), [matches]);
   const [telCode, setTelCode] = useState('+1');
 
-  const countryPattern = useMemo(() => {
-    return fixRegex(validationRegex.country.key);
-  }, [validationRegex.country]);
-
   const phonePattern = useMemo(() => {
     return fixRegex(validationRegex.phone.key);
   }, [validationRegex.phone]);
@@ -102,10 +98,7 @@ const UserProfilePage: React.FC = () => {
     return yup.lazy((values: typeof initialValues) =>
       yup.object({
         userid: yup.number().required(t('User ID is required')),
-        countryISO: yup
-          .string()
-          .required(t('Country is required'))
-          .matches(new RegExp(countryPattern), validationRegex.country.value),
+        countryISO: yup.string().required(t('Country is required')),
         phone: yup
           .string()
           .required(t('Phone number is required'))
@@ -121,18 +114,16 @@ const UserProfilePage: React.FC = () => {
       }),
     );
   }, [
-    countryPattern,
     phonePattern,
     t,
     usernamePattern,
-    validationRegex.country.value,
     validationRegex.phone.value,
     validationRegex.username.value,
   ]);
 
   const { run: getUserDetails } = useRequest(GetUserDetailsService, {
     onSuccess(res) {
-      if (res.statusCode === 0) {
+      if (res.id) {
         saveProfile(res);
 
         dispatch({
@@ -151,7 +142,7 @@ const UserProfilePage: React.FC = () => {
     },
   });
 
-  const { run: updateUser, loading } = useRequest(UpdateUserService, {
+  const { run: updateUserDetails, loading } = useRequest(UpdateUserDetailsService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserDetails();
@@ -168,7 +159,8 @@ const UserProfilePage: React.FC = () => {
     validationSchema,
     onSubmit(values) {
       const { phone, ...restValues } = values;
-      updateUser({
+
+      updateUserDetails({
         phone: `${telCode} ${phone}`,
         ...restValues,
       });

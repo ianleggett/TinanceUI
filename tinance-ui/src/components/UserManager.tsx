@@ -66,8 +66,9 @@ const reducer = (state: UserManagerState, action: UserManagerAction): UserManage
  */
 async function requestRemoteUserProfile(dispatch: Dispatch<UserManagerAction>) {
   try {
-    const { statusCode, msg, ...profile } = await GetUserDetailsService();
-    if (statusCode === 0) {
+    const profile = await GetUserDetailsService();
+
+    if (profile.id) {
       saveProfile(profile);
 
       dispatch({
@@ -75,7 +76,7 @@ async function requestRemoteUserProfile(dispatch: Dispatch<UserManagerAction>) {
         payload: profile,
       });
     } else {
-      snackbar.warning(msg || 'Get user profile failed');
+      snackbar.warning('Get user profile failed');
     }
   } catch {
     snackbar.warning('Get user profile failed');

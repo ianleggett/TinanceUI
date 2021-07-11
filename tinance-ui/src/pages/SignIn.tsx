@@ -15,8 +15,7 @@ import * as yup from 'yup';
 
 import { useUserManagerDispatch } from '../components';
 import { SignInService } from '../services';
-import { GetUserDetailsService } from '../services/get-user-details';
-import { clearProfile, clearToken, saveProfile, saveToken, saveTokenExpiryTime } from '../utils';
+import { saveProfile, saveToken, saveTokenExpiryTime } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,13 +60,18 @@ const SignInPage: React.FC = () => {
     });
   }, [t]);
 
-  const { run: getUserProfile, loading } = useRequest(GetUserDetailsService, {
+  const { run: signin, loading } = useRequest(SignInService, {
     onSuccess(res) {
-      if (res) {
+      const { token, ...profile } = res;
+
+      if (token) {
+        saveToken(token);
+        saveProfile(profile);
+        saveTokenExpiryTime(3_600_000); // Token will be expired in 1 hour
         saveProfile(res);
         dispatch({
           type: 'saveUserInfo',
-          payload: res,
+          payload: profile,
         });
 
         enqueueSnackbar(t('Sign in successful'), {
@@ -81,27 +85,6 @@ const SignInPage: React.FC = () => {
         } else {
           history.replace('/');
         }
-      } else {
-        clearToken();
-        clearProfile();
-
-        enqueueSnackbar(t('Get user profile failed'), {
-          variant: 'warning',
-        });
-
-        history.replace('/');
-      }
-    },
-  });
-
-  const { run: signin, loading: signing } = useRequest(SignInService, {
-    onSuccess(res) {
-      const { token } = res;
-
-      if (token) {
-        saveToken(token);
-        saveTokenExpiryTime(3_600_000); // Token will be expired in 1 hour
-        getUserProfile();
       } else {
         enqueueSnackbar(res.message || t('Sign in failed'), {
           variant: 'warning',
@@ -148,7 +131,7 @@ const SignInPage: React.FC = () => {
             name="username"
             label={t('Username')}
             variant="outlined"
-            disabled={signing || loading}
+            disabled={loading}
             autoComplete="username"
             value={formik.values.username}
             onChange={formik.handleChange}
@@ -162,7 +145,7 @@ const SignInPage: React.FC = () => {
             label={t('Password')}
             variant="outlined"
             type="password"
-            disabled={signing || loading}
+            disabled={loading}
             autoComplete="current-password"
             value={formik.values.password}
             onChange={formik.handleChange}
@@ -177,7 +160,7 @@ const SignInPage: React.FC = () => {
             size="large"
             className={classes.submit}
           >
-            {signing || loading ? t('Signing In...') : t('Sign In')}
+            {loading ? t('Signing In...') : t('Sign In')}
           </Button>
           <Box display="flex" justifyContent="space-between" className={classes.links}>
             <Button variant="text" color="primary" onClick={handleGoToForgotPasswordPage}>

@@ -27,7 +27,7 @@ import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { useAppConfigState, useUserManagerState } from '../components';
-import { GetUserCoinService, SetUserCoinsService } from '../services';
+import { GetUserWalletService, SetUserWaletService } from '../services';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -100,29 +100,24 @@ const UserWalletPage: React.FC = () => {
     );
   }, [t]);
 
-  const { run: getUserCoins } = useRequest(GetUserCoinService, {
+  const { run: getUserWallet } = useRequest(GetUserWalletService, {
     onSuccess(res) {
-      if (res.id) {
-        setFormData({
-          coinid: res.id,
-          walletAddr: res.walletAddress,
-        });
+      if (res.coinid) {
+        setFormData(res);
       } else {
-        enqueueSnackbar(t('Get user coins failed'), {
+        enqueueSnackbar(res.msg || t('Get user wallet failed'), {
           variant: 'warning',
         });
       }
     },
   });
 
-  const { run: setUserCoins, loading } = useRequest(SetUserCoinsService, {
+  const { run: setUserWallet, loading } = useRequest(SetUserWaletService, {
     onSuccess(res) {
-      if (res.statusCode === 0 && profile) {
-        getUserCoins({
-          cid: profile.mywallet.id,
-        });
+      if (res.statusCode === 0) {
+        getUserWallet();
       } else {
-        enqueueSnackbar(res.msg || t('Set user coins failed'), {
+        enqueueSnackbar(res.msg || t('Set user wallet failed'), {
           variant: 'warning',
         });
       }
@@ -133,7 +128,7 @@ const UserWalletPage: React.FC = () => {
     initialValues,
     validationSchema,
     onSubmit(values) {
-      setUserCoins(values);
+      setUserWallet(values);
     },
   });
 
@@ -161,11 +156,7 @@ const UserWalletPage: React.FC = () => {
   }, [history]);
 
   useMount(() => {
-    if (profile) {
-      getUserCoins({
-        cid: profile.mywallet.id,
-      });
-    }
+    getUserWallet();
   });
 
   useUpdateEffect(() => {
