@@ -342,7 +342,7 @@ declare namespace API {
 
   interface UpdateUserDetailsResponse extends BaseResponse {}
 
-  interface GetUserBankResponse extends BaseResponse {
+  interface GetUserBankResponse {
     id: number;
     field1value: string;
     field2value: string;

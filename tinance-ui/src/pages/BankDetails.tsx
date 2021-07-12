@@ -6,13 +6,14 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutlined';
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-import { useMount, useRequest } from 'ahooks';
+import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
@@ -28,6 +29,9 @@ const useStyles = makeStyles((theme) => ({
   },
   active: {
     color: theme.palette.primary.main,
+  },
+  hidden: {
+    display: 'none',
   },
   card: {
     padding: 32,
@@ -45,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
   form: {
     'display': 'flex',
     'flexDirection': 'column',
+    'marginTop': theme.spacing(4),
     '& > * + *': {
       marginTop: theme.spacing(2),
     },
@@ -71,29 +76,33 @@ const BankDetailsPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const [bankDetails, setBankDetails] = useState<Record<string, any> | null>(null);
+  const [bankDetails, setBankDetails] = useState<API.GetUserBankResponse | null>(null);
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
   const direction = useMemo(() => (matches ? 'row' : 'column'), [matches]);
 
+  const payType = useMemo<Partial<API.GetUserBankResponse['payType']>>(() => {
+    return bankDetails ? bankDetails.payType : {};
+  }, [bankDetails]);
+
   const validationSchema = useCallback(() => {
     return yup.lazy((values: typeof initialValues) => yup.object({}));
   }, []);
 
-  const { run: getUserBank } = useRequest(GetUserBankService, {
+  const { run: getUserBank, loading } = useRequest(GetUserBankService, {
     onSuccess(res) {
       if (res.id) {
         setBankDetails(res);
       } else {
-        enqueueSnackbar(res.msg || t('Get user bank failed'), {
+        enqueueSnackbar(t('Get user bank failed'), {
           variant: 'warning',
         });
       }
     },
   });
 
-  const { run: updateUserBank, loading } = useRequest(UpdateUserBankService, {
+  const { run: updateUserBank, loading: updating } = useRequest(UpdateUserBankService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserBank();
@@ -140,6 +149,17 @@ const BankDetailsPage: React.FC = () => {
     getUserBank();
   });
 
+  useUpdateEffect(() => {
+    if (bankDetails) {
+      formik.setFieldValue('payTypeId', bankDetails.payType.id);
+      formik.setFieldValue('field1value', bankDetails.field1value);
+      formik.setFieldValue('field2value', bankDetails.field2value);
+      formik.setFieldValue('field3value', bankDetails.field3value);
+      formik.setFieldValue('field4value', bankDetails.field4value);
+      formik.setFieldValue('field5value', bankDetails.field5value);
+    }
+  }, [bankDetails]);
+
   return (
     <Grid container direction={direction} spacing={2} className={classes.container}>
       <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
@@ -179,6 +199,76 @@ const BankDetailsPage: React.FC = () => {
             {t('Bank Details')}
           </Typography>
           <form onSubmit={handleSubmit} className={classes.form}>
+            <TextField
+              id="payTypeId"
+              name="payTypeId"
+              label={t('Pay Type ID')}
+              variant="outlined"
+              value={formik.values.payTypeId}
+              onChange={formik.handleChange}
+              className={classes.hidden}
+              fullWidth
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+            <Grid spacing={2} container>
+              <Grid xs={12} item>
+                <TextField
+                  id="field1value"
+                  name="field1value"
+                  variant="outlined"
+                  label={payType.field1name}
+                  value={formik.values.field1value}
+                  onChange={formik.handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid xs={12} item>
+                <TextField
+                  id="field2value"
+                  name="field2value"
+                  variant="outlined"
+                  label={payType.field2name}
+                  value={formik.values.field2value}
+                  onChange={formik.handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid xs={12} item>
+                <TextField
+                  id="field3value"
+                  name="field3value"
+                  variant="outlined"
+                  label={payType.field3name}
+                  value={formik.values.field3value}
+                  onChange={formik.handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid xs={12} item>
+                <TextField
+                  id="field4value"
+                  name="field4value"
+                  variant="outlined"
+                  label={payType.field4name}
+                  value={formik.values.field4value}
+                  onChange={formik.handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid xs={12} item>
+                <TextField
+                  id="field5value"
+                  name="field5value"
+                  variant="outlined"
+                  label={payType.field5name}
+                  value={formik.values.field5value}
+                  onChange={formik.handleChange}
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
             <Button
               type="submit"
               color="primary"
@@ -186,7 +276,7 @@ const BankDetailsPage: React.FC = () => {
               size="large"
               className={classes.submit}
             >
-              {loading ? t('Changing...') : t('Change Bank Details')}
+              {loading || updating ? t('Changing...') : t('Change Bank Details')}
             </Button>
           </form>
         </Paper>
