@@ -16,10 +16,11 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { useMount, useRequest, useUnmount } from 'ahooks';
+import { useMount, useRequest, useSessionStorageState, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
@@ -113,7 +114,8 @@ const OfferListPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [offers, setOffers] = useState<Offer.Model[]>([]);
-  const [selectedOffer, setSelectedOffer] = useState<number>(0);
+  const [selectedOffer, setSelectedOffer] = useState<string>('');
+  const [, setCachedOffer] = useSessionStorageState<Offer.Model>('current_offer');
 
   const { run, loading, cancel } = useRequest(GetMyOffersService, {
     onSuccess(res) {
@@ -134,7 +136,7 @@ const OfferListPage: React.FC = () => {
             return offer;
           }),
         );
-
+        setSelectedOffer('');
         enqueueSnackbar(t('Toggle live successful'), {
           variant: 'success',
         });
@@ -187,13 +189,23 @@ const OfferListPage: React.FC = () => {
   );
 
   const handleToggleLive = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, checked: boolean, oid: number) => {
+    (event: React.ChangeEvent<HTMLInputElement>, checked: boolean, oid: string) => {
       if (!toggling) {
         setSelectedOffer(oid);
         toggleLive({ oid, v: checked });
       }
     },
     [toggleLive, toggling],
+  );
+
+  const handleEditOffer = useCallback(
+    (offer: Offer.Model) => {
+      setCachedOffer(offer);
+      setTimeout(() => {
+        history.push(`/offers/update/${offer.orderId}`);
+      }, 100);
+    },
+    [history, setCachedOffer],
   );
 
   const handleGoToCreateOfferPage = useCallback(() => {
@@ -324,7 +336,7 @@ const OfferListPage: React.FC = () => {
                 onChange={(event, checked) => handleToggleLive(event, checked, offer.id)}
                 className={classes.checkbox}
               />
-              <Grid container spacing={1}>
+              <Grid container alignItems="flex-end" spacing={1}>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                   <Typography variant="h5" color="primary" className={classes.title}>
                     {offer.fromccy.name} / {offer.toccy.name}
@@ -418,6 +430,16 @@ const OfferListPage: React.FC = () => {
                     value={((offer.fromAmount - offer.remainCryptoAmt) / offer.fromAmount) * 100}
                     className={classes.progress}
                   />
+                </Grid>
+                <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => handleEditOffer(offer)}
+                    startIcon={<EditOutlinedIcon />}
+                  >
+                    {t('Edit Offer')}
+                  </Button>
                 </Grid>
               </Grid>
             </Paper>

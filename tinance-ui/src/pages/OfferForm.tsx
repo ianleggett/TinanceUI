@@ -25,14 +25,14 @@ import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import SwapHorizOutlinedIcon from '@material-ui/icons/SwapHorizOutlined';
 import Alert from '@material-ui/lab/Alert';
 import { DateTimePicker } from '@material-ui/pickers';
-import { useMount, useRequest } from 'ahooks';
+import { useMount, useRequest, useSessionStorageState, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { useAppConfigState } from '../components';
@@ -113,6 +113,7 @@ const formatter = 'YYYY-MM-DDTHH:mm';
 const OfferFormPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
+  const { oid } = useParams<{ oid: string }>();
   const { t } = useTranslation();
   const { feeRate } = useAppConfigState();
   const { enqueueSnackbar } = useSnackbar();
@@ -122,6 +123,7 @@ const OfferFormPage: React.FC = () => {
   const [usingDefault, setUsingDefault] = useState(true);
   const [expiryTime, setExpiryTime] = useState(dayjs().add(relativeExpiryTime, 'hours'));
   const [bankDetails, setBankDetails] = useState<API.GetUserBankResponse | null>(null);
+  const [cachedOffer, setCachedOffer] = useSessionStorageState<Offer.Model>('current_offer');
 
   const steps = useMemo(() => {
     return [t('Offer Details'), t('Payment Details'), t('Expiry Time')];
@@ -205,11 +207,11 @@ const OfferFormPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.push('/offers');
-        enqueueSnackbar(t('New offer created successful'), {
+        enqueueSnackbar(t(oid ? 'Offer updated successful' : 'New offer created successful'), {
           variant: 'success',
         });
       } else {
-        enqueueSnackbar(res.msg || t('New offer created failed'), {
+        enqueueSnackbar(res.msg || t(oid ? 'Offer updated failed' : 'New offer created failed'), {
           variant: 'warning',
         });
       }
@@ -249,6 +251,7 @@ const OfferFormPage: React.FC = () => {
 
       if (usingDefault) {
         run({
+          orderid: oid,
           fromamt: fromamt ? Number.parseInt(fromamt, 10) : 0,
           toamt: fromamt ? Number.parseInt(toamt, 10) : 0,
           expiry: expiryTime.format(formatter),
@@ -258,6 +261,7 @@ const OfferFormPage: React.FC = () => {
         payType.payTypeId = defaultPayDetail.payTypeId;
 
         run({
+          orderid: oid,
           fromamt: fromamt ? Number.parseInt(fromamt, 10) : 0,
           toamt: fromamt ? Number.parseInt(toamt, 10) : 0,
           expiry: expiryTime.format(formatter),
@@ -306,6 +310,25 @@ const OfferFormPage: React.FC = () => {
 
   useMount(() => {
     getBankDetails();
+
+    if (oid && cachedOffer) {
+      const [paymentDetail] = cachedOffer.paymentDetails;
+
+      setUsingDefault(false);
+      setExpiryTime(dayjs(cachedOffer.expiry));
+
+      formik.setFieldValue('fromccyid', cachedOffer.fromccy.id);
+      formik.setFieldValue('fromamt', cachedOffer.fromAmount.toString());
+      formik.setFieldValue('toccyid', cachedOffer.toccy.id);
+      formik.setFieldValue('toamt', cachedOffer.toAmount.toString());
+
+      if (paymentDetail) {
+        setBankDetails(paymentDetail);
+        setTimeout(() => {
+          formik.setFieldValue('payType', defaultPayDetail);
+        }, 100);
+      }
+    }
   });
 
   useEffect(() => {
@@ -314,6 +337,10 @@ const OfferFormPage: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultPayDetail, usingDefault]);
+
+  useUnmount(() => {
+    setCachedOffer();
+  });
 
   return (
     <form onSubmit={handleSubmit}>
@@ -347,7 +374,7 @@ const OfferFormPage: React.FC = () => {
                   color="textPrimary"
                   className={classes.title}
                 >
-                  {t('Create new offer')}
+                  {t(oid ? 'Update offer' : 'Create new offer')}
                 </Typography>
 
                 <Grid spacing={2} className={classes.main} container>
@@ -650,7 +677,9 @@ const OfferFormPage: React.FC = () => {
                   onClick={handleNext}
                   className={classes.right}
                 >
-                  {loading ? t('Creating...') : t('Create Offer')}
+                  {loading
+                    ? t(oid ? 'Updating...' : 'Creating...')
+                    : t(oid ? 'Update Offer' : 'Create Offer')}
                 </Button>
               </CardActions>
             </Card>

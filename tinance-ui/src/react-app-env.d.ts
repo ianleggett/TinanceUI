@@ -79,7 +79,7 @@ declare namespace User {
       coinprecision: number;
       walletAddress: string;
     };
-    payDetails: BankDetail[];
+    payDetails: PublicData.BankDetail[];
   }
 }
 
@@ -95,7 +95,7 @@ declare namespace Offer {
     | 'UNKNOWN';
 
   interface Model {
-    id: number;
+    id: string;
     buyer: boolean;
     complete: boolean;
     created: number;
@@ -110,10 +110,10 @@ declare namespace Offer {
     inProg: boolean;
     live: boolean;
     orderId: string;
-    paymentDetails: BankDetail[];
     procStatus: Status;
     remainCryptoAmt: number;
     updated: number;
+    paymentDetails: PublicData.BankDetail[];
     userDetails: {
       blurb?: string;
       cid: number;
@@ -162,7 +162,7 @@ declare namespace Trade {
       tradecount: number;
       username: string;
     };
-    sellerBankDetails: BankDetail;
+    sellerBankDetails: PublicData.BankDetail;
     sellerAddress: string;
     fromccy: PublicData.CCYCode;
     fromAmount: number;
@@ -279,6 +279,7 @@ declare namespace API {
     toccyid: number;
     toamt: number;
     expiry: string;
+    orderid?: string;
     payType?: {
       payTypeId: number;
       field1value: string;
@@ -346,7 +347,7 @@ declare namespace API {
 
   interface UpdateUserDetailsResponse extends BaseResponse {}
 
-  type GetUserBankResponse = BankDetail;
+  type GetUserBankResponse = PublicData.BankDetail;
 
   interface UpdateUserBankParams {
     payTypeId: number;
@@ -373,7 +374,7 @@ declare namespace API {
   interface SetUserWalletResponse extends BaseResponse {}
 
   interface ToggleOfferLiveParams {
-    oid: number;
+    oid: string;
     v: boolean;
   }
 

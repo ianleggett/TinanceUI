@@ -78,6 +78,11 @@ const App: React.FC = () => {
 
                       <AccessControlRoute path="/offers" component={OfferListPage} exact />
                       <AccessControlRoute path="/offers/create" component={OfferFormPage} exact />
+                      <AccessControlRoute
+                        path="/offers/update/:oid"
+                        component={OfferFormPage}
+                        exact
+                      />
                       <AccessControlRoute path="/trades" component={TradeListPage} exact />
                       <AccessControlRoute
                         path="/account/profile"
