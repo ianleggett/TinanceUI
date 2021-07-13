@@ -371,4 +371,11 @@ declare namespace API {
   }
 
   interface SetUserWalletResponse extends BaseResponse {}
+
+  interface ToggleOfferLiveParams {
+    oid: number;
+    v: boolean;
+  }
+
+  interface ToggleOfferLiveResponse extends BaseResponse {}
 }

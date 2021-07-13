@@ -11,6 +11,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
+import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
@@ -21,12 +22,13 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import { useMount, useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
+import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
 import { offerStatusMap } from '../constants';
-import { GetMyOffersService } from '../services';
+import { GetMyOffersService, ToggleOfferLiveService } from '../services';
 
 const useStyles = makeStyles((theme) => ({
   filter: {
@@ -74,6 +76,12 @@ const useStyles = makeStyles((theme) => ({
     left: theme.spacing(4),
     textTransform: 'uppercase',
   },
+  checkbox: {
+    position: 'absolute',
+    top: theme.spacing(4),
+    right: theme.spacing(4),
+    textTransform: 'uppercase',
+  },
   empty: {
     display: 'flex',
     flexDirection: 'column',
@@ -103,12 +111,37 @@ const OfferListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
   const [offers, setOffers] = useState<Offer.Model[]>([]);
+  const [selectedOffer, setSelectedOffer] = useState<number>(0);
 
   const { run, loading, cancel } = useRequest(GetMyOffersService, {
     onSuccess(res) {
       if (res) {
         setOffers(res);
+      }
+    },
+  });
+
+  const { run: toggleLive, loading: toggling } = useRequest(ToggleOfferLiveService, {
+    onSuccess(res) {
+      if (res.statusCode) {
+        setOffers((prevState) =>
+          prevState.map((offer) => {
+            if (offer.id === selectedOffer) {
+              offer.live = !offer.live;
+            }
+            return offer;
+          }),
+        );
+
+        enqueueSnackbar(t('Toggle live successful'), {
+          variant: 'success',
+        });
+      } else {
+        enqueueSnackbar(t('Toggle live failed'), {
+          variant: 'warning',
+        });
       }
     },
   });
@@ -151,6 +184,16 @@ const OfferListPage: React.FC = () => {
       }
     },
     [formik, loading],
+  );
+
+  const handleToggleLive = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>, checked: boolean, oid: number) => {
+      if (!toggling) {
+        setSelectedOffer(oid);
+        toggleLive({ oid, v: checked });
+      }
+    },
+    [toggleLive, toggling],
   );
 
   const handleGoToCreateOfferPage = useCallback(() => {
@@ -274,6 +317,12 @@ const OfferListPage: React.FC = () => {
                 label={offer.buyer ? t('Sell') : t('Buy')}
                 className={classes.chip}
                 style={{ color: '#D97706', borderColor: '#D97706' }}
+              />
+              <Switch
+                color="primary"
+                checked={offer.live}
+                onChange={(event, checked) => handleToggleLive(event, checked, offer.id)}
+                className={classes.checkbox}
               />
               <Grid container spacing={1}>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
