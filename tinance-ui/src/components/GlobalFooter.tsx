@@ -15,6 +15,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
+import pkg from '../../package.json';
 import type { AppLang } from '../constants';
 import { languages } from '../constants';
 import type { AppConfigAction } from './AppConfig';
@@ -25,6 +26,10 @@ const useStyles = makeStyles((theme) => {
       flex: '0 0 54px',
       padding: 16,
       borderTop: `1px solid ${theme.palette.divider}`,
+    },
+    center: {
+      marginTop: theme.spacing(2),
+      textAlign: 'center',
     },
     left: {
       textAlign: 'left',
@@ -164,6 +169,18 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = (props) => {
             </Menu>
           </Box>
         </Grid>
+        {process.env.NODE_ENV !== 'production' ? (
+          <Grid xs={12} item>
+            <Typography
+              component="p"
+              variant="caption"
+              color="textSecondary"
+              className={classes.center}
+            >
+              {t('Current Version')}: {pkg.version} | {t('Dev Proxy')}: {pkg.proxy}
+            </Typography>
+          </Grid>
+        ) : null}
       </Grid>
     </Container>
   );
