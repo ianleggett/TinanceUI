@@ -25,7 +25,7 @@ import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import SwapHorizOutlinedIcon from '@material-ui/icons/SwapHorizOutlined';
 import Alert from '@material-ui/lab/Alert';
 import { DateTimePicker } from '@material-ui/pickers';
-import { useRequest } from 'ahooks';
+import { useMount, useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
@@ -35,8 +35,8 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
-import { useAppConfigState, useUserManagerState } from '../components';
-import { AddUpdateOrderService } from '../services';
+import { useAppConfigState } from '../components';
+import { AddUpdateOrderService, GetUserBankService } from '../services';
 
 const useStyles = makeStyles((theme) => ({
   step: {
@@ -115,13 +115,13 @@ const OfferFormPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { feeRate } = useAppConfigState();
-  const { profile } = useUserManagerState();
   const { enqueueSnackbar } = useSnackbar();
   const { ccyCodes, relativeExpiryTime } = useAppConfigState();
   const [invert, setInvert] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [usingDefault, setUsingDefault] = useState(true);
   const [expiryTime, setExpiryTime] = useState(dayjs().add(relativeExpiryTime, 'hours'));
+  const [bankDetails, setBankDetails] = useState<API.GetUserBankResponse | null>(null);
 
   const steps = useMemo(() => {
     return [t('Offer Details'), t('Payment Details'), t('Expiry Time')];
@@ -147,13 +147,25 @@ const OfferFormPage: React.FC = () => {
     };
   }, [invert, t]);
 
+  const { run: getBankDetails } = useRequest(GetUserBankService, {
+    onSuccess(res) {
+      if (res.id) {
+        setBankDetails(res);
+      } else {
+        enqueueSnackbar(t('Get user bank details failed'), {
+          variant: 'warning',
+        });
+      }
+    },
+  });
+
   const defaultPayDetail = useMemo(() => {
-    if (!profile) {
+    if (!bankDetails) {
       return initialValues.payType;
     }
 
     const { field1value, field2value, field3value, field4value, field5value, payType } =
-      profile.payDetails[0];
+      bankDetails;
 
     return {
       field1value,
@@ -163,10 +175,10 @@ const OfferFormPage: React.FC = () => {
       field5value,
       payTypeId: payType.id,
     };
-  }, [profile]);
+  }, [bankDetails]);
 
   const defaultPayType = useMemo(() => {
-    if (!profile) {
+    if (!bankDetails) {
       return {
         id: 1,
         name: 'Bank Transfer',
@@ -179,8 +191,8 @@ const OfferFormPage: React.FC = () => {
       };
     }
 
-    return profile.payDetails[0].payType;
-  }, [profile]);
+    return bankDetails.payType;
+  }, [bankDetails]);
 
   const validationSchema = useMemo(() => {
     return yup.object({
@@ -197,7 +209,7 @@ const OfferFormPage: React.FC = () => {
           variant: 'success',
         });
       } else {
-        enqueueSnackbar(t(res.msg || t('New offer created failed')), {
+        enqueueSnackbar(res.msg || t('New offer created failed'), {
           variant: 'warning',
         });
       }
@@ -292,12 +304,16 @@ const OfferFormPage: React.FC = () => {
     });
   }, [formik]);
 
+  useMount(() => {
+    getBankDetails();
+  });
+
   useEffect(() => {
     if (usingDefault) {
       formik.setFieldValue('payType', defaultPayDetail);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usingDefault]);
+  }, [defaultPayDetail, usingDefault]);
 
   return (
     <form onSubmit={handleSubmit}>

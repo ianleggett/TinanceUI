@@ -22,6 +22,19 @@ declare namespace PublicData {
     field5name: string;
   }
 
+  interface BankDetail {
+    id: number;
+    payType: PaymentType;
+    field1value: string;
+    field2value: string;
+    field3value: string;
+    field4value: string;
+    field5value: string;
+    timesUsed: number;
+    updated: number;
+    usernotes: string;
+  }
+
   interface UserProfile {
     cid: number;
     blurb: string;
@@ -66,20 +79,7 @@ declare namespace User {
       coinprecision: number;
       walletAddress: string;
     };
-    payDetails: [
-      {
-        id: number;
-        payType: PublicData.PaymentType;
-        field1value: string;
-        field2value: string;
-        field3value: string;
-        field4value: string;
-        field5value: string;
-        timesUsed: number;
-        usernotes: string;
-        updated: string;
-      },
-    ];
+    payDetails: BankDetail[];
   }
 }
 
@@ -110,18 +110,7 @@ declare namespace Offer {
     inProg: boolean;
     live: boolean;
     orderId: string;
-    paymentDetails: {
-      id: number;
-      payType: PublicData.PaymentType;
-      field1value: string;
-      field2value: string;
-      field3value: string;
-      field4value: string;
-      field5value: string;
-      timesUsed: number;
-      updated: number;
-      usernotes: string;
-    }[];
+    paymentDetails: BankDetail[];
     procStatus: Status;
     remainCryptoAmt: number;
     updated: number;
@@ -152,13 +141,28 @@ declare namespace Trade {
 
   interface Model {
     id: number;
-    contractId: string;
     tradeId: string;
     numericOrderId: number;
     parentOrderId: string;
-    buyerId: number;
+    buyer: {
+      cid: number;
+      countryISO: string;
+      feedback: number;
+      lastseen: string;
+      tradecount: number;
+      username: string;
+    };
     buyerAddress: string;
-    sellerId: number;
+    bu;
+    seller: {
+      cid: number;
+      countryISO: string;
+      feedback: number;
+      lastseen: string;
+      tradecount: number;
+      username: string;
+    };
+    sellerBankDetails: BankDetail;
     sellerAddress: string;
     fromccy: PublicData.CCYCode;
     fromAmount: number;
@@ -216,8 +220,8 @@ declare namespace API {
   interface SignUpResponse extends BaseResponse {}
 
   interface ForgotPasswordParams {
-    email: string;
-    username: string;
+    email?: string;
+    username?: string;
   }
 
   interface ForgotPasswordResponse extends BaseResponse {}
@@ -342,27 +346,7 @@ declare namespace API {
 
   interface UpdateUserDetailsResponse extends BaseResponse {}
 
-  interface GetUserBankResponse {
-    id: number;
-    field1value: string;
-    field2value: string;
-    field3value: string;
-    field4value: string;
-    field5value: string;
-    payType: {
-      id: number;
-      name: string;
-      enabled: boolean;
-      field1name: string;
-      field2name: string;
-      field3name: string;
-      field4name: string;
-      field5name: string;
-    };
-    timesUsed: number;
-    updated: string;
-    usernotes?: string;
-  }
+  type GetUserBankResponse = BankDetail;
 
   interface UpdateUserBankParams {
     payTypeId: number;
