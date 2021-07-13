@@ -14,7 +14,6 @@ import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
@@ -348,7 +347,7 @@ const TradeListPage: React.FC = () => {
 
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
-      const isSeller = !!profile && trade.sellerId === profile.id;
+      const isSeller = !!profile && trade.seller.cid === profile.id;
 
       switch (trade.status) {
         case 'CREATED': {
@@ -356,11 +355,9 @@ const TradeListPage: React.FC = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => handleCryptoDeposit(trade.contractId)}
+              onClick={() => handleCryptoDeposit(trade.tradeId)}
             >
-              {depositing && trade.contractId === selectedOrderId
-                ? t('Depositing...')
-                : t('Deposit')}
+              {depositing && trade.tradeId === selectedOrderId ? t('Depositing...') : t('Deposit')}
             </Button>
           ) : null;
         }
@@ -370,9 +367,9 @@ const TradeListPage: React.FC = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => handleFlagFundsSent(trade.contractId)}
+              onClick={() => handleFlagFundsSent(trade.tradeId)}
             >
-              {flagging && trade.contractId === selectedOrderId
+              {flagging && trade.tradeId === selectedOrderId
                 ? t('Confirming...')
                 : t('I have sent bank funds')}
             </Button>
@@ -384,9 +381,9 @@ const TradeListPage: React.FC = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => handleFlagComplete(trade.contractId)}
+              onClick={() => handleFlagComplete(trade.tradeId)}
             >
-              {flagging2 && trade.contractId === selectedOrderId
+              {flagging2 && trade.tradeId === selectedOrderId
                 ? t('Confirming...')
                 : t('I have received bank funds')}
             </Button>
@@ -396,11 +393,11 @@ const TradeListPage: React.FC = () => {
         case 'CANCEL_REQ': {
           return isSeller ? null : (
             <Button
-              color="secondary"
+              color="primary"
               variant="outlined"
-              onClick={() => handleFlagFundsSent(trade.contractId)}
+              onClick={() => handleFlagFundsSent(trade.tradeId)}
             >
-              {flagging && trade.contractId === selectedOrderId
+              {flagging && trade.tradeId === selectedOrderId
                 ? t('Confirming...')
                 : t('I have sent bank funds')}
             </Button>
@@ -426,7 +423,7 @@ const TradeListPage: React.FC = () => {
 
   const getSecondaryButton = useCallback(
     (trade: Trade.Model) => {
-      const isSeller = !!profile && trade.sellerId === profile.id;
+      const isSeller = !!profile && trade.seller.cid === profile.id;
 
       switch (trade.status) {
         case 'CREATED': {
@@ -434,7 +431,7 @@ const TradeListPage: React.FC = () => {
             <Button
               color="secondary"
               variant="outlined"
-              onClick={() => handleAlertDialogOpen(trade.contractId)}
+              onClick={() => handleAlertDialogOpen(trade.tradeId)}
             >
               {t('Cancel transaction')}
             </Button>
@@ -446,7 +443,7 @@ const TradeListPage: React.FC = () => {
             <Button
               color="secondary"
               variant="outlined"
-              onClick={() => handleAlertDialogOpen(trade.contractId)}
+              onClick={() => handleAlertDialogOpen(trade.tradeId)}
             >
               {t('Cancel transaction')}
             </Button>
@@ -458,9 +455,9 @@ const TradeListPage: React.FC = () => {
             <Button
               color="secondary"
               variant="outlined"
-              onClick={() => handleAcceptCancel(trade.contractId)}
+              onClick={() => handleAcceptCancel(trade.tradeId)}
             >
-              {acceptting && trade.contractId === selectedOrderId
+              {acceptting && trade.tradeId === selectedOrderId
                 ? t('Acceptting...')
                 : t('Accept Cancel')}
             </Button>
@@ -577,13 +574,13 @@ const TradeListPage: React.FC = () => {
           ) : (
             trades.map((trade) => (
               <Paper key={trade.id} className={classes.card}>
-                {profile && [trade.buyerId, trade.sellerId].includes(profile.id) ? (
+                {profile && [trade.buyer.cid, trade.seller.cid].includes(profile.id) ? (
                   <Chip
                     color="primary"
                     variant="outlined"
                     className={classes.chip}
                     label={
-                      trade.buyerId === profile.id
+                      trade.buyer.cid === profile.id
                         ? t('You are the Buyer')
                         : t('You are the Seller')
                     }
@@ -630,9 +627,7 @@ const TradeListPage: React.FC = () => {
                     <Typography color="textSecondary" variant="overline">
                       {t('Order ID')}
                     </Typography>
-                    <Tooltip title={trade.contractId}>
-                      <Typography color="primary">{trade.contractId.slice(0, 24)}...</Typography>
-                    </Tooltip>
+                    <Typography color="primary">{trade.parentOrderId}</Typography>
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                     <Typography color="textSecondary" variant="overline">
@@ -661,30 +656,58 @@ const TradeListPage: React.FC = () => {
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" component="p" variant="body1">
-                      {profile && trade.sellerId === profile.id
-                        ? `You are selling ${trade.fromAmount.toFixed(4)} ${
-                            trade.fromccy.name
-                          } for ${trade.toAmount.toFixed(4)} ${
-                            trade.toccy.name
-                          } at an exchange rate of ${calcExchangeRate(
-                            trade.fromAmount.toString(),
-                            trade.toAmount.toString(),
-                          )} to Buyer
-                      ${trade.buyerId}.`
-                        : `You are buying ${trade.fromAmount.toFixed(4)} ${
-                            trade.fromccy.name
-                          } for ${trade.toAmount.toFixed(4)} ${
-                            trade.toccy.name
-                          } at an exchange rate of ${calcExchangeRate(
-                            trade.fromAmount.toString(),
-                            trade.toAmount.toString(),
-                          )} from Seller
-                      ${trade.sellerId}.`}
+                      {profile && trade.seller.cid === profile.id ? (
+                        <>
+                          <Typography component="span">You are selling </Typography>
+                          <Typography component="span" color="primary">
+                            {trade.fromAmount.toFixed(4)} {trade.fromccy.name}
+                          </Typography>
+                          <Typography component="span">for</Typography>
+                          <Typography component="span" color="primary">
+                            {trade.toAmount.toFixed(4)} {trade.toccy.name}
+                          </Typography>
+                          <Typography component="span"> at an exchange rate of </Typography>
+                          <Typography component="span" color="primary">
+                            {calcExchangeRate(
+                              trade.fromAmount.toString(),
+                              trade.toAmount.toString(),
+                            )}
+                          </Typography>
+                          <Typography component="span"> to Buyer </Typography>
+                          <Typography component="span" color="primary">
+                            {trade.buyer.username}
+                          </Typography>
+                        </>
+                      ) : (
+                        <>
+                          <Typography component="span">You are buying </Typography>
+                          <Typography component="span" color="primary">
+                            <code>{trade.fromAmount.toFixed(4)}</code> {trade.fromccy.name}
+                          </Typography>
+                          <Typography component="span"> for </Typography>
+                          <Typography component="span" color="primary">
+                            <code>{trade.toAmount.toFixed(4)}</code> {trade.toccy.name}
+                          </Typography>
+                          <Typography component="span"> at an exchange rate of </Typography>
+                          <Typography component="span" color="primary">
+                            <code>
+                              {calcExchangeRate(
+                                trade.fromAmount.toString(),
+                                trade.toAmount.toString(),
+                              )}
+                            </code>
+                          </Typography>
+                          <Typography component="span"> to Seller </Typography>
+                          <Typography component="span" color="primary">
+                            {trade.seller.username}
+                          </Typography>
+                        </>
+                      )}
                     </Typography>
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" color="primary" component="p" variant="h5">
-                      {profile && trade.sellerId === profile.id
+                      {profile && trade.seller.cid === profile.id
                         ? t(sellerInfo[trade.status])
                         : t(buyerInfo[trade.status])}
                     </Typography>
@@ -730,7 +753,7 @@ const TradeListPage: React.FC = () => {
             {t('Cancel')}
           </Button>
           <Button color="secondary" variant="contained" onClick={handleCancelTrade} autoFocus>
-            {cancelling ? t('Cancelling...') : t('Confirm')}
+            {cancelling ? t('Confirming...') : t('Confirm')}
           </Button>
         </DialogActions>
       </Dialog>
