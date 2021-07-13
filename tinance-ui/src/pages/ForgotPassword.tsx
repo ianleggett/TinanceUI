@@ -1,14 +1,18 @@
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
+import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
@@ -46,8 +50,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialValues = {
-  username: '',
   email: '',
+  username: '',
 };
 
 const ForgotPasswordPage: React.FC = () => {
@@ -57,6 +61,7 @@ const ForgotPasswordPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { validationRegex } = useAppConfigState();
   const emailRef = useRef('');
+  const [formType, setFormType] = useState<'email' | 'username'>('email');
 
   const usernamePattern = useMemo(() => {
     return fixRegex(validationRegex.username.key);
@@ -65,14 +70,8 @@ const ForgotPasswordPage: React.FC = () => {
   const validationSchema = useCallback(() => {
     return yup.lazy((values: typeof initialValues) =>
       yup.object({
-        username: yup
-          .string()
-          .required(t('Username is required'))
-          .matches(new RegExp(usernamePattern), validationRegex.username.value),
-        email: yup
-          .string()
-          .required(t('Email address is Required'))
-          .email(t('Invalid email adrress format')),
+        username: yup.string().matches(new RegExp(usernamePattern), validationRegex.username.value),
+        email: yup.string().email(t('Invalid email adrress format')),
       }),
     );
   }, [t, usernamePattern, validationRegex.username.value]);
@@ -96,7 +95,13 @@ const ForgotPasswordPage: React.FC = () => {
     initialValues,
     validationSchema,
     onSubmit: (values) => {
-      forgotPassword(values);
+      if (values[formType]) {
+        forgotPassword({ [formType]: values[formType] });
+      } else {
+        enqueueSnackbar(`Field ${formType} is Required`, {
+          variant: 'warning',
+        });
+      }
     },
   });
 
@@ -110,6 +115,19 @@ const ForgotPasswordPage: React.FC = () => {
     [formik, loading],
   );
 
+  const handleFormTypeChange = useCallback(
+    (
+      event: React.ChangeEvent<{
+        name?: string | undefined;
+        value: unknown;
+      }>,
+    ) => {
+      setFormType(event.target.value as 'email' | 'username');
+      formik.resetForm();
+    },
+    [formik],
+  );
+
   const handleGoToSignInPage = useCallback(() => {
     history.push('/signin');
   }, [history]);
@@ -121,36 +139,55 @@ const ForgotPasswordPage: React.FC = () => {
           {t('Forgot Password')}
         </Typography>
         <Typography component="p" variant="subtitle1" className={classes.subtitle}>
-          {t('Input your username and email to get a password reset link')}
+          {t('Input your username or email address to get a password reset link')}
         </Typography>
         <form onSubmit={handleSubmit} className={classes.form}>
-          <TextField
-            id="username"
-            name="username"
-            label={t('Username')}
-            variant="outlined"
-            disabled={loading}
-            autoComplete="username"
-            value={formik.values.username}
-            onChange={formik.handleChange}
-            error={formik.touched.username && Boolean(formik.errors.username)}
-            helperText={formik.touched.username && formik.errors.username}
-            fullWidth
-          />
-          <TextField
-            id="email"
-            name="email"
-            type="email"
-            label={t('Email Address')}
-            variant="outlined"
-            disabled={loading}
-            autoComplete="email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
-            fullWidth
-          />
+          <FormControl variant="outlined" fullWidth>
+            <InputLabel id="country-select">{t('Username / Email Address')}</InputLabel>
+            <Select
+              id="formType"
+              name="formType"
+              label={t('Username / Email Address')}
+              labelId="form-type-select"
+              value={formType}
+              onChange={handleFormTypeChange}
+              disabled={loading}
+              fullWidth
+            >
+              <MenuItem value="email">I remember my email address</MenuItem>
+              <MenuItem value="username">I remember my username</MenuItem>
+            </Select>
+          </FormControl>
+          {formType === 'username' ? (
+            <TextField
+              id="username"
+              name="username"
+              label={t('Username')}
+              variant="outlined"
+              disabled={loading}
+              autoComplete="username"
+              value={formik.values.username}
+              onChange={formik.handleChange}
+              error={formik.touched.username && Boolean(formik.errors.username)}
+              helperText={formik.touched.username && formik.errors.username}
+              fullWidth
+            />
+          ) : (
+            <TextField
+              id="email"
+              name="email"
+              type="email"
+              label={t('Email Address')}
+              variant="outlined"
+              disabled={loading}
+              autoComplete="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
+              fullWidth
+            />
+          )}
           <Button
             type="submit"
             color="primary"
@@ -158,7 +195,7 @@ const ForgotPasswordPage: React.FC = () => {
             size="large"
             className={classes.submit}
           >
-            {loading ? t('Sending...') : t('Send Reset Email')}
+            {loading ? t('Sending Email...') : t('Send Reset Email')}
           </Button>
           <Box display="flex" justifyContent="center" className={classes.links}>
             <Button variant="text" color="primary" onClick={handleGoToSignInPage}>
