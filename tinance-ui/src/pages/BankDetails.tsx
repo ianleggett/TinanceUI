@@ -106,11 +106,19 @@ const BankDetailsPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserBank();
+        enqueueSnackbar(t('Update user bank successful'), {
+          variant: 'success',
+        });
       } else {
         enqueueSnackbar(res.msg || t('Update user bank failed'), {
           variant: 'warning',
         });
       }
+    },
+    onError(error) {
+      enqueueSnackbar(error.message || t('Update user bank failed'), {
+        variant: 'warning',
+      });
     },
   });
 

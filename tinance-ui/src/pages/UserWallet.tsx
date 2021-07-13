@@ -116,11 +116,19 @@ const UserWalletPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserWallet();
+        enqueueSnackbar(t('Set user wallet successful'), {
+          variant: 'success',
+        });
       } else {
         enqueueSnackbar(res.msg || t('Set user wallet failed'), {
           variant: 'warning',
         });
       }
+    },
+    onError(error) {
+      enqueueSnackbar(error.message || t('Set user wallet failed'), {
+        variant: 'warning',
+      });
     },
   });
 
@@ -244,7 +252,7 @@ const UserWalletPage: React.FC = () => {
               size="large"
               className={classes.submit}
             >
-              {loading ? t('Updating...') : t('Update')}
+              {loading ? t('Updating...') : t('Update User Wallet')}
             </Button>
           </form>
         </Paper>

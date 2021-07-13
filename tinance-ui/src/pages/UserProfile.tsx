@@ -146,6 +146,9 @@ const UserProfilePage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserDetails();
+        enqueueSnackbar(t('Change profile successful'), {
+          variant: 'success',
+        });
       } else {
         enqueueSnackbar(res.msg || t('Change profile failed'), {
           variant: 'warning',
@@ -234,6 +237,11 @@ const UserProfilePage: React.FC = () => {
 
         setTelCode(first);
         formik.setFieldValue('phone', rest.join(' '));
+      } else {
+        const country = countryCodes.find((v) => v.tripleCode === countryISO);
+        if (country) {
+          setTelCode(country.telCode);
+        }
       }
     } else {
       enqueueSnackbar(t('Get user profile failed'), {
