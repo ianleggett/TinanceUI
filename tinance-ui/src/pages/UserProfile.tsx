@@ -87,11 +87,11 @@ const UserProfilePage: React.FC = () => {
   const [telCode, setTelCode] = useState('+1');
 
   const phonePattern = useMemo(() => {
-    return fixRegex(validationRegex.phone.key);
+    return fixRegex(validationRegex.phone?.key);
   }, [validationRegex.phone]);
 
   const usernamePattern = useMemo(() => {
-    return fixRegex(validationRegex.username.key);
+    return fixRegex(validationRegex.username?.key);
   }, [validationRegex.username]);
 
   const validationSchema = useCallback(() => {
@@ -102,7 +102,7 @@ const UserProfilePage: React.FC = () => {
         phone: yup
           .string()
           .required(t('Phone number is required'))
-          .matches(new RegExp(phonePattern), validationRegex.phone.value),
+          .matches(new RegExp(phonePattern), validationRegex.phone?.value),
         email: yup
           .string()
           .required(t('Email address is Required'))
@@ -110,15 +110,15 @@ const UserProfilePage: React.FC = () => {
         username: yup
           .string()
           .required(t('Username is required'))
-          .matches(new RegExp(usernamePattern), validationRegex.username.value),
+          .matches(new RegExp(usernamePattern), validationRegex.username?.value),
       }),
     );
   }, [
     phonePattern,
     t,
     usernamePattern,
-    validationRegex.phone.value,
-    validationRegex.username.value,
+    validationRegex.phone?.value,
+    validationRegex.username?.value,
   ]);
 
   const { run: getUserDetails } = useRequest(GetUserDetailsService, {

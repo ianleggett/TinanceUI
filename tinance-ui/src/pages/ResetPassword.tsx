@@ -68,11 +68,11 @@ const ResetPasswordPage: React.FC = () => {
   const usernameRef = useRef(new URLSearchParams(search).get('username') ?? '');
 
   const passwordPattern = useMemo(() => {
-    return fixRegex(validationRegex.password.key);
+    return fixRegex(validationRegex.password?.key);
   }, [validationRegex.password]);
 
   const usernamePattern = useMemo(() => {
-    return fixRegex(validationRegex.username.key);
+    return fixRegex(validationRegex.username?.key);
   }, [validationRegex.username]);
 
   const validationSchema = useCallback(() => {
@@ -81,15 +81,15 @@ const ResetPasswordPage: React.FC = () => {
         username: yup
           .string()
           .required(t('Username is required'))
-          .matches(new RegExp(usernamePattern), validationRegex.username.value),
+          .matches(new RegExp(usernamePattern), validationRegex.username?.value),
         newpwd: yup
           .string()
           .required(t('New password is required'))
-          .matches(new RegExp(passwordPattern), validationRegex.password.value),
+          .matches(new RegExp(passwordPattern), validationRegex.password?.value),
         newpwd2: yup
           .string()
           .required(t('New password is required'))
-          .matches(new RegExp(passwordPattern), validationRegex.password.value)
+          .matches(new RegExp(passwordPattern), validationRegex.password?.value)
           .oneOf(
             [yup.ref('password'), null],
             t('Confirm new password should be the same as new password'),
@@ -100,8 +100,8 @@ const ResetPasswordPage: React.FC = () => {
     passwordPattern,
     t,
     usernamePattern,
-    validationRegex.password.value,
-    validationRegex.username.value,
+    validationRegex.password?.value,
+    validationRegex.username?.value,
   ]);
 
   const { run: resetPassword, loading } = useRequest(ResetPasswordService, {

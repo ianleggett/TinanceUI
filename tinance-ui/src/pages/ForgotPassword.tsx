@@ -64,17 +64,19 @@ const ForgotPasswordPage: React.FC = () => {
   const [formType, setFormType] = useState<'email' | 'username'>('email');
 
   const usernamePattern = useMemo(() => {
-    return fixRegex(validationRegex.username.key);
+    return fixRegex(validationRegex.username?.key);
   }, [validationRegex.username]);
 
   const validationSchema = useCallback(() => {
     return yup.lazy((values: typeof initialValues) =>
       yup.object({
-        username: yup.string().matches(new RegExp(usernamePattern), validationRegex.username.value),
+        username: yup
+          .string()
+          .matches(new RegExp(usernamePattern), validationRegex.username?.value),
         email: yup.string().email(t('Invalid email adrress format')),
       }),
     );
-  }, [t, usernamePattern, validationRegex.username.value]);
+  }, [t, usernamePattern, validationRegex.username?.value]);
 
   const { run: forgotPassword, loading } = useRequest(ForgotPasswordService, {
     onSuccess(res) {
