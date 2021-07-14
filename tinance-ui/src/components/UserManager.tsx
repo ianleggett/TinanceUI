@@ -68,7 +68,7 @@ async function requestRemoteUserProfile(dispatch: Dispatch<UserManagerAction>) {
   try {
     const profile = await GetUserDetailsService();
 
-    if (profile.id) {
+    if (profile.cid) {
       saveProfile(profile);
 
       dispatch({

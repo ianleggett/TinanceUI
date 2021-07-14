@@ -123,7 +123,7 @@ const UserProfilePage: React.FC = () => {
 
   const { run: getUserDetails } = useRequest(GetUserDetailsService, {
     onSuccess(res) {
-      if (res.id) {
+      if (res.cid) {
         saveProfile(res);
 
         dispatch({
@@ -222,9 +222,9 @@ const UserProfilePage: React.FC = () => {
 
   useMount(() => {
     if (profile) {
-      const { id, countryISO, phone, email, username } = profile;
+      const { cid, countryISO, phone, email, username } = profile;
 
-      formik.setFieldValue('userid', id);
+      formik.setFieldValue('userid', cid);
       formik.setFieldValue('email', email);
       formik.setFieldValue('username', username);
 

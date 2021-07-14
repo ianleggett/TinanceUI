@@ -261,7 +261,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
           <Box display="flex" alignItems="center" className={classes.buttons}>
             {profile ? (
               <>
-                <Tooltip title={t('User Center') as string} enterDelay={300}>
+                <Tooltip title={t('User Center') as string} enterDelay={300} arrow>
                   <Button
                     color="inherit"
                     aria-haspopup="true"

@@ -60,7 +60,7 @@ declare namespace PublicData {
 
 declare namespace User {
   interface Model {
-    id: number;
+    cid: number;
     blurb?: string;
     username: string;
     email: string;

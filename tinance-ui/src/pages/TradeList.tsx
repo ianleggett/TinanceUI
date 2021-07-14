@@ -36,6 +36,7 @@ import {
   FlagFundsSentService,
   GetMyTradesService,
 } from '../services';
+import { toFixed } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   filter: {
@@ -245,7 +246,7 @@ const TradeListPage: React.FC = () => {
     const to = toamt === '' ? 0 : Number.parseInt(toamt, 10);
 
     if (from !== 0 && to !== 0) {
-      return (to / from).toFixed(4);
+      return toFixed(to / from, 4);
     }
 
     return '--';
@@ -347,7 +348,7 @@ const TradeListPage: React.FC = () => {
 
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
-      const isSeller = !!profile && trade.seller.cid === profile.id;
+      const isSeller = !!profile && trade.seller.cid === profile.cid;
 
       switch (trade.status) {
         case 'CREATED': {
@@ -423,7 +424,7 @@ const TradeListPage: React.FC = () => {
 
   const getSecondaryButton = useCallback(
     (trade: Trade.Model) => {
-      const isSeller = !!profile && trade.seller.cid === profile.id;
+      const isSeller = !!profile && trade.seller.cid === profile.cid;
 
       switch (trade.status) {
         case 'CREATED': {
@@ -574,13 +575,13 @@ const TradeListPage: React.FC = () => {
           ) : (
             trades.map((trade) => (
               <Paper key={trade.id} className={classes.card}>
-                {profile && [trade.buyer.cid, trade.seller.cid].includes(profile.id) ? (
+                {profile && [trade.buyer.cid, trade.seller.cid].includes(profile.cid) ? (
                   <Chip
                     color="primary"
                     variant="outlined"
                     className={classes.chip}
                     label={
-                      trade.buyer.cid === profile.id
+                      trade.buyer.cid === profile.cid
                         ? t('You are the Buyer')
                         : t('You are the Seller')
                     }
@@ -597,6 +598,7 @@ const TradeListPage: React.FC = () => {
                     <TextField
                       label={t('Crypto')}
                       variant="outlined"
+                      inputMode="decimal"
                       value={trade.fromAmount}
                       InputProps={{
                         readOnly: true,
@@ -611,6 +613,7 @@ const TradeListPage: React.FC = () => {
                     <TextField
                       label={t('Fiat')}
                       variant="outlined"
+                      inputMode="decimal"
                       value={trade.toAmount}
                       InputProps={{
                         readOnly: true,
@@ -656,15 +659,15 @@ const TradeListPage: React.FC = () => {
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" component="p" variant="body1">
-                      {profile && trade.seller.cid === profile.id ? (
+                      {profile && trade.seller.cid === profile.cid ? (
                         <>
                           <Typography component="span">You are selling </Typography>
                           <Typography component="span" color="primary">
-                            {trade.fromAmount.toFixed(4)} {trade.fromccy.name}
+                            {toFixed(trade.fromAmount)} {trade.fromccy.name}
                           </Typography>
-                          <Typography component="span">for</Typography>
+                          <Typography component="span"> for </Typography>
                           <Typography component="span" color="primary">
-                            {trade.toAmount.toFixed(4)} {trade.toccy.name}
+                            {toFixed(trade.toAmount)} {trade.toccy.name}
                           </Typography>
                           <Typography component="span"> at an exchange rate of </Typography>
                           <Typography component="span" color="primary">
@@ -682,11 +685,11 @@ const TradeListPage: React.FC = () => {
                         <>
                           <Typography component="span">You are buying </Typography>
                           <Typography component="span" color="primary">
-                            <code>{trade.fromAmount.toFixed(4)}</code> {trade.fromccy.name}
+                            <code>{toFixed(trade.fromAmount)}</code> {trade.fromccy.name}
                           </Typography>
                           <Typography component="span"> for </Typography>
                           <Typography component="span" color="primary">
-                            <code>{trade.toAmount.toFixed(4)}</code> {trade.toccy.name}
+                            <code>{toFixed(trade.toAmount)}</code> {trade.toccy.name}
                           </Typography>
                           <Typography component="span"> at an exchange rate of </Typography>
                           <Typography component="span" color="primary">
@@ -707,7 +710,7 @@ const TradeListPage: React.FC = () => {
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" color="primary" component="p" variant="h5">
-                      {profile && trade.seller.cid === profile.id
+                      {profile && trade.seller.cid === profile.cid
                         ? t(sellerInfo[trade.status])
                         : t(buyerInfo[trade.status])}
                     </Typography>

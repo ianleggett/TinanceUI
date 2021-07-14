@@ -37,6 +37,7 @@ import * as yup from 'yup';
 
 import { useAppConfigState } from '../components';
 import { AddUpdateOrderService, GetUserBankService } from '../services';
+import { toFixed } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   step: {
@@ -223,7 +224,7 @@ const OfferFormPage: React.FC = () => {
     const to = toamt === '' ? 0 : Number.parseInt(toamt, 10);
 
     if (from !== 0 && to !== 0) {
-      return (to / from).toFixed(4);
+      return toFixed(to / from, 4);
     }
 
     return '--';
@@ -235,7 +236,7 @@ const OfferFormPage: React.FC = () => {
       const to = toamt === '' ? 0 : Number.parseInt(toamt, 10);
 
       if (from !== 0 && to !== 0) {
-        return ((invert ? to : from) * feeRate).toFixed(4);
+        return toFixed((invert ? to : from) * feeRate, 4);
       }
 
       return '--';
@@ -408,7 +409,7 @@ const OfferFormPage: React.FC = () => {
                           name="fromamt"
                           variant="outlined"
                           type="number"
-                          inputMode="numeric"
+                          inputMode="decimal"
                           label={t("You'll send")}
                           value={formik.values.fromamt}
                           onChange={formik.handleChange}
@@ -420,7 +421,7 @@ const OfferFormPage: React.FC = () => {
                     </Grid>
                   </Grid>
                   <Grid xs={2} className={classes.arrow} item>
-                    <Tooltip title={t('Switch Crypto and Fiat') as string}>
+                    <Tooltip title={t('Switch Crypto and Fiat') as string} placement="top" arrow>
                       <IconButton color="primary" onClick={handleSwitchCryptoAndFiat}>
                         <SwapHorizOutlinedIcon />
                       </IconButton>
@@ -455,7 +456,7 @@ const OfferFormPage: React.FC = () => {
                           name="toamt"
                           variant="outlined"
                           type="number"
-                          inputMode="numeric"
+                          inputMode="decimal"
                           label={t("You'll receive")}
                           value={formik.values.toamt}
                           onChange={formik.handleChange}

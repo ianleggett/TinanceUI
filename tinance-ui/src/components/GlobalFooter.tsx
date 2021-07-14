@@ -141,7 +141,7 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = (props) => {
               {t('Terms & Conditions')}
             </Button>
             <Divider orientation="vertical" className={classes.divider} />
-            <Tooltip title={t('Change Language') as string} enterDelay={300}>
+            <Tooltip title={t('Change Language') as string} enterDelay={300} placement="top" arrow>
               <Button
                 variant="text"
                 color="primary"

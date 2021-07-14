@@ -13,6 +13,7 @@ import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
@@ -28,8 +29,10 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
+import { useUserManagerState } from '../components';
 import { offerStatusMap } from '../constants';
 import { GetMyOffersService, ToggleOfferLiveService } from '../services';
+import { toFixed } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   filter: {
@@ -113,6 +116,7 @@ const OfferListPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { profile } = useUserManagerState();
   const [offers, setOffers] = useState<Offer.Model[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<string>('');
   const [, setCachedOffer] = useSessionStorageState<Offer.Model>('current_offer');
@@ -157,6 +161,19 @@ const OfferListPage: React.FC = () => {
       run({ keyword });
     },
   });
+
+  const isBuyer = useCallback(
+    (trade: Offer.Model): boolean => {
+      if (profile) {
+        return (
+          (trade.userDetails.cid === profile.cid && trade.buyer) ||
+          (trade.userDetails.cid !== profile.cid && !trade.buyer)
+        );
+      }
+      return true;
+    },
+    [profile],
+  );
 
   const handleStatusSelectChange = useCallback(
     (
@@ -323,19 +340,27 @@ const OfferListPage: React.FC = () => {
         ) : (
           offers.map((offer) => (
             <Paper key={offer.id} className={classes.card}>
-              <Chip
-                color="primary"
-                variant="outlined"
-                label={offer.buyer ? t('Sell') : t('Buy')}
-                className={classes.chip}
-                style={{ color: '#D97706', borderColor: '#D97706' }}
-              />
-              <Switch
-                color="primary"
-                checked={offer.live}
-                onChange={(event, checked) => handleToggleLive(event, checked, offer.id)}
-                className={classes.checkbox}
-              />
+              {profile ? (
+                <Chip
+                  color="primary"
+                  variant="outlined"
+                  label={isBuyer(offer) ? t('Buy') : t('Sell')}
+                  className={classes.chip}
+                  style={{ color: '#D97706', borderColor: '#D97706' }}
+                />
+              ) : null}
+              <Tooltip
+                title={(offer.live ? t('Active') : t('Inactive')) as string}
+                placement="top"
+                arrow
+              >
+                <Switch
+                  color="primary"
+                  checked={offer.live}
+                  onChange={(event, checked) => handleToggleLive(event, checked, offer.id)}
+                  className={classes.checkbox}
+                />
+              </Tooltip>
               <Grid container alignItems="flex-end" spacing={1}>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                   <Typography variant="h5" color="primary" className={classes.title}>
@@ -346,6 +371,7 @@ const OfferListPage: React.FC = () => {
                   <TextField
                     label={t('Crypto')}
                     variant="outlined"
+                    inputMode="decimal"
                     value={offer.fromAmount}
                     InputProps={{
                       readOnly: true,
@@ -360,6 +386,7 @@ const OfferListPage: React.FC = () => {
                   <TextField
                     label={t('Fiat')}
                     variant="outlined"
+                    inputMode="decimal"
                     value={offer.toAmount}
                     InputProps={{
                       readOnly: true,
@@ -405,7 +432,7 @@ const OfferListPage: React.FC = () => {
                   <Typography color="textSecondary" variant="overline">
                     {t('Exchange Rate')}
                   </Typography>
-                  <Typography color="primary">{offer.exchRate.toFixed(4)}</Typography>
+                  <Typography color="primary">{toFixed(offer.exchRate, 4)}</Typography>
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
@@ -431,16 +458,18 @@ const OfferListPage: React.FC = () => {
                     className={classes.progress}
                   />
                 </Grid>
-                <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleEditOffer(offer)}
-                    startIcon={<EditOutlinedIcon />}
-                  >
-                    {t('Edit Offer')}
-                  </Button>
-                </Grid>
+                {new Set(['CREATED', 'EXPIRED']).has(offer.procStatus) ? (
+                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleEditOffer(offer)}
+                      startIcon={<EditOutlinedIcon />}
+                    >
+                      {t('Edit Offer')}
+                    </Button>
+                  </Grid>
+                ) : null}
               </Grid>
             </Paper>
           ))

@@ -199,7 +199,7 @@ const ChangePasswordPage: React.FC = () => {
 
   useMount(() => {
     if (profile) {
-      formik.setFieldValue('userid', profile.id);
+      formik.setFieldValue('userid', profile.cid);
     } else {
       enqueueSnackbar(t('Get user profile failed'), {
         variant: 'warning',

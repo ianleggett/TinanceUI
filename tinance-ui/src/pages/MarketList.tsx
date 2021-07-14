@@ -33,6 +33,7 @@ import { useHistory } from 'react-router-dom';
 
 import { useAppConfigState, useUserManagerState } from '../components';
 import { GetAllOffersService, TakeOrderService } from '../services';
+import { toFixed } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -108,7 +109,7 @@ const MarketListPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { isLoggedIn } = useUserManagerState();
+  const { profile, isLoggedIn } = useUserManagerState();
   const { ccyCodes, paymentTypes } = useAppConfigState();
 
   const theme = useTheme();
@@ -177,6 +178,20 @@ const MarketListPage: React.FC = () => {
       });
     },
   });
+
+  const isBuyer = useCallback(
+    (trade: Offer.Model): boolean => {
+      if (profile) {
+        return (
+          (trade.userDetails.cid === profile.cid && trade.buyer) ||
+          (trade.userDetails.cid !== profile.cid && !trade.buyer)
+        );
+      }
+
+      return false;
+    },
+    [profile],
+  );
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -389,15 +404,15 @@ const MarketListPage: React.FC = () => {
               <Divider className={classes.divider} />
             </Grid>
             <Grid container spacing={1}>
-              {[1, 2, 3, 4].map((item) => (
+              {[1, 2, 3, 4, 5].map((item) => (
                 <Grid key={item} xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Skeleton variant="text" width={50} />
                   <Skeleton variant="rect" width={100} style={{ marginTop: 6 }} />
                 </Grid>
               ))}
-              <Grid xs={false} sm={false} md={10} lg={10} xl={10} item />
-              <Grid xs={12} sm={12} md={2} lg={2} xl={2} item>
-                <Skeleton variant="rect" height={36} width="100%" />
+              <Grid xs={false} sm={false} md={6} lg={6} xl={6} item />
+              <Grid xs={12} sm={12} md={3} lg={3} xl={3} item>
+                <Skeleton variant="rect" height={36} width="50%" />
               </Grid>
             </Grid>
           </Paper>
@@ -423,11 +438,11 @@ const MarketListPage: React.FC = () => {
               <Chip
                 color="primary"
                 variant="outlined"
-                label={offer.buyer ? t('Sell') : t('Buy')}
+                label={isBuyer(offer) ? t('Buy') : t('Sell')}
                 className={classes.chip}
                 style={{ color: '#D97706', borderColor: '#D97706' }}
               />
-              <Grid container spacing={1}>
+              <Grid container alignItems="center" spacing={1}>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                   <Typography variant="h5" color="primary" className={classes.title}>
                     {offer.fromccy.name} / {offer.toccy.name}
@@ -437,6 +452,7 @@ const MarketListPage: React.FC = () => {
                   <TextField
                     label={t('Crypto')}
                     variant="outlined"
+                    inputMode="decimal"
                     value={offer.fromAmount}
                     InputProps={{
                       readOnly: true,
@@ -451,6 +467,7 @@ const MarketListPage: React.FC = () => {
                   <TextField
                     label={t('Fiat')}
                     variant="outlined"
+                    inputMode="decimal"
                     value={offer.toAmount}
                     InputProps={{
                       readOnly: true,
@@ -467,7 +484,7 @@ const MarketListPage: React.FC = () => {
                   <Typography color="textSecondary" variant="overline">
                     {t('Exchange Rate')}
                   </Typography>
-                  <Typography color="primary">{offer.exchRate.toFixed(4)}</Typography>
+                  <Typography color="primary">{toFixed(offer.exchRate, 4)}</Typography>
                 </Grid>
                 {offer.paymentDetails[0] ? (
                   <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
@@ -481,7 +498,13 @@ const MarketListPage: React.FC = () => {
                 ) : null}
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    {offer.userDetails.username}
+                    {t('Owner')}
+                  </Typography>
+                  <Typography color="primary">{offer.userDetails.username}</Typography>
+                </Grid>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Trades')}
                   </Typography>
                   <Typography color="primary">
                     {t('0 Trades', {
@@ -594,13 +617,12 @@ const MarketListPage: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Grid xs={false} sm={false} md={10} lg={10} xl={10} item />
-                    <Grid xs={12} sm={12} md={2} lg={2} xl={2} item>
+                    <Grid xs={false} sm={false} md={6} lg={6} xl={6} item />
+                    <Grid xs={12} sm={12} md={3} lg={3} xl={3} item>
                       <Button
                         color="secondary"
                         variant="outlined"
                         onClick={() => handleTakeOverOffer(offer.orderId)}
-                        fullWidth
                       >
                         {t('Trade')}
                       </Button>

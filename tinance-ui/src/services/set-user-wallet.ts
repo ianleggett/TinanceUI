@@ -10,7 +10,7 @@ export async function SetUserWaletService(
   params: API.SetUserWalletParams,
 ): Promise<API.SetUserWalletResponse> {
   try {
-    const res = await request<API.SetUserWalletResponse>('/v1/public/setuserwallet.json', {
+    const res = await request<API.SetUserWalletResponse>('/v1/setuserwallet.json', {
       method: 'POST',
       data: params,
     });
