@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialValues = {
-  userid: 0,
+  cid: 0,
   countryISO: 'USA',
   phone: '',
   email: '',
@@ -97,7 +97,7 @@ const UserProfilePage: React.FC = () => {
   const validationSchema = useCallback(() => {
     return yup.lazy((values: typeof initialValues) =>
       yup.object({
-        userid: yup.number().required(t('User ID is required')),
+        cid: yup.number().required(t('User ID is required')),
         countryISO: yup.string().required(t('Country is required')),
         phone: yup
           .string()
@@ -224,7 +224,7 @@ const UserProfilePage: React.FC = () => {
     if (profile) {
       const { cid, countryISO, phone, email, username } = profile;
 
-      formik.setFieldValue('userid', cid);
+      formik.setFieldValue('cid', cid);
       formik.setFieldValue('email', email);
       formik.setFieldValue('username', username);
 
@@ -290,13 +290,13 @@ const UserProfilePage: React.FC = () => {
           </Typography>
           <form onSubmit={handleSubmit} className={classes.form}>
             <TextField
-              id="userid"
-              name="userid"
+              id="cid"
+              name="cid"
               label={t('User ID')}
               variant="outlined"
               disabled={loading}
               autoComplete="username"
-              value={formik.values.userid}
+              value={formik.values.cid}
               onChange={formik.handleChange}
               className={classes.userid}
               fullWidth

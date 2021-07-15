@@ -338,7 +338,7 @@ declare namespace API {
   interface ChangePasswordResponse extends BaseResponse {}
 
   interface UpdateUserDetailsParams {
-    userid: number;
+    cid: number;
     countryISO?: string;
     phone?: string;
     email?: string;
