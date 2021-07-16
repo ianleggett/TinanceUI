@@ -1,4 +1,4 @@
-import { request } from '../utils';
+import { getToken, request } from '../utils';
 
 /**
  * Set user wallet service.
@@ -13,6 +13,9 @@ export async function SetUserWaletService(
     const res = await request<API.SetUserWalletResponse>('/v1/setuserwallet.json', {
       method: 'POST',
       data: params,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
     });
 
     return res;
