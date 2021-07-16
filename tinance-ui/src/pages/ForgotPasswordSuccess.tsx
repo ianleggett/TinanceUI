@@ -33,11 +33,12 @@ const ForgotPasswordSuccessPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const emailRef = useRef(new URLSearchParams(search).get('email') ?? '');
+  const usernameRef = useRef(new URLSearchParams(search).get('username') ?? '');
 
   useMount(() => {
-    if (!emailRef.current) {
+    if (!emailRef.current && !usernameRef.current) {
       history.replace('/');
-      enqueueSnackbar(t("There's no email url query string in the URL"), {
+      enqueueSnackbar(t("There's no email or username url query string in the URL"), {
         variant: 'warning',
       });
     }
@@ -57,7 +58,7 @@ const ForgotPasswordSuccessPage: React.FC = () => {
           className={classes.email}
           rel="noreferrer"
         >
-          {emailRef.current}
+          {emailRef.current ?? `The email of ${usernameRef.current}`}
         </Link>
         <Typography component="p" variant="body1">
           {t(

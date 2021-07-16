@@ -61,6 +61,7 @@ const ForgotPasswordPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { validationRegex } = useAppConfigState();
   const emailRef = useRef('');
+  const usernameRef = useRef('');
   const [formType, setFormType] = useState<'email' | 'username'>('email');
 
   const usernamePattern = useMemo(() => {
@@ -81,7 +82,12 @@ const ForgotPasswordPage: React.FC = () => {
   const { run: forgotPassword, loading } = useRequest(ForgotPasswordService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
-        history.replace(`/forgot-password/success?email=${emailRef.current}`);
+        if (emailRef.current) {
+          history.replace(`/forgot-password/success?email=${emailRef.current}`);
+        } else if (usernameRef.current) {
+          history.replace(`/forgot-password/success?username=${usernameRef.current}`);
+        }
+
         enqueueSnackbar(t('Reset email has been sent'), {
           variant: 'success',
         });
@@ -99,6 +105,14 @@ const ForgotPasswordPage: React.FC = () => {
     onSubmit: (values) => {
       if (values[formType]) {
         forgotPassword({ [formType]: values[formType] });
+
+        if (formType === 'email') {
+          emailRef.current = values[formType];
+          usernameRef.current = '';
+        } else {
+          emailRef.current = '';
+          usernameRef.current = values[formType];
+        }
       } else {
         enqueueSnackbar(`Field ${formType} is Required`, {
           variant: 'warning',
