@@ -1,3 +1,4 @@
+import { Web3Provider } from '@ethersproject/providers';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
@@ -17,6 +18,7 @@ import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutline
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
+import { Web3ReactProvider } from '@web3-react/core';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
@@ -27,7 +29,14 @@ import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { useAppConfigState, useUserManagerState } from '../components';
+import { Wallet } from '../components/Wallet';
 import { GetUserWalletService, SetUserWaletService } from '../services';
+
+function getLibrary(provider: any): Web3Provider {
+  const library = new Web3Provider(provider);
+  library.pollingInterval = 12_000;
+  return library;
+}
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -69,6 +78,10 @@ const initialValues = {
   coinid: 9,
   walletAddr: '',
 };
+
+// function connectwallet() {
+//   alert('Connect wallet');
+// }
 
 const UserWalletPage: React.FC = () => {
   const classes = useStyles();
@@ -210,6 +223,11 @@ const UserWalletPage: React.FC = () => {
           <Typography component="h2" variant="h3" color="primary" className={classes.title}>
             {t('User Wallet')}
           </Typography>
+
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <Wallet />
+          </Web3ReactProvider>
+          {/*
           <form onSubmit={handleSubmit} className={classes.form}>
             <Grid spacing={2} container>
               <Grid xs={12} sm={12} md={4} item>
@@ -255,6 +273,7 @@ const UserWalletPage: React.FC = () => {
               {loading ? t('Updating...') : t('Update User Wallet')}
             </Button>
           </form>
+  */}
         </Paper>
       </Grid>
     </Grid>
