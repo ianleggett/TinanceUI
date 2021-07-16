@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialValues = {
-  payTypeId: 0,
+  payTypeId: 1,
   field1value: '',
   field2value: '',
   field3value: '',
@@ -159,7 +159,7 @@ const BankDetailsPage: React.FC = () => {
 
   useUpdateEffect(() => {
     if (bankDetails) {
-      formik.setFieldValue('payTypeId', bankDetails.payType.id);
+      formik.setFieldValue('payTypeId', bankDetails.payType.id || 1);
       formik.setFieldValue('field1value', bankDetails.field1value);
       formik.setFieldValue('field2value', bankDetails.field2value);
       formik.setFieldValue('field3value', bankDetails.field3value);
