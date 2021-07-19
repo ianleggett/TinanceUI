@@ -379,4 +379,15 @@ declare namespace API {
   }
 
   interface ToggleOfferLiveResponse extends BaseResponse {}
+
+  interface GetNetworkConfigParams {}
+
+  interface GetNetworkConfigResponse extends BaseResponse {
+    brokerPrivateKey: string;
+    buyerfeePct: number;
+    escrowCtrAddr: string;
+    httpService: string;
+    sellerfeePct: number;
+    usdtcoinCtrAddr: string;
+  }
 }

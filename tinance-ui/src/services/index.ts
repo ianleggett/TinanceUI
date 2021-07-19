@@ -10,6 +10,7 @@ export * from './get-all-offers';
 export * from './get-ccy-codes';
 export * from './get-my-offers';
 export * from './get-my-trades';
+export * from './get-network-config';
 export * from './get-payment-types';
 export * from './get-profile-public';
 export * from './get-user-bank';
