@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import type { Web3Provider } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
 import Button from '@material-ui/core/Button';
@@ -99,7 +100,8 @@ const UserWalletPage: React.FC = () => {
   const [activatingConnector, setActivatingConnector] = useState();
   const [networkConfig, setNetworkConfig] = useState<any>();
   const triedEager = useEagerConnect();
-  const { chainId, account, library, activate, active, connector } = useWeb3React<Web3Provider>();
+  const { chainId, account, library, activate, active, connector, deactivate } =
+    useWeb3React<Web3Provider>();
 
   useInactiveListener(!triedEager || !!activatingConnector);
 
@@ -194,12 +196,29 @@ const UserWalletPage: React.FC = () => {
   }, []);
 
   const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
+  console.log(active);
+  console.log(`--------- ${address} ----------`);
+  console.log(`--------- ${account} ----------`);
+  console.log(balance);
 
   const formattedBalance = useMemo(() => {
-    return balance === undefined
+    const test = BigNumber.from('2000');
+    return test === undefined
       ? `???`
-      : Number.parseFloat(formatUnits(balance, decimals)).toPrecision(6);
-  }, [balance, decimals]);
+      : Number.parseFloat(formatUnits(test, decimals)).toPrecision(6);
+  }, [decimals]);
+  // const formattedBalance = useMemo(() => {
+  //   // return (
+  //   //   <SWRConfig value={{ fetcher: library ? fetcher(library, new Map(ABIs)) : undefined }}>
+  //   //     {balance === undefined
+  //   //       ? `???`
+  //   //       : Number.parseFloat(formatUnits(balance, decimals)).toPrecision(6)}
+  //   //   </SWRConfig>
+  //   // );
+  //   return balance === undefined
+  //     ? `???`
+  //     : Number.parseFloat(formatUnits(balance, decimals)).toPrecision(6);
+  // }, [balance, decimals]);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -230,7 +249,8 @@ const UserWalletPage: React.FC = () => {
 
   const disconnectWallet = useCallback(() => {
     injectedConnector.deactivate();
-  }, []);
+    deactivate();
+  }, [deactivate]);
 
   useMount(() => {
     getUserWallet();
@@ -242,6 +262,10 @@ const UserWalletPage: React.FC = () => {
       setActivatingConnector(undefined);
     }
   }, [activatingConnector, connector]);
+
+  useEffect(() => {
+    setUserWallet({ coinid: 9, walletAddr: account || '' });
+  }, [active, account, setUserWallet]);
 
   useUpdateEffect(() => {
     formik.setFieldValue('coinid', formData.coinid);
@@ -326,17 +350,23 @@ const UserWalletPage: React.FC = () => {
                 />
               </Grid>
               <Grid xs={12} sm={12} md={12} item>
-                <TextField
-                  id="balance"
-                  name="balance"
-                  variant="outlined"
-                  label={t('Your Balance')}
-                  value={formattedBalance}
-                  fullWidth
-                  InputProps={{
-                    readOnly: true,
+                <SWRConfig
+                  value={{
+                    fetcher: library ? fetcher(library, new Map(ABIs)) : undefined,
                   }}
-                />
+                >
+                  <TextField
+                    id="balance"
+                    name="balance"
+                    variant="outlined"
+                    label={t('Your Balance')}
+                    value={formattedBalance}
+                    fullWidth
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                </SWRConfig>
               </Grid>
             </Grid>
             <Grid spacing={2} container>

@@ -1,3 +1,5 @@
+import { Contract } from '@ethersproject/contracts';
+import { Web3Provider } from '@ethersproject/providers';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import Dialog from '@material-ui/core/Dialog';
@@ -19,6 +21,7 @@ import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { useWeb3React } from '@web3-react/core';
 import { useMount, useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
@@ -28,6 +31,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useUserManagerState } from '../components';
 import { tradeStatusMap } from '../constants';
+import ERC20ABI from '../constants/ERC20.abi.json';
 import {
   AcceptCancelService,
   CancelTradeService,
@@ -143,6 +147,7 @@ const TradeListPage: React.FC = () => {
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
+  const { account, library } = useWeb3React<Web3Provider>();
 
   const { run, loading, cancel } = useRequest(GetMyTradesService, {
     onSuccess(res) {
@@ -292,6 +297,29 @@ const TradeListPage: React.FC = () => {
     [formik, loading],
   );
 
+  // const depositor = useCallback(
+  //   (oid: string, amt, symbol, address, decimals) => {
+  //     // const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
+  //     // this comes from swagger API call getnetworkconfig.json
+  //     const ESCROW = '0x618Bb55A032A4334AfBfdd07A297fe2B677B2052';
+  //     const contract = new Contract(address, ERC20ABI, library.getSigner());
+  //     contract.allowance(account, ESCROW).then((val) => {
+  //       if (val !== 0) {
+  //         alert(`Allowance was non zero (${val}), it has been reset, try again!!!`);
+  //         contract.approve(ESCROW, 0);
+  //       } else {
+  //         contract.approve(ESCROW, amt).then(() => {
+  //           // the escrow contract calls the transfer once deposit() is called
+  //           // alert('call here API v1/deposit( ctrid )');
+  //           setSelectedOrderId(oid);
+  //           setOpenAlertDialog(true);
+  //         });
+  //       }
+  //     });
+  //   },
+  //   [library, account],
+  // );
+
   const handleAlertDialogOpen = useCallback((oid: string) => {
     setSelectedOrderId(oid);
     setOpenAlertDialog(true);
@@ -358,7 +386,9 @@ const TradeListPage: React.FC = () => {
               color="primary"
               onClick={() => handleCryptoDeposit(trade.tradeId)}
             >
-              {depositing && trade.tradeId === selectedOrderId ? t('Depositing...') : t('Deposit')}
+              {depositing && trade.tradeId === selectedOrderId
+                ? t('Depositing...')
+                : `${t('Deposit')} ${toFixed(trade.fromAmount)} ${trade.fromccy.name}`}
             </Button>
           ) : null;
         }
