@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import type { Web3Provider } from '@ethersproject/providers';
-import { formatUnits } from '@ethersproject/units';
+import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from '@ethersproject/providers';
+import { formatEther, formatUnits } from '@ethersproject/units';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
@@ -20,23 +20,28 @@ import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutline
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-import { useWeb3React } from '@web3-react/core';
+import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
+import useEtherSWR, { EtherSWRConfig } from 'ether-swr';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useSnackbar } from 'notistack';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import useSWR, { SWRConfig } from 'swr';
-import fetcher from 'swr-eth';
 import * as yup from 'yup';
 
 import { useAppConfigState } from '../components';
 import { Networks, TOKENS_BY_NETWORK } from '../constants';
+import ERC20ABI from '../constants/ERC20.abi.json';
 import { GetNetworkConfigService, GetUserWalletService, SetUserWaletService } from '../services';
-import { useEagerConnect, useInactiveListener } from '../utils';
+
+function getLibrary(provider: ExternalProvider | JsonRpcFetchFunc): Web3Provider {
+  const library = new Web3Provider(provider);
+  library.pollingInterval = 12_000;
+  return library;
+}
 
 export const injectedConnector = new InjectedConnector({
   supportedChainIds: [
@@ -47,6 +52,8 @@ export const injectedConnector = new InjectedConnector({
     Networks.Kovan, // Kovan
   ],
 });
+
+const mymap = new Map<string, any>([['0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6', ERC20ABI]]);
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -86,6 +93,30 @@ const initialValues = {
   walletAddr: '',
 };
 
+export const TokenBalance = ({
+  symbol,
+  address,
+  decimals,
+  account,
+}: {
+  symbol: string;
+  address: string;
+  decimals: number;
+  account: string | null | undefined;
+}): JSX.Element => {
+  const { data: balance, mutate } = useEtherSWR([address, 'balanceOf', account]);
+
+  if (!balance) {
+    return <div>...</div>;
+  }
+
+  return (
+    <div>
+      Balance : {Number.parseFloat(formatUnits(balance, decimals))} {symbol}
+    </div>
+  );
+};
+
 const UserWalletPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
@@ -99,11 +130,9 @@ const UserWalletPage: React.FC = () => {
   const [formData, setFormData] = useState(initialValues);
   const [activatingConnector, setActivatingConnector] = useState();
   const [networkConfig, setNetworkConfig] = useState<any>();
-  const triedEager = useEagerConnect();
+
   const { chainId, account, library, activate, active, connector, deactivate } =
     useWeb3React<Web3Provider>();
-
-  useInactiveListener(!triedEager || !!activatingConnector);
 
   const ABIs = useMemo(() => {
     return (chainId ? TOKENS_BY_NETWORK[chainId] : []).map<[string, any]>(({ address, abi }) => [
@@ -195,18 +224,14 @@ const UserWalletPage: React.FC = () => {
     return TOKENS_BY_NETWORK[Networks.Kovan][0];
   }, []);
 
-  const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
-  console.log(active);
-  console.log(`--------- ${address} ----------`);
-  console.log(`--------- ${account} ----------`);
-  console.log(balance);
+  // const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
 
-  const formattedBalance = useMemo(() => {
-    const test = BigNumber.from('2000');
-    return test === undefined
-      ? `???`
-      : Number.parseFloat(formatUnits(test, decimals)).toPrecision(6);
-  }, [decimals]);
+  console.log(active);
+  console.log(`ADDR ${address} `);
+  console.log(`ACCT: ${account} `);
+  console.log(`ACCT: ${library?.getSigner} `);
+  //  console.log(`BAL: ${balance} `);
+
   // const formattedBalance = useMemo(() => {
   //   // return (
   //   //   <SWRConfig value={{ fetcher: library ? fetcher(library, new Map(ABIs)) : undefined }}>
@@ -350,31 +375,25 @@ const UserWalletPage: React.FC = () => {
                 />
               </Grid>
               <Grid xs={12} sm={12} md={12} item>
-                <SWRConfig
+                <EtherSWRConfig
                   value={{
-                    fetcher: library ? fetcher(library, new Map(ABIs)) : undefined,
+                    provider: library,
+                    ABIs: new Map(mymap),
+                    refreshInterval: 30_000,
                   }}
                 >
-                  <TextField
-                    id="balance"
-                    name="balance"
-                    variant="outlined"
-                    label={t('Your Balance')}
-                    value={formattedBalance}
-                    fullWidth
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </SWRConfig>
+                  {active && <TokenBalance {...{ symbol, address, decimals, account }} />}
+                </EtherSWRConfig>
               </Grid>
             </Grid>
             <Grid spacing={2} container>
               <Grid xs={12} sm={12} md={4} item>
                 {active ? (
-                  <SWRConfig
+                  <EtherSWRConfig
                     value={{
-                      fetcher: library ? fetcher(library, new Map(ABIs)) : undefined,
+                      provider: library,
+                      ABIs: new Map(mymap),
+                      refreshInterval: 30_000,
                     }}
                   >
                     <Button
@@ -385,7 +404,7 @@ const UserWalletPage: React.FC = () => {
                     >
                       {t('Disconnect')}
                     </Button>
-                  </SWRConfig>
+                  </EtherSWRConfig>
                 ) : (
                   <Button
                     color="primary"
