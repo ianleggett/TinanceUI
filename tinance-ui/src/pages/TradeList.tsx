@@ -24,6 +24,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import { useWeb3React } from '@web3-react/core';
 import { useMount, useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
+import { BigNumber } from 'ethers';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
@@ -302,38 +303,38 @@ const TradeListPage: React.FC = () => {
 
   const handleDeposit = useCallback(
     (oid: string, amt) => {
+      const cryptoAmt = amt * 10 ** decimals;
       console.log(`deposit ${amt} ${symbol}`);
       // const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
       // this comes from swagger API call getnetworkconfig.json
-      const ESCROW = address;
-      //  '0x618Bb55A032A4334AfBfdd07A297fe2B677B2052';
+      const ESCROW = '0x618Bb55A032A4334AfBfdd07A297fe2B677B2052'; // Our smart contract
       if (library === undefined) {
         console.log('library undefined, return');
         return;
       }
       const contract = new Contract(
-        '0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6',
+        address, // '0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6', // USDT coin address
         ERC20ABI,
         library.getSigner(),
       );
       console.log(contract);
-      contract.allowance(account, ESCROW).then((val: any) => {
-        if (val !== 0) {
+      contract.allowance(account, ESCROW).then((val: BigNumber) => {
+        if (!val.isZero()) {
           alert(`Allowance was non zero (${val}), it has been reset, try again!!!`);
           contract.approve(ESCROW, 0);
         } else {
-          contract.approve(ESCROW, amt).then(() => {
+          contract.approve(ESCROW, cryptoAmt).then(() => {
             // the escrow contract calls the transfer once deposit() is called
-            console.log('Here to execute next step');
-            alert('call here API v1/deposit( ctrid )');
-            // setSelectedOrderId(oid);
-            // setOpenAlertDialog(true);
+            // console.log('Here to execute next step');
+            // alert('call here API v1/deposit( ctrid )');
+            depositCrypto({ oid });
+            setSelectedOrderId(oid);
           });
         }
       });
     },
     // [library, account],
-    [library, account, address, symbol],
+    [library, account, address, symbol, decimals, depositCrypto],
   );
 
   const handleAlertDialogOpen = useCallback((oid: string) => {
@@ -348,7 +349,7 @@ const TradeListPage: React.FC = () => {
   }, [cancelCancel]);
 
   const handleCryptoDeposit = useCallback(
-    (oid: string) => {
+    (oid: string, amt: BigNumber) => {
       cancelDeposit();
       depositCrypto({ oid });
       setSelectedOrderId(oid);
