@@ -1,5 +1,5 @@
 import DayjsUtils from '@date-io/dayjs';
-import { Web3Provider } from '@ethersproject/providers';
+import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from '@ethersproject/providers';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
@@ -38,11 +38,11 @@ import UserProfilePage from './pages/UserProfile';
 import UserWalletPage from './pages/UserWallet';
 import { SnackbarUtilsConfigurator } from './utils';
 
-const getLibrary = (provider: any): Web3Provider => {
+function getLibrary(provider: ExternalProvider | JsonRpcFetchFunc): Web3Provider {
   const library = new Web3Provider(provider);
   library.pollingInterval = 12_000;
   return library;
-};
+}
 
 const App: React.FC = () => {
   return (
