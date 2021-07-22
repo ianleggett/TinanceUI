@@ -26,11 +26,11 @@ import { useMount, useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useUserManagerState } from '../components';
-import { tradeStatusMap } from '../constants';
+import { Networks, TOKENS_BY_NETWORK, tradeStatusMap } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
 import {
   AcceptCancelService,
@@ -148,6 +148,9 @@ const TradeListPage: React.FC = () => {
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const { account, library } = useWeb3React<Web3Provider>();
+  const { symbol, address, decimals } = useMemo(() => {
+    return TOKENS_BY_NETWORK[Networks.Kovan][0];
+  }, []);
 
   const { run, loading, cancel } = useRequest(GetMyTradesService, {
     onSuccess(res) {
@@ -297,28 +300,41 @@ const TradeListPage: React.FC = () => {
     [formik, loading],
   );
 
-  // const depositor = useCallback(
-  //   (oid: string, amt, symbol, address, decimals) => {
-  //     // const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
-  //     // this comes from swagger API call getnetworkconfig.json
-  //     const ESCROW = '0x618Bb55A032A4334AfBfdd07A297fe2B677B2052';
-  //     const contract = new Contract(address, ERC20ABI, library.getSigner());
-  //     contract.allowance(account, ESCROW).then((val) => {
-  //       if (val !== 0) {
-  //         alert(`Allowance was non zero (${val}), it has been reset, try again!!!`);
-  //         contract.approve(ESCROW, 0);
-  //       } else {
-  //         contract.approve(ESCROW, amt).then(() => {
-  //           // the escrow contract calls the transfer once deposit() is called
-  //           // alert('call here API v1/deposit( ctrid )');
-  //           setSelectedOrderId(oid);
-  //           setOpenAlertDialog(true);
-  //         });
-  //       }
-  //     });
-  //   },
-  //   [library, account],
-  // );
+  const handleDeposit = useCallback(
+    (oid: string, amt) => {
+      console.log(`deposit ${amt} ${symbol}`);
+      // const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
+      // this comes from swagger API call getnetworkconfig.json
+      const ESCROW = address;
+      //  '0x618Bb55A032A4334AfBfdd07A297fe2B677B2052';
+      if (library === undefined) {
+        console.log('library undefined, return');
+        return;
+      }
+      const contract = new Contract(
+        '0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6',
+        ERC20ABI,
+        library.getSigner(),
+      );
+      console.log(contract);
+      contract.allowance(account, ESCROW).then((val: any) => {
+        if (val !== 0) {
+          alert(`Allowance was non zero (${val}), it has been reset, try again!!!`);
+          contract.approve(ESCROW, 0);
+        } else {
+          contract.approve(ESCROW, amt).then(() => {
+            // the escrow contract calls the transfer once deposit() is called
+            console.log('Here to execute next step');
+            alert('call here API v1/deposit( ctrid )');
+            // setSelectedOrderId(oid);
+            // setOpenAlertDialog(true);
+          });
+        }
+      });
+    },
+    // [library, account],
+    [library, account, address, symbol],
+  );
 
   const handleAlertDialogOpen = useCallback((oid: string) => {
     setSelectedOrderId(oid);
@@ -384,7 +400,7 @@ const TradeListPage: React.FC = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => handleCryptoDeposit(trade.tradeId)}
+              onClick={() => handleDeposit(trade.tradeId, trade.fromAmount)}
             >
               {depositing && trade.tradeId === selectedOrderId
                 ? t('Depositing...')
@@ -443,12 +459,13 @@ const TradeListPage: React.FC = () => {
       depositing,
       flagging,
       flagging2,
-      handleCryptoDeposit,
+      // handleCryptoDeposit,
       handleFlagComplete,
       handleFlagFundsSent,
       profile,
       selectedOrderId,
       t,
+      handleDeposit,
     ],
   );
 

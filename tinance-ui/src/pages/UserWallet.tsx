@@ -196,29 +196,25 @@ const UserWalletPage: React.FC = () => {
   }, []);
 
   const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
-  console.log(active);
-  console.log(`--------- ${address} ----------`);
-  console.log(`--------- ${account} ----------`);
-  console.log(balance);
 
-  const formattedBalance = useMemo(() => {
-    const test = BigNumber.from('2000');
-    return test === undefined
-      ? `???`
-      : Number.parseFloat(formatUnits(test, decimals)).toPrecision(6);
-  }, [decimals]);
   // const formattedBalance = useMemo(() => {
-  //   // return (
-  //   //   <SWRConfig value={{ fetcher: library ? fetcher(library, new Map(ABIs)) : undefined }}>
-  //   //     {balance === undefined
-  //   //       ? `???`
-  //   //       : Number.parseFloat(formatUnits(balance, decimals)).toPrecision(6)}
-  //   //   </SWRConfig>
-  //   // );
-  //   return balance === undefined
+  //   const test = BigNumber.from('2000');
+  //   return test === undefined
   //     ? `???`
-  //     : Number.parseFloat(formatUnits(balance, decimals)).toPrecision(6);
-  // }, [balance, decimals]);
+  //     : Number.parseFloat(formatUnits(test, decimals)).toPrecision(6);
+  // }, [decimals]);
+  const formattedBalance = useMemo(() => {
+    // return (
+    //   <SWRConfig value={{ fetcher: library ? fetcher(library, new Map(ABIs)) : undefined }}>
+    //     {balance === undefined
+    //       ? `???`
+    //       : Number.parseFloat(formatUnits(balance, decimals)).toPrecision(6)}
+    //   </SWRConfig>
+    // );
+    return balance === undefined
+      ? `???`
+      : Number.parseFloat(formatUnits(balance, decimals)).toPrecision(6);
+  }, [balance, decimals]);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
