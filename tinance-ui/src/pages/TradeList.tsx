@@ -1,5 +1,5 @@
 import { Contract } from '@ethersproject/contracts';
-import { Web3Provider } from '@ethersproject/providers';
+import { TransactionReceipt, TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import Dialog from '@material-ui/core/Dialog';
@@ -33,6 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserManagerState } from '../components';
 import { Networks, TOKENS_BY_NETWORK, tradeStatusMap } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
+import ESCROWABI from '../constants/ESCROW.abi.json';
 import {
   AcceptCancelService,
   CancelTradeService,
@@ -307,7 +308,7 @@ const TradeListPage: React.FC = () => {
       console.log(`deposit ${amt} ${symbol}`);
       // const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
       // this comes from swagger API call getnetworkconfig.json
-      const ESCROW = '0x618Bb55A032A4334AfBfdd07A297fe2B677B2052'; // Our smart contract
+      const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
       if (library === undefined) {
         console.log('library undefined, return');
         return;
@@ -368,11 +369,24 @@ const TradeListPage: React.FC = () => {
 
   const handleFlagComplete = useCallback(
     (oid: string) => {
-      cancelCancel();
-      flagComplete({ oid });
-      setSelectedOrderId(oid);
+      const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
+      if (library === undefined) {
+        console.log('library undefined, return');
+        return;
+      }
+      const thisEscrow = new Contract(ESCROW, ESCROWABI, library.getSigner());
+      const orderIdNumeric = BigInt(`0x${oid}`);
+      thisEscrow.releaseEscrow(orderIdNumeric).then((val: TransactionResponse) => {
+        alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
+        console.log(`txn: ${JSON.stringify(val)}`);
+        const txn = val.hash;
+        alert(`txn: ${txn} `);
+        flagComplete({ oid, txn });
+        setSelectedOrderId(oid);
+        cancelCancel();
+      });
     },
-    [cancelCancel, flagComplete],
+    [library, cancelCancel, flagComplete],
   );
 
   const handleAcceptCancel = useCallback(
