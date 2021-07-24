@@ -92,7 +92,7 @@ const BankDetailsPage: React.FC = () => {
 
   const { run: getUserBank, loading } = useRequest(GetUserBankService, {
     onSuccess(res) {
-      if (res.id) {
+      if (res && res.id) {
         setBankDetails(res);
       } else {
         enqueueSnackbar(t("You haven't setup your bank account, please add bank account."), {
