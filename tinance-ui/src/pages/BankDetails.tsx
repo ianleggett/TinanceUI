@@ -95,7 +95,7 @@ const BankDetailsPage: React.FC = () => {
       if (res.id) {
         setBankDetails(res);
       } else {
-        enqueueSnackbar(t('Get user bank failed'), {
+        enqueueSnackbar(t("You haven't setup your bank account, please add bank account."), {
           variant: 'warning',
         });
       }
