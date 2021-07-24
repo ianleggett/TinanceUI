@@ -197,10 +197,10 @@ const UserWalletPage: React.FC = () => {
 
   const { run: getNetworkConfig } = useRequest(GetNetworkConfigService, {
     onSuccess(res) {
-      if (res.statusCode === 0) {
+      if (res) {
         setNetworkConfig(res);
       } else {
-        enqueueSnackbar(res.msg || t('Get network config failed'), {
+        enqueueSnackbar(t('Get network config failed'), {
           variant: 'warning',
         });
       }
