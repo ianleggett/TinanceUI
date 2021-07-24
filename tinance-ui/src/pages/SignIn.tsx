@@ -15,7 +15,7 @@ import * as yup from 'yup';
 
 import { useUserManagerDispatch } from '../components';
 import { SignInService } from '../services';
-import { saveProfile, saveToken, saveTokenExpiryTime } from '../utils';
+import { saveProfile, saveToken } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,10 +65,8 @@ const SignInPage: React.FC = () => {
       const { token, ...profile } = res;
 
       if (token) {
-        saveToken(token);
+        saveToken(token, profile.expirymins);
         saveProfile(profile);
-        saveTokenExpiryTime(3_600_000); // Token will be expired in 1 hour
-        saveProfile(res);
         dispatch({
           type: 'saveUserInfo',
           payload: profile,

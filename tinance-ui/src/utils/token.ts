@@ -1,65 +1,46 @@
-import Cookies from 'js-cookie';
-
-export const DEFAULT_TOKEN_KEY = 'token';
+import { clearProfile } from './profile';
+import { snackbar } from './snackbar';
 
 const cache = localStorage; // or sessionStorage
 
 /**
- * Get user token string from cookie or cache.
- *
- * @param key - User token key, default is 'token'
- * @returns User token string
- */
-export function getToken(key: string = DEFAULT_TOKEN_KEY): string {
-  return Cookies.get(key) ?? cache.getItem(key) ?? '';
-}
-
-/**
- * Save user token string to cookie and cache.
+ * Save user token string to cache.
  *
  * @param token - User token string
- * @param key - User token key, default is 'token'
+ * @param expires - Expires after saving, default is 60 (in min)
  */
-export function saveToken(token: string, key: string = DEFAULT_TOKEN_KEY): void {
-  Cookies.set(key, token);
-  cache.setItem(key, token);
+export function saveToken(token: string, expires: number = 60): void {
+  cache.setItem('expiry_time', (Date.now() + expires * 60_000).toString());
+  cache.setItem('token', token);
 }
 
 /**
- * Remove user token string from cookie and cache.
- *
- * @param key - User token key, default is 'token'
+ * Remove user token string from cache.
  */
-export function clearToken(key: string = DEFAULT_TOKEN_KEY): void {
-  Cookies.remove(key);
-  cache.removeItem(key);
+export function clearToken(): void {
+  cache.removeItem('token');
+  cache.removeItem('expiry_time');
 }
 
 /**
- * Save expiry time of token string to cache.
+ * Get user token string from cache.
  *
- * @param millisecond - Millisecond from now
- * @param key - Token expiry time key, default is 'expiry_time'
+ * @returns User token string
  */
-export function saveTokenExpiryTime(millisecond: number, key: string = 'expiry_time'): void {
-  cache.setItem(key, (Date.now() + millisecond).toString());
-}
+export function getToken(): string {
+  const expiryTimeStr = cache.getItem('expiry_time');
 
-/**
- * Get expiry time of token string from cache.
- *
- * @param key - Token expiry time key, default is 'expiry_time'
- */
-export function getTokenExpiryTime(key: string = 'expiry_time'): number {
-  const expiryTimeStr = cache.getItem(key);
-  return expiryTimeStr ? Number.parseInt(expiryTimeStr, 10) : 0;
-}
+  if (!expiryTimeStr) {
+    return '';
+  }
 
-/**
- * Remove expiry time of token string from cache.
- *
- * @param key - Token expiry time key, default is 'expiry_time'
- */
-export function clearTokenExpiryTime(key: string = 'expiry_time'): void {
-  cache.removeItem(key);
+  if (Number.parseInt(expiryTimeStr, 10) >= Date.now()) {
+    return cache.getItem('token') ?? '';
+  }
+
+  clearToken();
+  clearProfile();
+  snackbar.warning('Token is expired, please login');
+
+  return '';
 }

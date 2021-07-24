@@ -27,7 +27,7 @@ import * as yup from 'yup';
 
 import { useAppConfigState, useUserManager } from '../components';
 import { ChangePasswordService, SignOutService } from '../services';
-import { clearProfile, clearToken, clearTokenExpiryTime, fixRegex } from '../utils';
+import { clearProfile, clearToken, fixRegex } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -128,7 +128,6 @@ const ChangePasswordPage: React.FC = () => {
 
         clearToken();
         clearProfile();
-        clearTokenExpiryTime();
 
         history.replace('/signin');
         enqueueSnackbar(t('Please login with new password'), {

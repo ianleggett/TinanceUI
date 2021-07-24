@@ -41,6 +41,8 @@ declare namespace PublicData {
     username: string;
     email: string;
     phone: string;
+    feepct: number;
+    expirymins: number;
     feedback: number;
     tradecount: number;
     disable: boolean;
@@ -65,6 +67,8 @@ declare namespace User {
     username: string;
     email: string;
     countryISO: string;
+    feepct: number;
+    expirymins: number;
     phone?: string;
     role: 'ROLE_USER' | 'ROLE_ADMIN';
     verified: boolean;

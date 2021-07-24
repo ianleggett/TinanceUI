@@ -28,7 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { SignOutService } from '../services';
-import { clearProfile, clearToken, clearTokenExpiryTime } from '../utils';
+import { clearProfile, clearToken } from '../utils';
 import { useUserManager } from './UserManager';
 
 const useStyles = makeStyles((theme) => {
@@ -177,7 +177,6 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
 
     clearToken();
     clearProfile();
-    clearTokenExpiryTime();
 
     history.replace('/');
   }, [dispatch, history, signout]);
