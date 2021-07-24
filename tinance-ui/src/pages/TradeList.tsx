@@ -146,6 +146,7 @@ const TradeListPage: React.FC = () => {
   const { t } = useTranslation();
   const { profile } = useUserManagerState();
   const { enqueueSnackbar } = useSnackbar();
+  const [loading, setLoading] = useState(true);
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
@@ -154,10 +155,16 @@ const TradeListPage: React.FC = () => {
     return TOKENS_BY_NETWORK[Networks.Kovan][0];
   }, []);
 
-  const { run, loading, cancel } = useRequest(GetMyTradesService, {
+  const { run, cancel } = useRequest(GetMyTradesService, {
+    pollingWhenHidden: false,
+    refreshOnWindowFocus: true,
+    pollingInterval: profile && profile.pollingRate ? profile.pollingRate * 1000 : 10_000,
     onSuccess(res) {
       if (res) {
         setTrades(res);
+        if (loading) {
+          setLoading(false);
+        }
       }
     },
   });
