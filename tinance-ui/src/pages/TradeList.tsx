@@ -29,6 +29,7 @@ import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 
 import { useUserManagerState } from '../components';
 import { Networks, TOKENS_BY_NETWORK, tradeStatusMap } from '../constants';
@@ -108,6 +109,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 4,
     marginBottom: 4,
   },
+  markets: {
+    marginTop: theme.spacing(2),
+  },
 }));
 
 const initialValues = {
@@ -143,6 +147,7 @@ const sellerInfo: Record<Trade.Status, string> = {
 
 const TradeListPage: React.FC = () => {
   const classes = useStyles();
+  const history = useHistory();
   const { t } = useTranslation();
   const { profile } = useUserManagerState();
   const { enqueueSnackbar } = useSnackbar();
@@ -412,6 +417,10 @@ const TradeListPage: React.FC = () => {
     }
   }, [cancelTrade, cancelling, selectedOrderId]);
 
+  const handleGoToMarketListPage = useCallback(() => {
+    history.push('/markets');
+  }, [history]);
+
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
       const isSeller = !!profile && trade.seller.cid === profile.cid;
@@ -640,6 +649,14 @@ const TradeListPage: React.FC = () => {
               <Typography variant="body1" color="textSecondary">
                 {t('No trade meeting the filter')}
               </Typography>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleGoToMarketListPage}
+                className={classes.markets}
+              >
+                {t('Go to markets')}
+              </Button>
             </Paper>
           ) : (
             trades.map((trade) => (
