@@ -13,6 +13,7 @@ export const appConfig = {
   validationRegex: {} as Record<string, PublicData.Regex>,
   relativeExpiryTime: 2, // in hours
   feeRate: 0.0015,
+  walletConnected: false,
 };
 
 export const offerStatusMap: Record<Offer.Status, string> = {

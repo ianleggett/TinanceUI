@@ -110,7 +110,7 @@ const MarketListPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { profile, isLoggedIn } = useUserManagerState();
-  const { ccyCodes, paymentTypes } = useAppConfigState();
+  const { ccyCodes, paymentTypes, walletConnected } = useAppConfigState();
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
@@ -227,12 +227,19 @@ const MarketListPage: React.FC = () => {
         return;
       }
 
+      if (!walletConnected) {
+        enqueueSnackbar(t('Please connect user wallet first'), {
+          variant: 'warning',
+        });
+        return;
+      }
+
       if (!creating) {
         setCurrentOrderId(oid);
         setConfirming(true);
       }
     },
-    [creating, enqueueSnackbar, history, isLoggedIn, t],
+    [creating, enqueueSnackbar, history, isLoggedIn, t, walletConnected],
   );
 
   const handleAccept = useCallback(() => {

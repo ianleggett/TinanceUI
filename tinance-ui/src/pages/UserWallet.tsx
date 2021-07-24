@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from '@ethersproject/providers';
-import { formatEther, formatUnits } from '@ethersproject/units';
+import { formatUnits } from '@ethersproject/units';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
@@ -20,19 +20,19 @@ import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutline
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
+import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import useEtherSWR, { EtherSWRConfig } from 'ether-swr';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useSnackbar } from 'notistack';
-import { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
-import { useAppConfigState } from '../components';
+import { useAppConfig } from '../components';
 import { Networks, TOKENS_BY_NETWORK } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
 import { GetNetworkConfigService, GetUserWalletService, SetUserWaletService } from '../services';
@@ -122,7 +122,7 @@ const UserWalletPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { ccyCodes } = useAppConfigState();
+  const [{ ccyCodes }, dispatch] = useAppConfig();
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
@@ -242,6 +242,26 @@ const UserWalletPage: React.FC = () => {
     },
     [formik, loading],
   );
+
+  // Set global state `walletConnected` in app context to true
+  const handleWalletConnect = useCallback(() => {
+    dispatch({
+      type: 'update',
+      payload: {
+        walletConnected: true,
+      },
+    });
+  }, [dispatch]);
+
+  // Set global state `walletConnected` in app context to false
+  const handleWalletDisconnect = useCallback(() => {
+    dispatch({
+      type: 'update',
+      payload: {
+        walletConnected: false,
+      },
+    });
+  }, [dispatch]);
 
   const handleGoToUserProfilePage = useCallback(() => {
     history.push('/account/profile');
