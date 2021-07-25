@@ -304,7 +304,9 @@ const UserWalletPage: React.FC = () => {
   });
 
   useEffect(() => {
-    if (account !== undefined) setUserWallet({ coinid: 9, walletAddr: account || '' });
+    if (account !== undefined && account !== null) {
+      setUserWallet({ coinid: 9, walletAddr: account });
+    }
   }, [active, account, setUserWallet]);
 
   const { symbol, address, decimals } = useMemo(() => {
@@ -327,6 +329,11 @@ const UserWalletPage: React.FC = () => {
     },
     [formik, loading],
   );
+
+  useUpdateEffect(() => {
+    formik.setFieldValue('coinid', formData.coinid);
+    formik.setFieldValue('walletAddr', formData.walletAddr);
+  }, [formData]);
 
   const handleGoToUserProfilePage = useCallback(() => {
     history.push('/account/profile');
