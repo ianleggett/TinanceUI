@@ -277,12 +277,14 @@ const UserWalletPage: React.FC = () => {
 
   const connectWallet = useCallback(() => {
     activate(injectedConnector);
-  }, [activate]);
+    handleWalletConnect(); // ICL quick fix to make work for testing
+  }, [activate, handleWalletConnect]);
 
   const disconnectWallet = useCallback(() => {
     injectedConnector.deactivate();
     deactivate();
-  }, [deactivate]);
+    handleWalletDisconnect(); // ICL quick fix to make work for testing
+  }, [deactivate, handleWalletDisconnect]);
 
   useMount(() => {
     getUserWallet();
