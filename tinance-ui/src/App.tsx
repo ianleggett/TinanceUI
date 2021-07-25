@@ -49,7 +49,8 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <SnackbarProvider
-        autoHideDuration={3000}
+        autoHideDuration={8000}
+        style={{ pointerEvents: 'all' }}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'center',

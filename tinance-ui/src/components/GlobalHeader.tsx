@@ -22,13 +22,12 @@ import ExpandMoreOutlinedIcon from '@material-ui/icons/ExpandMoreOutlined';
 import MenuOutlinedIcon from '@material-ui/icons/MenuOutlined';
 import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined';
 import { useRequest } from 'ahooks';
-import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { SignOutService } from '../services';
-import { clearProfile, clearToken } from '../utils';
+import { clearProfile, clearToken, snackbar } from '../utils';
 import { useUserManager } from './UserManager';
 
 const useStyles = makeStyles((theme) => {
@@ -99,7 +98,6 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const [{ profile }, dispatch] = useUserManager();
-  const { enqueueSnackbar } = useSnackbar();
   const [showDrawer, setShowDrawer] = useState(false);
   const [userMenu, setUserMenu] = useState<HTMLButtonElement | null>(null);
   const { title, logo, maxWidth } = props as PropsWithDefault;
@@ -107,13 +105,9 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const { run: signout } = useRequest(SignOutService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
-        enqueueSnackbar(t('Sign out successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Sign out successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Sign out failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Sign out failed'));
       }
     },
   });

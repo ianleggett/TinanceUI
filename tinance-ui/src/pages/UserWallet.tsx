@@ -26,7 +26,6 @@ import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import useEtherSWR, { EtherSWRConfig } from 'ether-swr';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
-import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -36,6 +35,7 @@ import { useAppConfig } from '../components';
 import { Networks, TOKENS_BY_NETWORK } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
 import { GetNetworkConfigService, GetUserWalletService, SetUserWaletService } from '../services';
+import { snackbar } from '../utils';
 
 function getLibrary(provider: ExternalProvider | JsonRpcFetchFunc): Web3Provider {
   const library = new Web3Provider(provider);
@@ -121,7 +121,6 @@ const UserWalletPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const [{ ccyCodes }, dispatch] = useAppConfig();
 
   const theme = useTheme();
@@ -163,15 +162,11 @@ const UserWalletPage: React.FC = () => {
       if (res.coinid) {
         setFormData(res);
       } else {
-        enqueueSnackbar(res.msg || t('Get user wallet failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Get user wallet failed'));
       }
     },
     onError(error) {
-      enqueueSnackbar(error.message || t('Get user wallet failed'), {
-        variant: 'warning',
-      });
+      snackbar.warning(error.message || t('Get user wallet failed'));
     },
   });
 
@@ -179,19 +174,13 @@ const UserWalletPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserWallet();
-        enqueueSnackbar(t('Set user wallet successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Set user wallet successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Set user wallet failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Set user wallet failed'));
       }
     },
     onError(error) {
-      enqueueSnackbar(error.message || t('Set user wallet failed'), {
-        variant: 'warning',
-      });
+      snackbar.warning(error.message || t('Set user wallet failed'));
     },
   });
 
@@ -200,15 +189,11 @@ const UserWalletPage: React.FC = () => {
       if (res) {
         setNetworkConfig(res);
       } else {
-        enqueueSnackbar(t('Get network config failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(t('Get network config failed'));
       }
     },
     onError(error) {
-      enqueueSnackbar(error.message || t('Get network config failed'), {
-        variant: 'warning',
-      });
+      snackbar.warning(error.message || t('Get network config failed'));
     },
   });
 

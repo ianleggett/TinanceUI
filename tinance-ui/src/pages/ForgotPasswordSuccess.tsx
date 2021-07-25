@@ -4,10 +4,11 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { useMount } from 'ahooks';
-import { useSnackbar } from 'notistack';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+
+import { snackbar } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,16 +32,13 @@ const ForgotPasswordSuccessPage: React.FC = () => {
   const history = useHistory();
   const { search } = useLocation();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const emailRef = useRef(new URLSearchParams(search).get('email') ?? '');
   const usernameRef = useRef(new URLSearchParams(search).get('username') ?? '');
 
   useMount(() => {
     if (!emailRef.current && !usernameRef.current) {
       history.replace('/');
-      enqueueSnackbar(t("There's no email or username url query string in the URL"), {
-        variant: 'warning',
-      });
+      snackbar.warning(t("There's no email or username url query string in the URL"));
     }
   });
 

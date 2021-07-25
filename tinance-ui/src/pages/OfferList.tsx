@@ -24,7 +24,6 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import { useMount, useRequest, useSessionStorageState, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -32,7 +31,7 @@ import { useHistory } from 'react-router-dom';
 import { useUserManagerState } from '../components';
 import { offerStatusMap } from '../constants';
 import { GetMyOffersService, ToggleOfferLiveService } from '../services';
-import { toFixed } from '../utils';
+import { snackbar, toFixed } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   filter: {
@@ -115,7 +114,6 @@ const OfferListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const { profile } = useUserManagerState();
   const [offers, setOffers] = useState<Offer.Model[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<string>('');
@@ -141,13 +139,9 @@ const OfferListPage: React.FC = () => {
           }),
         );
         setSelectedOffer('');
-        enqueueSnackbar(t('Toggle live successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Toggle live successful'));
       } else {
-        enqueueSnackbar(t('Toggle live failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(t('Toggle live failed'));
       }
     },
   });

@@ -26,14 +26,13 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import { useMount, useRequest, useUnmount } from 'ahooks';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
-import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
 import { useAppConfigState, useUserManagerState } from '../components';
 import { GetAllOffersService, TakeOrderService } from '../services';
-import { toFixed } from '../utils';
+import { snackbar, toFixed } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -108,7 +107,6 @@ const MarketListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const { profile, isLoggedIn } = useUserManagerState();
   const { ccyCodes, paymentTypes, walletConnected } = useAppConfigState();
 
@@ -145,13 +143,9 @@ const MarketListPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.push('/trades');
-        enqueueSnackbar(t('Take over offer successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Take over offer successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Take over offer failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Take over offer failed'));
       }
     },
   });
@@ -221,16 +215,12 @@ const MarketListPage: React.FC = () => {
     (oid: string) => {
       if (!isLoggedIn) {
         history.push('/signin?from=/markets');
-        enqueueSnackbar(t('Please login in first'), {
-          variant: 'warning',
-        });
+        snackbar.warning(t('Please login in first'));
         return;
       }
 
       if (!walletConnected) {
-        enqueueSnackbar(t('Please connect user wallet first'), {
-          variant: 'warning',
-        });
+        snackbar.warning(t('Please connect user wallet first'));
         return;
       }
 
@@ -239,7 +229,7 @@ const MarketListPage: React.FC = () => {
         setConfirming(true);
       }
     },
-    [creating, enqueueSnackbar, history, isLoggedIn, t, walletConnected],
+    [creating, history, isLoggedIn, t, walletConnected],
   );
 
   const handleAccept = useCallback(() => {

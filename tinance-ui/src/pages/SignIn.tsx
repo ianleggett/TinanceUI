@@ -7,7 +7,6 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -15,7 +14,7 @@ import * as yup from 'yup';
 
 import { useUserManagerDispatch } from '../components';
 import { SignInService } from '../services';
-import { saveProfile, saveToken } from '../utils';
+import { saveProfile, saveToken, snackbar } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,7 +49,6 @@ const SignInPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const dispatch = useUserManagerDispatch();
 
   const validationSchema = useMemo(() => {
@@ -72,9 +70,7 @@ const SignInPage: React.FC = () => {
           payload: profile,
         });
 
-        enqueueSnackbar(t('Sign in successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Sign in successful'));
 
         const redirectUrl = new URLSearchParams(window.location.search).get('from');
 
@@ -84,9 +80,7 @@ const SignInPage: React.FC = () => {
           history.replace('/');
         }
       } else {
-        enqueueSnackbar(res.message || t('Sign in failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.message || t('Sign in failed'));
       }
     },
   });

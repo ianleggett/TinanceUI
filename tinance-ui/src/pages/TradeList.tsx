@@ -26,7 +26,6 @@ import { useMount, useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { BigNumber } from 'ethers';
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -43,7 +42,7 @@ import {
   FlagFundsSentService,
   GetMyTradesService,
 } from '../services';
-import { toFixed } from '../utils';
+import { snackbar, toFixed } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   filter: {
@@ -150,7 +149,6 @@ const TradeListPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { profile } = useUserManagerState();
-  const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(true);
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
@@ -172,6 +170,9 @@ const TradeListPage: React.FC = () => {
         }
       }
     },
+    onError() {
+      cancel();
+    },
   });
 
   const {
@@ -184,9 +185,7 @@ const TradeListPage: React.FC = () => {
         run();
         setOpenAlertDialog(false);
       } else {
-        enqueueSnackbar(res.msg || t('Cancel trade failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Cancel trade failed'));
       }
     },
   });
@@ -201,13 +200,9 @@ const TradeListPage: React.FC = () => {
 
       if (res.statusCode === 0) {
         run();
-        enqueueSnackbar(t('Deposit crypto successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Deposit crypto successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Deposit crypto failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Deposit crypto failed'));
       }
     },
   });
@@ -218,13 +213,9 @@ const TradeListPage: React.FC = () => {
 
       if (res.statusCode === 0) {
         run();
-        enqueueSnackbar(t('Flag funds sent successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Flag funds sent successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Flag funds sent failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Flag funds sent failed'));
       }
     },
   });
@@ -235,13 +226,9 @@ const TradeListPage: React.FC = () => {
 
       if (res.statusCode === 0) {
         run();
-        enqueueSnackbar(t('Flag complete successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Flag complete successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Flag complete failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Flag complete failed'));
       }
     },
   });
@@ -252,13 +239,9 @@ const TradeListPage: React.FC = () => {
 
       if (res.statusCode === 0) {
         run();
-        enqueueSnackbar(t('Accpet cancel successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Accpet cancel successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Accept cancel failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Accept cancel failed'));
       }
     },
   });

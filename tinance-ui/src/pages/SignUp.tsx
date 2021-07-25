@@ -12,7 +12,6 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -21,7 +20,7 @@ import * as yup from 'yup';
 import { useAppConfigState } from '../components';
 import { countryCodes } from '../constants';
 import { SignUpService } from '../services';
-import { fixRegex, formatCountryCodeOption } from '../utils';
+import { fixRegex, formatCountryCodeOption, snackbar } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,7 +60,6 @@ const SignUpPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const { validationRegex } = useAppConfigState();
   const [telCode, setTelCode] = useState('+1');
   const emailRef = useRef('');
@@ -104,13 +102,9 @@ const SignUpPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.replace(`/signup/success?email=${emailRef.current}`);
-        enqueueSnackbar(t('Sign up successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Sign up successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Sign up failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Sign up failed'));
       }
     },
   });

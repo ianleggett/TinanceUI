@@ -11,7 +11,6 @@ import VisibilityOffOutlinedIcon from '@material-ui/icons/VisibilityOffOutlined'
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 import { useMount, useRequest } from 'ahooks';
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -19,7 +18,7 @@ import * as yup from 'yup';
 
 import { useAppConfigState } from '../components';
 import { ResetPasswordService } from '../services';
-import { fixRegex } from '../utils';
+import { fixRegex, snackbar } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,7 +60,6 @@ const ResetPasswordPage: React.FC = () => {
   const history = useHistory();
   const { search } = useLocation();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const { validationRegex } = useAppConfigState();
   const [showPassword, setShowPassword] = useState(false);
   const codeRef = useRef(new URLSearchParams(search).get('code') ?? '');
@@ -108,13 +106,9 @@ const ResetPasswordPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.replace(`/signin`);
-        enqueueSnackbar(t('Your password has been reset'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Your password has been reset'));
       } else {
-        enqueueSnackbar(t('Reset password failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(t('Reset password failed'));
       }
     },
   });
@@ -126,16 +120,12 @@ const ResetPasswordPage: React.FC = () => {
       const { username, newpwd } = values;
 
       if (!codeRef.current) {
-        enqueueSnackbar(t("Can't find one time code for verifying your identity"), {
-          variant: 'warning',
-        });
+        snackbar.warning(t("Can't find one time code for verifying your identity"));
         return;
       }
 
       if (!username) {
-        enqueueSnackbar(t("Can't find username for verifying your identity"), {
-          variant: 'warning',
-        });
+        snackbar.warning(t("Can't find username for verifying your identity"));
         return;
       }
 
@@ -164,16 +154,12 @@ const ResetPasswordPage: React.FC = () => {
 
   useMount(() => {
     if (!usernameRef.current) {
-      enqueueSnackbar(t("Can't find username for verifying your identity"), {
-        variant: 'warning',
-      });
+      snackbar.warning(t("Can't find username for verifying your identity"));
       return;
     }
 
     if (!codeRef.current) {
-      enqueueSnackbar(t("Can't find one time code for verifying your identity"), {
-        variant: 'warning',
-      });
+      snackbar.warning(t("Can't find one time code for verifying your identity"));
       return;
     }
 

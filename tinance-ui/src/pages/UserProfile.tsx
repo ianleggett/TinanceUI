@@ -19,7 +19,6 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import { useMount, useRequest } from 'ahooks';
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -28,7 +27,7 @@ import * as yup from 'yup';
 import { useAppConfigState, useUserManager } from '../components';
 import { countryCodes } from '../constants';
 import { GetUserDetailsService, UpdateUserDetailsService } from '../services';
-import { fixRegex, formatCountryCodeOption, saveProfile } from '../utils';
+import { fixRegex, formatCountryCodeOption, saveProfile, snackbar } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -77,7 +76,6 @@ const UserProfilePage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const { validationRegex } = useAppConfigState();
   const [{ profile }, dispatch] = useUserManager();
 
@@ -131,13 +129,9 @@ const UserProfilePage: React.FC = () => {
           payload: res,
         });
 
-        enqueueSnackbar(t('Change profile successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Change profile successful'));
       } else {
-        enqueueSnackbar(t('Update profile failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(t('Update profile failed'));
       }
     },
   });
@@ -146,13 +140,9 @@ const UserProfilePage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserDetails();
-        enqueueSnackbar(t('Change profile successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Change profile successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Change profile failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Change profile failed'));
       }
     },
   });
@@ -244,9 +234,7 @@ const UserProfilePage: React.FC = () => {
         }
       }
     } else {
-      enqueueSnackbar(t('Get user profile failed'), {
-        variant: 'warning',
-      });
+      snackbar.warning(t('Get user profile failed'));
     }
   });
 

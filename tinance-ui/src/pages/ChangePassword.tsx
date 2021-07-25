@@ -19,7 +19,6 @@ import VisibilityOffOutlinedIcon from '@material-ui/icons/VisibilityOffOutlined'
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 import { useMount, useRequest } from 'ahooks';
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -27,7 +26,7 @@ import * as yup from 'yup';
 
 import { useAppConfigState, useUserManager } from '../components';
 import { ChangePasswordService, SignOutService } from '../services';
-import { clearProfile, clearToken, fixRegex } from '../utils';
+import { clearProfile, clearToken, fixRegex, snackbar } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -75,7 +74,6 @@ const ChangePasswordPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const { validationRegex } = useAppConfigState();
   const [{ profile }, dispatch] = useUserManager();
 
@@ -116,9 +114,7 @@ const ChangePasswordPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.push('/account/password');
-        enqueueSnackbar(t('Change password successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Change password successful'));
 
         signout();
 
@@ -130,13 +126,9 @@ const ChangePasswordPage: React.FC = () => {
         clearProfile();
 
         history.replace('/signin');
-        enqueueSnackbar(t('Please login with new password'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Please login with new password'));
       } else {
-        enqueueSnackbar(res.msg || t('Change password failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Change password failed'));
       }
     },
   });
@@ -148,16 +140,12 @@ const ChangePasswordPage: React.FC = () => {
       const { newpwd2, ...restValues } = values;
 
       if (newpwd2 !== values.newpwd) {
-        enqueueSnackbar(t('Password should the same as confirm password'), {
-          variant: 'warning',
-        });
+        snackbar.warning(t('Password should the same as confirm password'));
         return;
       }
 
       if (newpwd2 === values.oldpwd) {
-        enqueueSnackbar(t('New password is the same as old password'), {
-          variant: 'warning',
-        });
+        snackbar.warning(t('New password is the same as old password'));
         return;
       }
 
@@ -200,9 +188,7 @@ const ChangePasswordPage: React.FC = () => {
     if (profile) {
       formik.setFieldValue('userid', profile.cid);
     } else {
-      enqueueSnackbar(t('Get user profile failed'), {
-        variant: 'warning',
-      });
+      snackbar.warning(t('Get user profile failed'));
     }
   });
 

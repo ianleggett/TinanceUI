@@ -11,7 +11,6 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { useRequest } from 'ahooks';
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -19,7 +18,7 @@ import * as yup from 'yup';
 
 import { useAppConfigState } from '../components';
 import { ForgotPasswordService } from '../services';
-import { fixRegex } from '../utils';
+import { fixRegex, snackbar } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,7 +57,6 @@ const ForgotPasswordPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const { validationRegex } = useAppConfigState();
   const emailRef = useRef('');
   const usernameRef = useRef('');
@@ -88,13 +86,9 @@ const ForgotPasswordPage: React.FC = () => {
           history.replace(`/forgot-password/success?username=${usernameRef.current}`);
         }
 
-        enqueueSnackbar(t('Reset email has been sent'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Reset email has been sent'));
       } else {
-        enqueueSnackbar(res.msg || t('Sending reset email failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Sending reset email failed'));
       }
     },
   });
@@ -114,9 +108,7 @@ const ForgotPasswordPage: React.FC = () => {
           usernameRef.current = values[formType];
         }
       } else {
-        enqueueSnackbar(`Field ${formType} is Required`, {
-          variant: 'warning',
-        });
+        snackbar.warning(`Field ${formType} is Required`);
       }
     },
   });

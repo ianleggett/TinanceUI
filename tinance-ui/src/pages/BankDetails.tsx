@@ -15,13 +15,13 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { GetUserBankService, UpdateUserBankService } from '../services';
+import { snackbar } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -75,7 +75,6 @@ const BankDetailsPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const [bankDetails, setBankDetails] = useState<API.GetUserBankResponse | null>(null);
 
   const theme = useTheme();
@@ -95,9 +94,7 @@ const BankDetailsPage: React.FC = () => {
       if (res && res.id) {
         setBankDetails(res);
       } else {
-        enqueueSnackbar(t("You haven't setup your bank account, please add bank account."), {
-          variant: 'warning',
-        });
+        snackbar.warning(t("You haven't setup your bank account, please add bank account."));
       }
     },
   });
@@ -106,19 +103,13 @@ const BankDetailsPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         getUserBank();
-        enqueueSnackbar(t('Update user bank successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t('Update user bank successful'));
       } else {
-        enqueueSnackbar(res.msg || t('Update user bank failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t('Update user bank failed'));
       }
     },
     onError(error) {
-      enqueueSnackbar(error.message || t('Update user bank failed'), {
-        variant: 'warning',
-      });
+      snackbar.warning(error.message || t('Update user bank failed'));
     },
   });
 

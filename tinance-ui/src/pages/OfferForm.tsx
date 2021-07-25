@@ -29,7 +29,6 @@ import { useMount, useRequest, useSessionStorageState, useUnmount } from 'ahooks
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
-import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useParams } from 'react-router-dom';
@@ -37,7 +36,7 @@ import * as yup from 'yup';
 
 import { useAppConfigState } from '../components';
 import { AddUpdateOrderService, GetUserBankService } from '../services';
-import { toFixed } from '../utils';
+import { snackbar, toFixed } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
   step: {
@@ -117,7 +116,6 @@ const OfferFormPage: React.FC = () => {
   const { oid } = useParams<{ oid: string }>();
   const { t } = useTranslation();
   const { feeRate } = useAppConfigState();
-  const { enqueueSnackbar } = useSnackbar();
   const { ccyCodes, relativeExpiryTime } = useAppConfigState();
   const [invert, setInvert] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -155,9 +153,7 @@ const OfferFormPage: React.FC = () => {
       if (res.id) {
         setBankDetails(res);
       } else {
-        enqueueSnackbar(t('Get user bank details failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(t('Get user bank details failed'));
       }
     },
   });
@@ -208,13 +204,9 @@ const OfferFormPage: React.FC = () => {
     onSuccess(res) {
       if (res.statusCode === 0) {
         history.push('/offers');
-        enqueueSnackbar(t(oid ? 'Offer updated successful' : 'New offer created successful'), {
-          variant: 'success',
-        });
+        snackbar.success(t(oid ? 'Offer updated successful' : 'New offer created successful'));
       } else {
-        enqueueSnackbar(res.msg || t(oid ? 'Offer updated failed' : 'New offer created failed'), {
-          variant: 'warning',
-        });
+        snackbar.warning(res.msg || t(oid ? 'Offer updated failed' : 'New offer created failed'));
       }
     },
   });
