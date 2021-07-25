@@ -794,6 +794,16 @@ const TradeListPage: React.FC = () => {
                       )}
                     </Typography>
                   </Grid>
+                  {trade.completedHash || trade.depositHash ? (
+                    <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                      <Typography align="center" color="secondary" component="p" variant="body1">
+                        <code>
+                          Transaction ID:&nbsp;
+                          {trade.completedHash || trade.depositHash}
+                        </code>
+                      </Typography>
+                    </Grid>
+                  ) : null}
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" color="primary" component="p" variant="h5">
                       {profile && trade.seller.cid === profile.cid
