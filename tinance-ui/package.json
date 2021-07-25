@@ -23,6 +23,8 @@
     "@web3-react/core": "^6.1.9",
     "@web3-react/injected-connector": "^6.0.7",
     "@web3-react/network-connector": "^6.1.9",
+    "@web3-react/walletconnect-connector": "latest",
+    "@web3-react/walletlink-connector": "latest",
     "ahooks": "^2.10.8",
     "dayjs": "^1.10.6",
     "ether-swr": "^0.6.4",

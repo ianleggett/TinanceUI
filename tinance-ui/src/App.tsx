@@ -60,68 +60,63 @@ const App: React.FC = () => {
         <UseRequestProvider value={{ manual: true }}>
           <MuiPickersUtilsProvider utils={DayjsUtils} locale="en">
             <BrowserRouter basename={process.env.PUBLIC_URL}>
-              <Web3ReactProvider getLibrary={getLibrary}>
-                <UserManagerProvider>
-                  <AppConfigProvider>
-                    <UserManagerConsumer>
-                      <Switch>
-                        <HomeRoute
-                          path="/"
-                          component={HomePage}
-                          authedComponent={TradeListPage}
-                          exact
-                        />
-                        <Route path="/signin" component={SignInPage} exact />
-                        <Route path="/signup" component={SignUpPage} exact />
-                        <Route path="/signup/success" component={SignUpSuccessPage} exact />
-                        <Route path="/forgot-password" component={ForgotPasswordPage} exact />
-                        <Route
-                          path="/forgot-password/success"
-                          component={ForgotPasswordSuccessPage}
-                          exact
-                        />
-                        <Route path="/reset-password" component={ResetPasswordPage} exact />
-                        <Route path="/faq" component={FaqPage} exact />
-                        <Route path="/privacy" component={PrivacyPage} exact />
-                        <Route path="/terms" component={TermsPage} exact />
-                        <Route path="/markets" component={MarketListPage} exact />
+              <UserManagerProvider>
+                <AppConfigProvider>
+                  <UserManagerConsumer>
+                    <Switch>
+                      <HomeRoute
+                        path="/"
+                        component={HomePage}
+                        authedComponent={TradeListPage}
+                        exact
+                      />
+                      <Route path="/signin" component={SignInPage} exact />
+                      <Route path="/signup" component={SignUpPage} exact />
+                      <Route path="/signup/success" component={SignUpSuccessPage} exact />
+                      <Route path="/forgot-password" component={ForgotPasswordPage} exact />
+                      <Route
+                        path="/forgot-password/success"
+                        component={ForgotPasswordSuccessPage}
+                        exact
+                      />
+                      <Route path="/reset-password" component={ResetPasswordPage} exact />
+                      <Route path="/faq" component={FaqPage} exact />
+                      <Route path="/privacy" component={PrivacyPage} exact />
+                      <Route path="/terms" component={TermsPage} exact />
+                      <Route path="/markets" component={MarketListPage} exact />
 
-                        <AccessControlRoute path="/offers" component={OfferListPage} exact />
-                        <AccessControlRoute path="/offers/create" component={OfferFormPage} exact />
-                        <AccessControlRoute
-                          path="/offers/update/:oid"
-                          component={OfferFormPage}
-                          exact
-                        />
-                        <AccessControlRoute path="/trades" component={TradeListPage} exact />
-                        <AccessControlRoute
-                          path="/account/profile"
-                          component={UserProfilePage}
-                          exact
-                        />
-                        <AccessControlRoute
-                          path="/account/wallet"
-                          component={UserWalletPage}
-                          exact
-                        />
-                        <AccessControlRoute
-                          path="/account/bank-details"
-                          component={BankDetailsPage}
-                          exact
-                        />
-                        <AccessControlRoute
-                          path="/account/password"
-                          component={ChangePasswordPage}
-                          exact
-                        />
+                      <AccessControlRoute path="/offers" component={OfferListPage} exact />
+                      <AccessControlRoute path="/offers/create" component={OfferFormPage} exact />
+                      <AccessControlRoute
+                        path="/offers/update/:oid"
+                        component={OfferFormPage}
+                        exact
+                      />
+                      <AccessControlRoute path="/trades" component={TradeListPage} exact />
+                      <AccessControlRoute path="/connect" component={UserWalletPage} exact />
+                      <AccessControlRoute
+                        path="/account/profile"
+                        component={UserProfilePage}
+                        exact
+                      />
+                      <AccessControlRoute path="/account/wallet" component={UserWalletPage} exact />
+                      <AccessControlRoute
+                        path="/account/bank-details"
+                        component={BankDetailsPage}
+                        exact
+                      />
+                      <AccessControlRoute
+                        path="/account/password"
+                        component={ChangePasswordPage}
+                        exact
+                      />
 
-                        <Route path="/403" component={ForbiddenPage} exact />
-                        <Route path="*" component={NotFoundPage} />
-                      </Switch>
-                    </UserManagerConsumer>
-                  </AppConfigProvider>
-                </UserManagerProvider>
-              </Web3ReactProvider>
+                      <Route path="/403" component={ForbiddenPage} exact />
+                      <Route path="*" component={NotFoundPage} />
+                    </Switch>
+                  </UserManagerConsumer>
+                </AppConfigProvider>
+              </UserManagerProvider>
             </BrowserRouter>
           </MuiPickersUtilsProvider>
         </UseRequestProvider>

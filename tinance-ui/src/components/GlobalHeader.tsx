@@ -21,6 +21,7 @@ import AttachMoneyOutlinedIcon from '@material-ui/icons/AttachMoneyOutlined';
 import ExpandMoreOutlinedIcon from '@material-ui/icons/ExpandMoreOutlined';
 import MenuOutlinedIcon from '@material-ui/icons/MenuOutlined';
 import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined';
+import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { useRequest } from 'ahooks';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -101,6 +102,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const [showDrawer, setShowDrawer] = useState(false);
   const [userMenu, setUserMenu] = useState<HTMLButtonElement | null>(null);
   const { title, logo, maxWidth } = props as PropsWithDefault;
+  const { active, error, deactivate } = useWeb3React();
 
   const { run: signout } = useRequest(SignOutService, {
     onSuccess(res) {
@@ -143,6 +145,11 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
     setShowDrawer(false);
   }, [history]);
 
+  const handleGoToConnectPage = useCallback(() => {
+    history.push('/connect');
+    setShowDrawer(false);
+  }, [history]);
+
   const handleGoToSigninPage = useCallback(() => {
     history.push('/signin');
   }, [history]);
@@ -163,7 +170,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
 
   const handleSignOut = useCallback(() => {
     setUserMenu(null);
-
+    deactivate();
     signout();
     dispatch({
       type: 'clearUserInfo',
@@ -173,7 +180,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
     clearProfile();
 
     history.replace('/');
-  }, [dispatch, history, signout]);
+  }, [dispatch, history, signout, deactivate]);
 
   return (
     <AppBar position="static" color="transparent" variant="outlined" className={classes.root}>
@@ -210,6 +217,13 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
               </Button>
               <Button variant="text" endIcon={<ExpandMoreOutlinedIcon />}>
                 {t('More')}
+              </Button>
+              <Button
+                variant="text"
+                color={pathname.startsWith('/connect') ? 'primary' : 'default'}
+                onClick={handleGoToConnectPage}
+              >
+                {active ? '🟢 connected' : error ? '🔴 error' : '🟠 Not connected'}
               </Button>
             </Box>
           </Hidden>

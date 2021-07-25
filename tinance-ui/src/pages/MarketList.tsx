@@ -1,3 +1,4 @@
+import { Web3Provider } from '@ethersproject/providers';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
@@ -23,6 +24,7 @@ import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { useWeb3React } from '@web3-react/core';
 import { useMount, useRequest, useUnmount } from 'ahooks';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
@@ -109,6 +111,8 @@ const MarketListPage: React.FC = () => {
   const { t } = useTranslation();
   const { profile, isLoggedIn } = useUserManagerState();
   const { ccyCodes, paymentTypes, walletConnected } = useAppConfigState();
+
+  const { active, error } = useWeb3React<Web3Provider>(); // ICL added instead of walletconnected
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
@@ -219,7 +223,7 @@ const MarketListPage: React.FC = () => {
         return;
       }
 
-      if (!walletConnected) {
+      if (!active) {
         snackbar.warning(t('Please connect user wallet first'));
         return;
       }
@@ -229,7 +233,7 @@ const MarketListPage: React.FC = () => {
         setConfirming(true);
       }
     },
-    [creating, history, isLoggedIn, t, walletConnected],
+    [creating, history, isLoggedIn, t, active],
   );
 
   const handleAccept = useCallback(() => {
