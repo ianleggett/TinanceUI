@@ -14,11 +14,11 @@ import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 
 const POLLING_INTERVAL = 12_000;
 const RPC_URLS: { [chainId: number]: string } = {
-  1: 'https://mainnet.infura.io',
-  3: 'https://ropsten.infura.io',
-  4: 'https://rinkeby.infura.io', // /v3/13ba69a445a244859517b9c014a5a297
-  5: 'https://goerli.infura.io',
-  42: 'https://kovan.infura.io',
+  1: 'https://mainnet.infura.io/v3/13ba69a445a244859517b9c014a5a297',
+  3: 'https://ropsten.infura.io/v3/13ba69a445a244859517b9c014a5a297',
+  4: 'https://rinkeby.infura.io/v3/13ba69a445a244859517b9c014a5a297', // /v3/13ba69a445a244859517b9c014a5a297
+  5: 'https://goerli.infura.io/v3/13ba69a445a244859517b9c014a5a297',
+  42: 'https://kovan.infura.io/v3/13ba69a445a244859517b9c014a5a297',
 };
 export const Networks = {
   MainNet: 1,
