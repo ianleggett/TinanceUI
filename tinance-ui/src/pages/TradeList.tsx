@@ -372,10 +372,10 @@ const TradeListPage: React.FC = () => {
       const thisEscrow = new Contract(ESCROW, ESCROWABI, library.getSigner());
       const orderIdNumeric = BigInt(`0x${oid}`);
       thisEscrow.releaseEscrow(orderIdNumeric).then((val: TransactionResponse) => {
-        alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
+        // alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
         console.log(`txn: ${JSON.stringify(val)}`);
         const txn = val.hash;
-        alert(`txn: ${txn} `);
+        // alert(`txn: ${txn} `);
         flagComplete({ oid, txn });
         setSelectedOrderId(oid);
         cancelCancel();
