@@ -14,8 +14,11 @@ import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 
 const POLLING_INTERVAL = 12_000;
 const RPC_URLS: { [chainId: number]: string } = {
-  1: process.env.RPC_URL_1 as string,
-  4: process.env.RPC_URL_4 as string,
+  1: 'https://mainnet.infura.io/v3/13ba69a445a244859517b9c014a5a297',
+  3: 'https://rinkeby.infura.io/v3/13ba69a445a244859517b9c014a5a297',
+  4: 'https://rinkeby.infura.io/v3/13ba69a445a244859517b9c014a5a297',
+  5: 'https://goerli.infura.io/v3/13ba69a445a244859517b9c014a5a297',
+  42: 'https://kovan.infura.io/v3/13ba69a445a244859517b9c014a5a297',
 };
 export const Networks = {
   MainNet: 1,
@@ -41,7 +44,7 @@ export const injectedConnector = new InjectedConnector({
 // })
 
 export const walletconnect = new WalletConnectConnector({
-  rpc: { 1: RPC_URLS[1] },
+  rpc: { 1: RPC_URLS[1], 3: RPC_URLS[3], 4: RPC_URLS[4], 5: RPC_URLS[5], 42: RPC_URLS[42] },
   qrcode: true,
   pollingInterval: POLLING_INTERVAL,
 });
