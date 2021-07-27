@@ -11,6 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
+import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
@@ -41,6 +42,7 @@ import {
   FlagCompleteService,
   FlagFundsSentService,
   GetMyTradesService,
+  GetNetworkConfigService,
 } from '../services';
 import { snackbar, toFixed } from '../utils';
 
@@ -111,6 +113,15 @@ const useStyles = makeStyles((theme) => ({
   markets: {
     marginTop: theme.spacing(2),
   },
+  link: {
+    display: 'block',
+    margin: theme.spacing(2),
+    padding: theme.spacing(2),
+    wordBreak: 'break-all',
+    lineHeight: 1.5,
+    border: `1px dashed ${theme.palette.primary.light}`,
+    borderRadius: 5,
+  },
 }));
 
 const initialValues = {
@@ -150,6 +161,9 @@ const TradeListPage: React.FC = () => {
   const { t } = useTranslation();
   const { profile } = useUserManagerState();
   const [loading, setLoading] = useState(true);
+  const [{ etherScanPrefix }, setNetworkConfig] = useState<any>({
+    etherScanPrefix: 'https://kovan.etherscan.io/tx/',
+  });
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
@@ -157,6 +171,19 @@ const TradeListPage: React.FC = () => {
   const { symbol, address, decimals } = useMemo(() => {
     return TOKENS_BY_NETWORK[Networks.Kovan][0];
   }, []);
+
+  const { run: getNetworkConfig } = useRequest(GetNetworkConfigService, {
+    onSuccess(res) {
+      if (res) {
+        setNetworkConfig(res);
+      } else {
+        snackbar.warning(t('Get network config failed'));
+      }
+    },
+    onError(error) {
+      snackbar.warning(error.message || t('Get network config failed'));
+    },
+  });
 
   const { run, cancel } = useRequest(GetMyTradesService, {
     pollingWhenHidden: false,
@@ -779,12 +806,17 @@ const TradeListPage: React.FC = () => {
                   </Grid>
                   {trade.completedHash || trade.depositHash ? (
                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                      <Typography align="center" color="secondary" component="p" variant="body1">
-                        <code>
-                          Transaction ID:&nbsp;
-                          {trade.completedHash || trade.depositHash}
-                        </code>
-                      </Typography>
+                      <Link
+                        variant="body1"
+                        color="primary"
+                        component="a"
+                        align="center"
+                        href={`${etherScanPrefix}${trade.completedHash || trade.depositHash}`}
+                        className={classes.link}
+                      >
+                        txn:&nbsp;
+                        {trade.completedHash || trade.depositHash}
+                      </Link>
                     </Grid>
                   ) : null}
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
