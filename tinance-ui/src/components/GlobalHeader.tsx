@@ -215,9 +215,6 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
               >
                 {t('Trades')}
               </Button>
-              <Button variant="text" endIcon={<ExpandMoreOutlinedIcon />}>
-                {t('More')}
-              </Button>
               <Button
                 variant="text"
                 color={pathname.startsWith('/connect') ? 'primary' : 'default'}
