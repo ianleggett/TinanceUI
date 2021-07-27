@@ -2,8 +2,16 @@ import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { useEffect, useState } from 'react';
 
-const injected = new InjectedConnector({
-  supportedChainIds: [1, 3, 4, 5, 42],
+import { Networks } from './connectors';
+
+export const injectedConnector = new InjectedConnector({
+  supportedChainIds: [
+    Networks.MainNet, // Mainet
+    Networks.Ropsten, // Ropsten
+    Networks.Rinkeby, // Rinkeby
+    Networks.Goerli, // Goerli
+    Networks.Kovan, // Kovan
+  ],
 });
 
 export function useEagerConnect(): any {
@@ -11,10 +19,10 @@ export function useEagerConnect(): any {
 
   const [tried, setTried] = useState(false);
   useEffect(() => {
-    injected.isAuthorized().then((isAuthorized: boolean) => {
+    injectedConnector.isAuthorized().then((isAuthorized: boolean) => {
       console.log('useEagerConnect:', { active, isAuthorized });
       if (isAuthorized) {
-        activate(injected, undefined, true).catch(() => {
+        activate(injectedConnector, undefined, true).catch(() => {
           setTried(true);
         });
       } else {
@@ -44,19 +52,19 @@ export function useInactiveListener(suppress = false): any {
     if (ethereum && ethereum.on && !active && !error) {
       const handleChainChanged = (chainId: string) => {
         console.log('chainChanged', chainId);
-        activate(injected);
+        activate(injectedConnector);
       };
 
       const handleAccountsChanged = (accounts: any[]) => {
         console.log('accountsChanged', accounts);
         if (accounts.length > 0) {
-          activate(injected);
+          activate(injectedConnector);
         }
       };
 
       const handleNetworkChanged = (networkId: string) => {
         console.log('networkChanged', networkId);
-        activate(injected);
+        activate(injectedConnector);
       };
 
       ethereum.on('chainChanged', handleChainChanged);

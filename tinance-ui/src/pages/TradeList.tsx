@@ -46,6 +46,8 @@ import {
 } from '../services';
 import { snackbar, toFixed } from '../utils';
 
+const USDT_DECIMALS = 2;
+
 const useStyles = makeStyles((theme) => ({
   filter: {
     padding: 16,
@@ -326,8 +328,9 @@ const TradeListPage: React.FC = () => {
 
   const handleDeposit = useCallback(
     (oid: string, amt) => {
-      const cryptoAmt = amt * 10 ** decimals;
+      const cryptoAmt = Math.round(amt * 10 ** decimals);
       console.log(`deposit ${amt} ${symbol}`);
+      console.log(`units ${cryptoAmt}`);
       // const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
       // this comes from swagger API call getnetworkconfig.json
       const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
@@ -340,7 +343,6 @@ const TradeListPage: React.FC = () => {
         ERC20ABI,
         library.getSigner(),
       );
-      console.log(contract);
       contract.allowance(account, ESCROW).then((val: BigNumber) => {
         if (!val.isZero()) {
           alert(`Allowance was non zero (${val}), it has been reset, try again!!!`);
@@ -399,10 +401,10 @@ const TradeListPage: React.FC = () => {
       const thisEscrow = new Contract(ESCROW, ESCROWABI, library.getSigner());
       const orderIdNumeric = BigInt(`0x${oid}`);
       thisEscrow.releaseEscrow(orderIdNumeric).then((val: TransactionResponse) => {
-        alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
+        // alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
         console.log(`txn: ${JSON.stringify(val)}`);
         const txn = val.hash;
-        alert(`txn: ${txn} `);
+        // alert(`txn: ${txn} `);
         flagComplete({ oid, txn });
         setSelectedOrderId(oid);
         cancelCancel();
@@ -441,11 +443,13 @@ const TradeListPage: React.FC = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => handleDeposit(trade.tradeId, trade.fromAmount)}
+              onClick={() => handleDeposit(trade.tradeId, trade.fromAmount + trade.sellerFee)}
             >
               {depositing && trade.tradeId === selectedOrderId
                 ? t('Depositing...')
-                : `${t('Deposit')} ${toFixed(trade.fromAmount)} ${trade.fromccy.name}`}
+                : `${t('Deposit')} ${(trade.fromAmount + trade.sellerFee).toFixed(USDT_DECIMALS)} ${
+                    trade.fromccy.name
+                  }`}
             </Button>
           ) : null;
         }
@@ -761,7 +765,11 @@ const TradeListPage: React.FC = () => {
                           <Typography component="span" color="primary">
                             {toFixed(trade.fromAmount)} {trade.fromccy.name}
                           </Typography>
-                          <Typography component="span"> for </Typography>
+                          <Typography component="span"> (plus </Typography>
+                          <Typography component="span" color="primary">
+                            {trade.sellerFee.toFixed(USDT_DECIMALS)}
+                          </Typography>
+                          <Typography component="span"> fees) for </Typography>
                           <Typography component="span" color="primary">
                             {toFixed(trade.toAmount)} {trade.toccy.name}
                           </Typography>
@@ -783,7 +791,11 @@ const TradeListPage: React.FC = () => {
                           <Typography component="span" color="primary">
                             <code>{toFixed(trade.fromAmount)}</code> {trade.fromccy.name}
                           </Typography>
-                          <Typography component="span"> for </Typography>
+                          <Typography component="span"> (less </Typography>
+                          <Typography component="span" color="primary">
+                            {trade.sellerFee.toFixed(USDT_DECIMALS)}
+                          </Typography>
+                          <Typography component="span"> fees) for </Typography>
                           <Typography component="span" color="primary">
                             <code>{toFixed(trade.toAmount)}</code> {trade.toccy.name}
                           </Typography>

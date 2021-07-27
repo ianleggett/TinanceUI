@@ -176,7 +176,8 @@ declare namespace Trade {
     toAmount: number;
     cryptoAmount: number;
     cryptoFee: number;
-    fee: number;
+    sellerFee: number;
+    buyerFee: number;
     status: Status;
     archive?: any;
     auditList: any[];

@@ -1,6 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
+import { CircularProgress } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
@@ -21,12 +22,11 @@ import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceW
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import useEtherSWR, { EtherSWRConfig } from 'ether-swr';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
@@ -35,23 +35,9 @@ import { useAppConfig } from '../components';
 import { Networks, TOKENS_BY_NETWORK } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
 import { GetNetworkConfigService, GetUserWalletService, SetUserWaletService } from '../services';
-import { snackbar } from '../utils';
-
-function getLibrary(provider: ExternalProvider | JsonRpcFetchFunc): Web3Provider {
-  const library = new Web3Provider(provider);
-  library.pollingInterval = 12_000;
-  return library;
-}
-
-export const injectedConnector = new InjectedConnector({
-  supportedChainIds: [
-    Networks.MainNet, // Mainet
-    Networks.Ropsten, // Ropsten
-    Networks.Rinkeby, // Rinkeby
-    Networks.Goerli, // Goerli
-    Networks.Kovan, // Kovan
-  ],
-});
+import { injectedConnector, walletconnect, walletlink } from '../utils/connectors';
+import { useEagerConnect } from '../utils/hooks';
+import { snackbar } from '../utils/snackbar';
 
 const mymap = new Map<string, any>([['0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6', ERC20ABI]]);
 
@@ -117,6 +103,118 @@ export const TokenBalance = ({
   );
 };
 
+const WalletConnection: React.FC = () => {
+  const { connector, library, chainId, account, activate, deactivate, active, error } =
+    useWeb3React<Web3Provider>();
+  const [activatingConnector, setActivatingConnector] = React.useState<any>();
+  useEffect(() => {
+    if (activatingConnector && activatingConnector === connector) {
+      setActivatingConnector(undefined);
+    }
+  }, [activatingConnector, connector]);
+
+  const triedEager = useEagerConnect();
+
+  const [{ ccyCodes }, dispatch] = useAppConfig();
+  // Set global state `walletConnected` in app context to true
+  const handleWalletConnect = useCallback(() => {
+    dispatch({
+      type: 'update',
+      payload: {
+        walletConnected: true,
+      },
+    });
+  }, [dispatch]);
+
+  // Set global state `walletConnected` in app context to false
+  const handleWalletDisconnect = useCallback(() => {
+    dispatch({
+      type: 'update',
+      payload: {
+        walletConnected: false,
+      },
+    });
+  }, [dispatch]);
+
+  enum ConnectorNames {
+    Injected = 'Injected',
+    // Network = 'Network',
+    WalletConnect = 'WalletConnect',
+    WalletLink = 'WalletLink',
+    // Ledger = 'Ledger',
+    // Trezor = 'Trezor',
+    // Lattice = 'Lattice',
+    // Frame = 'Frame',
+    // Authereum = 'Authereum',
+    // Fortmatic = 'Fortmatic',
+    // Magic = 'Magic',
+    // Portis = 'Portis',
+    // Torus = 'Torus'
+  }
+
+  const connectorsByName: { [connectorName in ConnectorNames]: any } = {
+    [ConnectorNames.Injected]: injectedConnector,
+    // [ConnectorNames.Network]: network,
+    [ConnectorNames.WalletConnect]: walletconnect,
+    [ConnectorNames.WalletLink]: walletlink,
+    // [ConnectorNames.Ledger]: ledger,
+    // [ConnectorNames.Trezor]: trezor,
+    // [ConnectorNames.Lattice]: lattice,
+    // [ConnectorNames.Frame]: frame,
+    // [ConnectorNames.Authereum]: authereum,
+    // [ConnectorNames.Fortmatic]: fortmatic,
+    // [ConnectorNames.Magic]: magic,
+    // [ConnectorNames.Portis]: portis,
+    // [ConnectorNames.Torus]: torus
+  };
+  return (
+    <>
+      {!active &&
+        Object.entries(connectorsByName).map((ky, i) => {
+          const currentConnector = ky[1];
+          const activating = currentConnector === activatingConnector;
+          const connected = currentConnector === connector;
+          const disabled = !triedEager || !!activatingConnector || connected || !!error;
+          return (
+            <Button
+              color="primary"
+              variant="outlined"
+              size="large"
+              disabled={disabled}
+              // key={ky}
+              onClick={() => {
+                setActivatingConnector(currentConnector);
+                activate(currentConnector);
+                handleWalletConnect();
+              }}
+            >
+              {activating && <CircularProgress />}
+              {/* {connected && (
+                <span role="img" aria-label="check">
+                  ✅
+                </span>
+              )} */}
+              {ky[0]}
+            </Button>
+          );
+        })}
+      {(active || error) && (
+        <Button
+          color="secondary"
+          variant="outlined"
+          size="large"
+          onClick={() => {
+            deactivate();
+            handleWalletDisconnect();
+          }}
+        >
+          Disconnect
+        </Button>
+      )}
+    </>
+  );
+};
+
 const UserWalletPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
@@ -130,7 +228,7 @@ const UserWalletPage: React.FC = () => {
   const [activatingConnector, setActivatingConnector] = useState();
   const [networkConfig, setNetworkConfig] = useState<any>();
 
-  const { chainId, account, library, activate, active, connector, deactivate } =
+  const { connector, library, chainId, account, activate, deactivate, active } =
     useWeb3React<Web3Provider>();
 
   const ABIs = useMemo(() => {
@@ -205,11 +303,15 @@ const UserWalletPage: React.FC = () => {
     },
   });
 
+  useEffect(() => {
+    if (account !== undefined && account !== null) {
+      setUserWallet({ coinid: 9, walletAddr: account });
+    }
+  }, [active, account, setUserWallet]);
+
   const { symbol, address, decimals } = useMemo(() => {
     return TOKENS_BY_NETWORK[Networks.Kovan][0];
   }, []);
-
-  // const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
 
   console.log(active);
   console.log(`ADDR ${address} `);
@@ -228,25 +330,10 @@ const UserWalletPage: React.FC = () => {
     [formik, loading],
   );
 
-  // Set global state `walletConnected` in app context to true
-  const handleWalletConnect = useCallback(() => {
-    dispatch({
-      type: 'update',
-      payload: {
-        walletConnected: true,
-      },
-    });
-  }, [dispatch]);
-
-  // Set global state `walletConnected` in app context to false
-  const handleWalletDisconnect = useCallback(() => {
-    dispatch({
-      type: 'update',
-      payload: {
-        walletConnected: false,
-      },
-    });
-  }, [dispatch]);
+  useUpdateEffect(() => {
+    formik.setFieldValue('coinid', formData.coinid);
+    formik.setFieldValue('walletAddr', formData.walletAddr);
+  }, [formData]);
 
   const handleGoToUserProfilePage = useCallback(() => {
     history.push('/account/profile');
@@ -260,40 +347,20 @@ const UserWalletPage: React.FC = () => {
     history.push('/account/bank-details');
   }, [history]);
 
-  const connectWallet = useCallback(() => {
-    activate(injectedConnector);
-    handleWalletConnect(); // ICL quick fix to make work for testing
-  }, [activate, handleWalletConnect]);
+  // const connectWallet = useCallback(() => {
+  //   activate(injectedConnector);
+  //   handleWalletConnect(); // ICL quick fix to make work for testing
+  // }, [activate, handleWalletConnect]);
 
-  const disconnectWallet = useCallback(() => {
-    injectedConnector.deactivate();
-    deactivate();
-    handleWalletDisconnect(); // ICL quick fix to make work for testing
-  }, [deactivate, handleWalletDisconnect]);
+  // const disconnectWallet = useCallback(() => {
+  //   injectedConnector.deactivate();
+  //   deactivate();
+  //   handleWalletDisconnect(); // ICL quick fix to make work for testing
+  // }, [deactivate, handleWalletDisconnect]);
 
   useMount(() => {
     getUserWallet();
     getNetworkConfig();
-  });
-
-  useEffect(() => {
-    if (activatingConnector && activatingConnector === connector) {
-      setActivatingConnector(undefined);
-    }
-  }, [activatingConnector, connector]);
-
-  useEffect(() => {
-    setUserWallet({ coinid: 9, walletAddr: account || '' });
-  }, [active, account, setUserWallet]);
-
-  useUpdateEffect(() => {
-    formik.setFieldValue('coinid', formData.coinid);
-    formik.setFieldValue('walletAddr', formData.walletAddr);
-  }, [formData]);
-
-  injectedConnector.on('connect', (info: { chainId: number }) => {
-    // eslint-disable-next-line no-alert
-    alert(`Onconnect call here API v1/setwallet( USDT=9, ${account} )`);
   });
 
   return (
@@ -382,7 +449,7 @@ const UserWalletPage: React.FC = () => {
             </Grid>
             <Grid spacing={2} container>
               <Grid xs={12} sm={12} md={4} item>
-                {active ? (
+                {/* {active ? (
                   <EtherSWRConfig
                     value={{
                       provider: library,
@@ -409,7 +476,8 @@ const UserWalletPage: React.FC = () => {
                   >
                     {t('Connect')}
                   </Button>
-                )}
+                )} */}
+                <WalletConnection />
               </Grid>
               <Grid xs={12} sm={12} md={8} item>
                 <Button type="submit" color="primary" variant="contained" size="large" fullWidth>
