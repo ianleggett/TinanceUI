@@ -107,6 +107,7 @@ const WalletConnection: React.FC = () => {
   const { connector, library, chainId, account, activate, deactivate, active, error } =
     useWeb3React<Web3Provider>();
   const [activatingConnector, setActivatingConnector] = React.useState<any>();
+
   useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
       setActivatingConnector(undefined);
@@ -114,8 +115,8 @@ const WalletConnection: React.FC = () => {
   }, [activatingConnector, connector]);
 
   const triedEager = useEagerConnect();
-
   const [{ ccyCodes }, dispatch] = useAppConfig();
+
   // Set global state `walletConnected` in app context to true
   const handleWalletConnect = useCallback(() => {
     dispatch({
@@ -152,7 +153,7 @@ const WalletConnection: React.FC = () => {
     // Torus = 'Torus'
   }
 
-  const connectorsByName: { [connectorName in ConnectorNames]: any } = {
+  const connectorsByName: Record<ConnectorNames, any> = {
     [ConnectorNames.Injected]: injectedConnector,
     // [ConnectorNames.Network]: network,
     [ConnectorNames.WalletConnect]: walletconnect,
@@ -167,50 +168,53 @@ const WalletConnection: React.FC = () => {
     // [ConnectorNames.Portis]: portis,
     // [ConnectorNames.Torus]: torus
   };
+
   return (
     <>
-      {!active &&
-        Object.entries(connectorsByName).map((ky, i) => {
-          const currentConnector = ky[1];
-          const activating = currentConnector === activatingConnector;
-          const connected = currentConnector === connector;
-          const disabled = !triedEager || !!activatingConnector || connected || !!error;
-          return (
-            <Button
-              color="primary"
-              variant="outlined"
-              size="large"
-              disabled={disabled}
-              // key={ky}
-              onClick={() => {
-                setActivatingConnector(currentConnector);
-                activate(currentConnector);
-                handleWalletConnect();
-              }}
-            >
-              {activating && <CircularProgress />}
-              {/* {connected && (
-                <span role="img" aria-label="check">
-                  ✅
-                </span>
-              )} */}
-              {ky[0]}
-            </Button>
-          );
-        })}
-      {(active || error) && (
-        <Button
-          color="secondary"
-          variant="outlined"
-          size="large"
-          onClick={() => {
-            deactivate();
-            handleWalletDisconnect();
-          }}
-        >
-          Disconnect
-        </Button>
-      )}
+      {!active
+        ? Object.entries(connectorsByName).map((ky, i) => {
+            const currentConnector = ky[1];
+            const activating = currentConnector === activatingConnector;
+            const connected = currentConnector === connector;
+            const disabled = !triedEager || !!activatingConnector || connected || !!error;
+
+            return (
+              <Grid key={ky[0]} xs={12} sm={12} md={4} item>
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  size="large"
+                  disabled={disabled}
+                  startIcon={activating ? <CircularProgress size="1em" /> : null}
+                  fullWidth
+                  onClick={() => {
+                    setActivatingConnector(currentConnector);
+                    activate(currentConnector);
+                    handleWalletConnect();
+                  }}
+                >
+                  {ky[0]}
+                </Button>
+              </Grid>
+            );
+          })
+        : null}
+      {active || error ? (
+        <Grid xs={12} sm={12} md={4} item>
+          <Button
+            color="secondary"
+            variant="outlined"
+            size="large"
+            fullWidth
+            onClick={() => {
+              deactivate();
+              handleWalletDisconnect();
+            }}
+          >
+            Disconnect
+          </Button>
+        </Grid>
+      ) : null}
     </>
   );
 };
@@ -448,38 +452,8 @@ const UserWalletPage: React.FC = () => {
               </Grid>
             </Grid>
             <Grid spacing={2} container>
-              <Grid xs={12} sm={12} md={4} item>
-                {/* {active ? (
-                  <EtherSWRConfig
-                    value={{
-                      provider: library,
-                      ABIs: new Map(mymap),
-                      refreshInterval: 30_000,
-                    }}
-                  >
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      size="large"
-                      onClick={disconnectWallet}
-                    >
-                      {t('Disconnect')}
-                    </Button>
-                  </EtherSWRConfig>
-                ) : (
-                  <Button
-                    color="primary"
-                    variant="outlined"
-                    size="large"
-                    onClick={connectWallet}
-                    fullWidth
-                  >
-                    {t('Connect')}
-                  </Button>
-                )} */}
-                <WalletConnection />
-              </Grid>
-              <Grid xs={12} sm={12} md={8} item>
+              <WalletConnection />
+              <Grid xs={12} sm={12} md={12} item>
                 <Button type="submit" color="primary" variant="contained" size="large" fullWidth>
                   {loading ? t('Updating...') : t('Update User Wallet')}
                 </Button>
