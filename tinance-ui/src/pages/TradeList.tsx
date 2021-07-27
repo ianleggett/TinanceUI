@@ -1,5 +1,6 @@
 import { Contract } from '@ethersproject/contracts';
 import { TransactionReceipt, TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import { CircularProgress } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import Dialog from '@material-ui/core/Dialog';
@@ -47,6 +48,8 @@ import {
 import { snackbar, toFixed } from '../utils';
 
 const USDT_DECIMALS = 2;
+// this comes from swagger API call getnetworkconfig.json
+const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
 
 const useStyles = makeStyles((theme) => ({
   filter: {
@@ -242,9 +245,9 @@ const TradeListPage: React.FC = () => {
 
       if (res.statusCode === 0) {
         run();
-        snackbar.success(t('Flag funds sent successful'));
+        snackbar.success(t('You acknowledged funds have been sent successfully'));
       } else {
-        snackbar.warning(res.msg || t('Flag funds sent failed'));
+        snackbar.warning(res.msg || t('Indicating funds sent - has failed'));
       }
     },
   });
@@ -255,9 +258,9 @@ const TradeListPage: React.FC = () => {
 
       if (res.statusCode === 0) {
         run();
-        snackbar.success(t('Flag complete successful'));
+        snackbar.success(t('Your trade is successful'));
       } else {
-        snackbar.warning(res.msg || t('Flag complete failed'));
+        snackbar.warning(res.msg || t('Indicating trade complete - has failed'));
       }
     },
   });
@@ -327,47 +330,57 @@ const TradeListPage: React.FC = () => {
   );
 
   const handleDeposit = useCallback(
-    (oid: string, amt) => {
+    (trade) => {
+      // (oid: string, amt) => {
+      const amt = trade.fromAmount + trade.sellerFee;
+      const oid = trade.tradeId;
+      // trade.tradeId, trade.fromAmount + trade.sellerFee
       const cryptoAmt = Math.round(amt * 10 ** decimals);
       console.log(`deposit ${amt} ${symbol}`);
       console.log(`units ${cryptoAmt}`);
-      // const { data: balance, mutate } = useSWR([address, 'balanceOf', account]);
-      // this comes from swagger API call getnetworkconfig.json
-      const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
       if (library === undefined) {
-        console.log('library undefined, return');
+        snackbar.warning(t('Please connect wallet'));
         return;
       }
-      const contract = new Contract(
-        address, // '0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6', // USDT coin address
-        ERC20ABI,
-        library.getSigner(),
-      );
-      // what is current user allowance ??
-      contract.allowance(account, ESCROW).then((val: BigNumber) => {
-        if (!val.isZero()) {
-          if (!val.eq(cryptoAmt)) {
-            alert(
-              `Allowance needs to be reset before this transaction ( ${val} ), please reset and try again !!`,
-            );
-            contract.approve(ESCROW, 0);
-          } else {
-            depositCrypto({ oid });
-            setSelectedOrderId(oid);
-          }
-        } else {
-          contract.approve(ESCROW, cryptoAmt).then(() => {
-            // the escrow contract calls the transfer once deposit() is called
-            // console.log('Here to execute next step');
-            // alert('call here API v1/deposit( ctrid )');
-            depositCrypto({ oid });
-            setSelectedOrderId(oid);
-          });
+      if (account !== trade.sellerAddress) {
+        snackbar.warning(`Wallet has changed !!, switch to wallet ${trade.sellerAddress}`);
+        return;
+      }
+      // address is address of USDT
+      const contract = new Contract(address, ERC20ABI, library.getSigner());
+      contract.balanceOf(account).then((bal: BigNumber) => {
+        if (bal.lt(cryptoAmt)) {
+          snackbar.warning('LOW BALANCE, not enough funds');
+          return;
         }
+        // account is user account, what is current user allowance ??
+        contract.allowance(account, ESCROW).then((val: BigNumber) => {
+          if (!val.isZero()) {
+            if (!val.eq(cryptoAmt)) {
+              snackbar.warning(
+                t(
+                  `Your allowance needs to be reset before transacting (currently : ${val}), please reset and try again !!`,
+                ),
+              );
+              contract.approve(ESCROW, 0);
+            } else {
+              depositCrypto({ oid });
+              setSelectedOrderId(oid);
+            }
+          } else {
+            contract.approve(ESCROW, cryptoAmt).then(() => {
+              // the escrow contract calls the transfer once deposit() is called
+              // console.log('Here to execute next step');
+              // alert('call here API v1/deposit( ctrid )');
+              depositCrypto({ oid });
+              setSelectedOrderId(oid);
+            });
+          }
+        });
       });
     },
     // [library, account],
-    [library, account, address, symbol, decimals, depositCrypto],
+    [library, account, address, symbol, decimals, depositCrypto, t],
   );
 
   const handleAlertDialogOpen = useCallback((oid: string) => {
@@ -381,14 +394,14 @@ const TradeListPage: React.FC = () => {
     setOpenAlertDialog(false);
   }, [cancelCancel]);
 
-  const handleCryptoDeposit = useCallback(
-    (oid: string, amt: BigNumber) => {
-      cancelDeposit();
-      depositCrypto({ oid });
-      setSelectedOrderId(oid);
-    },
-    [cancelDeposit, depositCrypto],
-  );
+  // const handleCryptoDeposit = useCallback(
+  //   (oid: string, amt: BigNumber) => {
+  //     cancelDeposit();
+  //     depositCrypto({ oid });
+  //     setSelectedOrderId(oid);
+  //   },
+  //   [cancelDeposit, depositCrypto],
+  // );
 
   const handleFlagFundsSent = useCallback(
     (oid: string) => {
@@ -401,7 +414,6 @@ const TradeListPage: React.FC = () => {
 
   const handleFlagComplete = useCallback(
     (oid: string) => {
-      const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
       if (library === undefined) {
         console.log('library undefined, return');
         return;
@@ -448,16 +460,17 @@ const TradeListPage: React.FC = () => {
       switch (trade.status) {
         case 'CREATED': {
           return isSeller ? (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleDeposit(trade.tradeId, trade.fromAmount + trade.sellerFee)}
-            >
-              {depositing && trade.tradeId === selectedOrderId
-                ? t('Depositing...')
-                : `${t('Deposit')} ${(trade.fromAmount + trade.sellerFee).toFixed(USDT_DECIMALS)} ${
-                    trade.fromccy.name
-                  }`}
+            <Button variant="contained" color="primary" onClick={() => handleDeposit(trade)}>
+              {depositing && trade.tradeId === selectedOrderId ? (
+                <>
+                  <CircularProgress size="1em" />
+                  <div>Depositing...</div>
+                </>
+              ) : (
+                `${t('Deposit')} ${(trade.fromAmount + trade.sellerFee).toFixed(USDT_DECIMALS)} ${
+                  trade.fromccy.name
+                }`
+              )}
             </Button>
           ) : null;
         }
