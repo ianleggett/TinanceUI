@@ -343,10 +343,18 @@ const TradeListPage: React.FC = () => {
         ERC20ABI,
         library.getSigner(),
       );
+      // what is current user allowance ??
       contract.allowance(account, ESCROW).then((val: BigNumber) => {
         if (!val.isZero()) {
-          alert(`Allowance was non zero (${val}), it has been reset, try again!!!`);
-          contract.approve(ESCROW, 0);
+          if (!val.eq(cryptoAmt)) {
+            alert(
+              `Allowance needs to be reset before this transaction ( ${val} ), please reset and try again !!`,
+            );
+            contract.approve(ESCROW, 0);
+          } else {
+            depositCrypto({ oid });
+            setSelectedOrderId(oid);
+          }
         } else {
           contract.approve(ESCROW, cryptoAmt).then(() => {
             // the escrow contract calls the transfer once deposit() is called
