@@ -143,7 +143,7 @@ const buyerInfo: Record<Trade.Status, string> = {
   ERROR: 'This trade has a process error, we are investigating the issue',
   DEPOSIT:
     'The seller has deposited crypto, please check the transaction and send Fiat bank funds now',
-  FIATSENT: 'Waiting for the seller to recieve Bank funds',
+  FIATSENT: 'Waiting for the seller to receive Bank funds',
   UNKNOWN: '',
 };
 
