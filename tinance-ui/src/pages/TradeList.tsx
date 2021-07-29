@@ -844,6 +844,7 @@ const TradeListPage: React.FC = () => {
                         color="primary"
                         component="a"
                         align="center"
+                        target="_blank"
                         href={`${etherScanPrefix}${trade.completedHash || trade.depositHash}`}
                         className={classes.link}
                       >
