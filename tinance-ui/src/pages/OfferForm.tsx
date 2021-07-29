@@ -508,7 +508,7 @@ const OfferFormPage: React.FC = () => {
                 <Grid spacing={2} container>
                   <Grid xs={12} item>
                     <FormControlLabel
-                      label={t('Using default blank details')}
+                      label={t('Using default bank details')}
                       control={
                         <Switch
                           color="primary"
