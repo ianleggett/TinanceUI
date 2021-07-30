@@ -129,7 +129,7 @@ const OfferListPage: React.FC = () => {
 
   const { run: toggleLive, loading: toggling } = useRequest(ToggleOfferLiveService, {
     onSuccess(res) {
-      if (res.statusCode) {
+      if (res.statusCode === 0) {
         setOffers((prevState) =>
           prevState.map((offer) => {
             if (offer.id === selectedOffer) {
@@ -351,7 +351,7 @@ const OfferListPage: React.FC = () => {
                 <Switch
                   color="primary"
                   checked={offer.live}
-                  onChange={(event, checked) => handleToggleLive(event, checked, offer.id)}
+                  onChange={(event, checked) => handleToggleLive(event, checked, offer.orderId)}
                   className={classes.checkbox}
                 />
               </Tooltip>
