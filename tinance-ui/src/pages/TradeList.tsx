@@ -765,14 +765,16 @@ const TradeListPage: React.FC = () => {
                     <Typography color="textSecondary" variant="overline">
                       {t('Expiry Time')}
                     </Typography>
-                    <Typography color="primary">{dayjs().format('YYYY-MM-DD HH:mm')}</Typography>
+                    <Typography color="primary">
+                      {trade.expiry ? dayjs(trade.expiry).format('YYYY-MM-DD HH:mm') : '-'}
+                    </Typography>
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                     <Typography color="textSecondary" variant="overline">
                       {t('Remaining Time')}
                     </Typography>
                     <Typography color="primary">
-                      {dayjs().to(dayjs('2021-07-08 20:20'), true)}
+                      {trade.expiry ? dayjs().to(dayjs(trade.expiry), true) : '-'}
                     </Typography>
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>

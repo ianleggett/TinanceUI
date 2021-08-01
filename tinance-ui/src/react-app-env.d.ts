@@ -186,6 +186,7 @@ declare namespace Trade {
     completedHash?: any;
     depositHash?: any;
     created: string;
+    expiry: number;
   }
 }
 
