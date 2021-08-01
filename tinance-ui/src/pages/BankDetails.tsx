@@ -91,8 +91,12 @@ const BankDetailsPage: React.FC = () => {
 
   const { run: getUserBank, loading } = useRequest(GetUserBankService, {
     onSuccess(res) {
-      if (res && res.id) {
+      if (res) {
         setBankDetails(res);
+
+        if (!res.id) {
+          snackbar.warning(t("You haven't setup your bank account, please add bank account."));
+        }
       } else {
         snackbar.warning(t("You haven't setup your bank account, please add bank account."));
       }
