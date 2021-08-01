@@ -5,6 +5,7 @@ import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Divider from '@material-ui/core/Divider';
 import FormControl from '@material-ui/core/FormControl';
@@ -18,18 +19,20 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
+import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
+import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useWeb3React } from '@web3-react/core';
 import { useMount, useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { BigNumber } from 'ethers';
 import { useFormik } from 'formik';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
@@ -45,6 +48,7 @@ import {
   FlagFundsSentService,
   GetMyTradesService,
   GetNetworkConfigService,
+  RateTradeService,
 } from '../services';
 import { snackbar, toFixed } from '../utils';
 
@@ -135,6 +139,11 @@ const initialValues = {
   keyword: '' as string,
 };
 
+const initialValuesForDialog = {
+  rating: -1,
+  extraComments: '',
+};
+
 const buyerInfo: Record<Trade.Status, string> = {
   ARBITRATE: 'Arbitration is in process, please forward evidence to support bank payments',
   CREATED: 'Waiting for seller to deposit crypto funds',
@@ -173,9 +182,21 @@ const TradeListPage: React.FC = () => {
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
+  const [openRateTradeDialog, setOpenRateTradeDialog] = useState(false);
   const { account, library } = useWeb3React<Web3Provider>();
   const { symbol, address, decimals } = useMemo(() => {
     return TOKENS_BY_NETWORK[Networks.Kovan][0];
+  }, []);
+
+  const dialogFormikRef = useRef<any>(null);
+  const handleRateTradeDialogClose = useCallback(() => {
+    setSelectedOrderId('');
+    setOpenRateTradeDialog(false);
+
+    if (dialogFormikRef.current) {
+      dialogFormikRef.current.resetForm();
+      dialogFormikRef.current = null;
+    }
   }, []);
 
   const { run: getNetworkConfig } = useRequest(GetNetworkConfigService, {
@@ -219,6 +240,18 @@ const TradeListPage: React.FC = () => {
         setOpenAlertDialog(false);
       } else {
         snackbar.warning(res.msg || t('Cancel trade failed'));
+      }
+    },
+  });
+
+  const { run: rateTrade, loading: rating } = useRequest(RateTradeService, {
+    onSuccess(res) {
+      if (res.statusCode === 0) {
+        run();
+        handleRateTradeDialogClose();
+        snackbar.success(t('Thank you for your feedback'));
+      } else {
+        snackbar.warning(res.msg || t('Rate trade failed'));
       }
     },
   });
@@ -328,6 +361,36 @@ const TradeListPage: React.FC = () => {
       }
     },
     [formik, loading],
+  );
+
+  const dialogFormik = useFormik({
+    initialValues: initialValuesForDialog,
+    onSubmit: (values) => {
+      rateTrade({
+        ...values,
+        tradeid: selectedOrderId,
+      });
+    },
+  });
+
+  const handleRateTradeDialogOpen = useCallback(
+    (oid: string) => {
+      setSelectedOrderId(oid);
+      setOpenRateTradeDialog(true);
+      dialogFormikRef.current = dialogFormik;
+    },
+    [dialogFormik],
+  );
+
+  const handleDialogSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      if (!rating) {
+        dialogFormik.handleSubmit();
+      }
+    },
+    [dialogFormik, rating],
   );
 
   const handleDeposit = useCallback(
@@ -461,7 +524,7 @@ const TradeListPage: React.FC = () => {
       switch (trade.status) {
         case 'CREATED': {
           return isSeller ? (
-            <Button variant="contained" color="primary" onClick={() => handleDeposit(trade)}>
+            <Button color="primary" variant="contained" onClick={() => handleDeposit(trade)}>
               {depositing && trade.tradeId === selectedOrderId ? (
                 <>
                   <CircularProgress size="1em" />
@@ -479,8 +542,8 @@ const TradeListPage: React.FC = () => {
         case 'DEPOSIT': {
           return isSeller ? null : (
             <Button
-              variant="contained"
               color="primary"
+              variant="contained"
               onClick={() => handleFlagFundsSent(trade.tradeId)}
             >
               {flagging && trade.tradeId === selectedOrderId
@@ -493,8 +556,8 @@ const TradeListPage: React.FC = () => {
         case 'FIATSENT': {
           return isSeller ? (
             <Button
-              variant="contained"
               color="primary"
+              variant="contained"
               onClick={() => handleFlagComplete(trade.tradeId)}
             >
               {flagging2 && trade.tradeId === selectedOrderId
@@ -518,6 +581,18 @@ const TradeListPage: React.FC = () => {
           );
         }
 
+        case 'COMPLETED': {
+          return (
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={() => handleRateTradeDialogOpen(trade.tradeId)}
+            >
+              {t('Rate this trade')}
+            </Button>
+          );
+        }
+
         default:
           return null;
       }
@@ -529,6 +604,7 @@ const TradeListPage: React.FC = () => {
       // handleCryptoDeposit,
       handleFlagComplete,
       handleFlagFundsSent,
+      handleRateTradeDialogOpen,
       profile,
       selectedOrderId,
       t,
@@ -910,6 +986,49 @@ const TradeListPage: React.FC = () => {
             {cancelling ? t('Confirming...') : t('Confirm')}
           </Button>
         </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openRateTradeDialog}
+        onClose={handleRateTradeDialogClose}
+        aria-labelledby="rate-trade-dialog-title"
+        aria-describedby="rate-trade-dialog-description"
+      >
+        <form onSubmit={handleDialogSubmit}>
+          <DialogTitle id="rate-trade-dialog-title">{t('Rate the trade')}</DialogTitle>
+          <DialogContent>
+            <Grid spacing={2} justifyContent="center" container>
+              <Grid xs={12} item>
+                <Rating
+                  size="large"
+                  value={dialogFormik.values.rating}
+                  onChange={(event, value) => {
+                    dialogFormik.setFieldValue('rating', value ?? -1);
+                  }}
+                />
+              </Grid>
+              <Grid xs={12} item>
+                <TextareaAutosize
+                  minRows={5}
+                  maxRows={10}
+                  id="extraComments"
+                  name="extraComments"
+                  placeholder={t('Extra Comments') as string}
+                  value={dialogFormik.values.extraComments}
+                  onChange={dialogFormik.handleChange}
+                  style={{ width: '100%' }}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleRateTradeDialogClose} color="default">
+              {t('Cancel')}
+            </Button>
+            <Button type="submit" color="primary" variant="contained" autoFocus>
+              {rating ? t('Submitting...') : t('Submit')}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </>
   );

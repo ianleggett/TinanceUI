@@ -404,4 +404,12 @@ declare namespace API {
     sellerfeePct: number;
     usdtcoinCtrAddr: string;
   }
+
+  interface RateTradeParams {
+    tradeid: string;
+    rating: number;
+    extraComments?: string;
+  }
+
+  interface RateTradeResponse extends BaseResponse {}
 }
