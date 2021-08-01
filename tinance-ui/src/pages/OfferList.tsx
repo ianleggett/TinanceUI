@@ -3,6 +3,7 @@ import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
+import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -356,6 +357,9 @@ const OfferListPage: React.FC = () => {
                 />
               </Tooltip>
               <Grid container alignItems="flex-end" spacing={1}>
+                <Hidden smUp>
+                  <Grid xs={12} style={{ height: 50 }} item />
+                </Hidden>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                   <Typography variant="h5" color="primary" className={classes.title}>
                     {offer.fromccy.name} / {offer.toccy.name}
