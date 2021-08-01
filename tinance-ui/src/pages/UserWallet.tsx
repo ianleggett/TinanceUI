@@ -32,14 +32,16 @@ import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { useAppConfig } from '../components';
-import { Networks, TOKENS_BY_NETWORK } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
 import { GetNetworkConfigService, GetUserWalletService, SetUserWaletService } from '../services';
-import { injectedConnector, walletconnect, walletlink } from '../utils/connectors';
-import { useEagerConnect } from '../utils/hooks';
+import { walletconnect, walletlink } from '../utils/connectors';
+import { injectedConnector, useEagerConnect } from '../utils/hooks';
 import { snackbar } from '../utils/snackbar';
 
-const mymap = new Map<string, any>([['0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6', ERC20ABI]]);
+const USDTCoinCtrAddr = '0xa2d7D534ea1952cB9C24334464E1289A7C460F4d';
+
+// const mymap = new Map<string, any>([['0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6', ERC20ABI]]);
+const mymap = new Map<string, any>([[USDTCoinCtrAddr, ERC20ABI]]);
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -235,12 +237,14 @@ const UserWalletPage: React.FC = () => {
   const { connector, library, chainId, account, activate, deactivate, active } =
     useWeb3React<Web3Provider>();
 
-  const ABIs = useMemo(() => {
-    return (chainId ? TOKENS_BY_NETWORK[chainId] : []).map<[string, any]>(({ address, abi }) => [
-      address,
-      abi,
-    ]);
-  }, [chainId]);
+  const chid = chainId === undefined ? 0 : chainId;
+  const { symbol, address, name, decimals, abi } = {
+    address: USDTCoinCtrAddr,
+    symbol: 'USDT',
+    name: 'USDT',
+    decimals: 2,
+    abi: ERC20ABI,
+  };
 
   /** Options of Crypto and Fiat select */
   const options = useMemo(() => {
@@ -313,14 +317,16 @@ const UserWalletPage: React.FC = () => {
     }
   }, [active, account, setUserWallet]);
 
-  const { symbol, address, decimals } = useMemo(() => {
-    return TOKENS_BY_NETWORK[Networks.Kovan][0];
-  }, []);
+  // const { symbol, address, decimals } = useMemo(() => {
+  //   return TOKENS_BY_NETWORK[chainId][0];
+  // }, []);
 
   console.log(active);
+  console.log(`ChainId ${chainId} `);
   console.log(`ADDR ${address} `);
   console.log(`ACCT: ${account} `);
-  console.log(`ACCT: ${library?.getSigner} `);
+  console.log(`Signer: ${library?.getSigner} `);
+
   //  console.log(`BAL: ${balance} `);
 
   const handleSubmit = useCallback(

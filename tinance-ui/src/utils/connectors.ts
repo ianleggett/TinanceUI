@@ -2,6 +2,7 @@ import { InjectedConnector } from '@web3-react/injected-connector';
 // import { NetworkConnector } from '@web3-react/network-connector'
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
+
 // import { LedgerConnector } from '@web3-react/ledger-connector'
 // import { TrezorConnector } from '@web3-react/trezor-connector'
 // import { LatticeConnector } from '@web3-react/lattice-connector'
@@ -20,23 +21,24 @@ const RPC_URLS: { [chainId: number]: string } = {
   5: 'https://goerli.infura.io/v3/13ba69a445a244859517b9c014a5a297',
   42: 'https://kovan.infura.io/v3/13ba69a445a244859517b9c014a5a297',
 };
-export const Networks = {
-  MainNet: 1,
-  Ropsten: 3,
-  Rinkeby: 4,
-  Goerli: 5,
-  Kovan: 42,
-};
+// export const Networks = {
+//   MainNet: 1,
+//   Ropsten: 3,
+//   Rinkeby: 4,
+//   Goerli: 5,
+//   Kovan: 42,
+// };
 
-export const injectedConnector = new InjectedConnector({
-  supportedChainIds: [
-    Networks.MainNet, // Mainet
-    Networks.Ropsten, // Ropsten
-    Networks.Rinkeby, // Rinkeby
-    Networks.Goerli, // Goerli
-    Networks.Kovan, // Kovan
-  ],
-});
+// export const injectedConnector = new InjectedConnector({
+//   supportedChainIds: [
+//     Networks.MainNet, // Mainet
+//     Networks.Ropsten, // Ropsten
+//     Networks.Rinkeby, // Rinkeby
+//     Networks.Goerli, // Goerli
+//     Networks.Kovan, // Kovan
+//     Networks.Local, // Kovan
+//   ],
+// });
 
 // export const network = new NetworkConnector({
 //   urls: { 1: RPC_URLS[1], 4: RPC_URLS[4] },

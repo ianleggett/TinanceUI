@@ -2,7 +2,7 @@ import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { useEffect, useState } from 'react';
 
-import { Networks } from './connectors';
+import { Networks } from '../constants';
 
 export const injectedConnector = new InjectedConnector({
   supportedChainIds: [
@@ -11,6 +11,7 @@ export const injectedConnector = new InjectedConnector({
     Networks.Rinkeby, // Rinkeby
     Networks.Goerli, // Goerli
     Networks.Kovan, // Kovan
+    Networks.Local, // Local
   ],
 });
 

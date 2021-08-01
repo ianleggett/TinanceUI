@@ -33,7 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
 import { useUserManagerState } from '../components';
-import { Networks, TOKENS_BY_NETWORK, tradeStatusMap } from '../constants';
+import { tradeStatusMap } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
 import ESCROWABI from '../constants/ESCROW.abi.json';
 import {
@@ -49,7 +49,7 @@ import { snackbar, toFixed } from '../utils';
 
 const USDT_DECIMALS = 2;
 // this comes from swagger API call getnetworkconfig.json
-const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
+// const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
 
 const useStyles = makeStyles((theme) => ({
   filter: {
@@ -166,16 +166,28 @@ const TradeListPage: React.FC = () => {
   const { t } = useTranslation();
   const { profile } = useUserManagerState();
   const [loading, setLoading] = useState(true);
-  const [{ etherScanPrefix }, setNetworkConfig] = useState<any>({
+  const [{ etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr }, setNetworkConfig] = useState<any>({
     etherScanPrefix: 'https://kovan.etherscan.io/tx/',
+    escrowCtrAddr: '',
+    USDTCoinCtrAddr: '',
   });
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
-  const { account, library } = useWeb3React<Web3Provider>();
-  const { symbol, address, decimals } = useMemo(() => {
-    return TOKENS_BY_NETWORK[Networks.Kovan][0];
-  }, []);
+  const { account, library, chainId } = useWeb3React<Web3Provider>();
+
+  const chid = chainId === undefined ? 0 : chainId;
+  const { symbol, address, name, decimals, abi } = {
+    address: USDTCoinCtrAddr,
+    symbol: 'USDT',
+    name: 'USDT',
+    decimals: 2,
+    abi: ERC20ABI,
+  };
+
+  // const { symbol, address, decimals } = useMemo(() => {
+  //   return TOKENS_BY_NETWORK[chainId][0];
+  // }, [chainId]);
 
   const { run: getNetworkConfig } = useRequest(GetNetworkConfigService, {
     onSuccess(res) {
@@ -354,7 +366,7 @@ const TradeListPage: React.FC = () => {
           return;
         }
         // account is user account, what is current user allowance ??
-        contract.allowance(account, ESCROW).then((val: BigNumber) => {
+        contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
           if (!val.isZero()) {
             if (!val.eq(cryptoAmt)) {
               snackbar.warning(
@@ -362,13 +374,13 @@ const TradeListPage: React.FC = () => {
                   `Your allowance needs to be reset before transacting (currently : ${val}), please reset and try again !!`,
                 ),
               );
-              contract.approve(ESCROW, 0);
+              contract.approve(escrowCtrAddr, 0);
             } else {
               depositCrypto({ oid });
               setSelectedOrderId(oid);
             }
           } else {
-            contract.approve(ESCROW, cryptoAmt).then(() => {
+            contract.approve(escrowCtrAddr, cryptoAmt).then(() => {
               // the escrow contract calls the transfer once deposit() is called
               // console.log('Here to execute next step');
               // alert('call here API v1/deposit( ctrid )');
@@ -380,7 +392,7 @@ const TradeListPage: React.FC = () => {
       });
     },
     // [library, account],
-    [library, account, address, symbol, decimals, depositCrypto, t],
+    [library, account, address, symbol, decimals, escrowCtrAddr, depositCrypto, t],
   );
 
   const handleAlertDialogOpen = useCallback((oid: string) => {
@@ -418,7 +430,7 @@ const TradeListPage: React.FC = () => {
         console.log('library undefined, return');
         return;
       }
-      const thisEscrow = new Contract(ESCROW, ESCROWABI, library.getSigner());
+      const thisEscrow = new Contract(escrowCtrAddr, ESCROWABI, library.getSigner());
       const orderIdNumeric = BigInt(`0x${oid}`);
       thisEscrow.releaseEscrow(orderIdNumeric).then((val: TransactionResponse) => {
         // alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
@@ -430,7 +442,7 @@ const TradeListPage: React.FC = () => {
         cancelCancel();
       });
     },
-    [library, cancelCancel, flagComplete],
+    [library, escrowCtrAddr, cancelCancel, flagComplete],
   );
 
   const handleAcceptCancel = useCallback(
