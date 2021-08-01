@@ -133,7 +133,7 @@ const OfferListPage: React.FC = () => {
       if (res.statusCode === 0) {
         setOffers((prevState) =>
           prevState.map((offer) => {
-            if (offer.id === selectedOffer) {
+            if (offer.orderId === selectedOffer) {
               offer.live = !offer.live;
             }
             return offer;
