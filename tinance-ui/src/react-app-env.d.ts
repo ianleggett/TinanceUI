@@ -121,11 +121,17 @@ declare namespace Offer {
     updated: number;
     paymentDetails: PublicData.BankDetail[];
     userDetails: {
-      blurb?: string;
+      cid: number;
+      aveTradeTime: string;
       cid: number;
       countryISO: string;
       feedback: number;
-      token?: string;
+      lastseen: string;
+      ratedCount: number;
+      ratedScoreTotal: number;
+      tradeCancelCount: number;
+      tradeCount: number;
+      tradeVolume: number;
       tradecount: number;
       username: string;
     };

@@ -27,6 +27,7 @@ import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useWeb3React } from '@web3-react/core';
 import { useMount, useRequest, useUnmount } from 'ahooks';
+import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useCallback, useMemo, useState } from 'react';
@@ -507,23 +508,54 @@ const MarketListPage: React.FC = () => {
                   </Typography>
                   <Typography color="primary">{offer.userDetails.username}</Typography>
                 </Grid>
+
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    {t('Trades')}
+                    {offer.userDetails.ratedCount
+                      ? `${t('Rating')} (${offer.userDetails.ratedCount})`
+                      : t('Rating')}
+                  </Typography>
+                  <Box component="div">
+                    <Rating size="small" value={offer.userDetails.feedback} readOnly />
+                  </Box>
+                </Grid>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Rated Count')}
+                  </Typography>
+                  <Typography color="primary">{offer.userDetails.ratedCount ?? 0}</Typography>
+                </Grid>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Trade Count')}
                   </Typography>
                   <Typography color="primary">
                     {t('0 Trades', {
-                      trades: offer.userDetails.tradecount,
+                      trades: offer.userDetails.tradeCount ?? 0,
                     })}
                   </Typography>
                 </Grid>
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    {t('Rating')}
+                    {t('Trade Volume')}
                   </Typography>
-                  <Box component="div">
-                    <Rating size="small" value={offer.userDetails.feedback} readOnly />
-                  </Box>
+                  <Typography color="primary">{offer.userDetails.tradeVolume ?? 0}</Typography>
+                </Grid>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Trade Cancel Count')}
+                  </Typography>
+                  <Typography color="primary">{offer.userDetails.tradeCancelCount ?? 0}</Typography>
+                </Grid>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Average Trade Time')}
+                  </Typography>
+                  <Typography color="primary">
+                    {offer.userDetails.aveTradeTime
+                      ? dayjs(offer.userDetails.aveTradeTime).format('YYYY-MM-DD HH:mm')
+                      : '-'}
+                  </Typography>
                 </Grid>
                 {confirming && offer.orderId === currentOrderId ? (
                   <>
