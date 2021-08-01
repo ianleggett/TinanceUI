@@ -521,12 +521,6 @@ const MarketListPage: React.FC = () => {
                 </Grid>
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    {t('Rated Count')}
-                  </Typography>
-                  <Typography color="primary">{offer.userDetails.ratedCount ?? 0}</Typography>
-                </Grid>
-                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
-                  <Typography color="textSecondary" variant="overline">
                     {t('Trade Count')}
                   </Typography>
                   <Typography color="primary">

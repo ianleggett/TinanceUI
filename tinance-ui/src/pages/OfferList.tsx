@@ -424,7 +424,11 @@ const OfferListPage: React.FC = () => {
                   <Typography color="textSecondary" variant="overline">
                     {t('Remaining Time')}
                   </Typography>
-                  <Typography color="primary">{dayjs().to(dayjs(offer.expiry), true)}</Typography>
+                  <Typography color="primary">
+                    {dayjs().isAfter(dayjs(offer.expiry))
+                      ? '-'
+                      : dayjs().to(dayjs(offer.expiry), true)}
+                  </Typography>
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
