@@ -18,6 +18,7 @@ export * from './get-user-details';
 export * from './get-user-trades';
 export * from './get-user-wallet';
 export * from './get-validation-regex';
+export * from './rate-trade';
 export * from './reset-password';
 export * from './set-user-wallet';
 export * from './signin';

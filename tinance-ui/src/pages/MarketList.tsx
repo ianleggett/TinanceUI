@@ -6,6 +6,7 @@ import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
+import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -26,6 +27,7 @@ import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useWeb3React } from '@web3-react/core';
 import { useMount, useRequest, useUnmount } from 'ahooks';
+import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useCallback, useMemo, useState } from 'react';
@@ -444,6 +446,9 @@ const MarketListPage: React.FC = () => {
                 style={{ color: '#D97706', borderColor: '#D97706' }}
               />
               <Grid container alignItems="center" spacing={1}>
+                <Hidden smUp>
+                  <Grid xs={12} style={{ height: 50 }} item />
+                </Hidden>
                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                   <Typography variant="h5" color="primary" className={classes.title}>
                     {offer.fromccy.name} / {offer.toccy.name}
@@ -503,23 +508,48 @@ const MarketListPage: React.FC = () => {
                   </Typography>
                   <Typography color="primary">{offer.userDetails.username}</Typography>
                 </Grid>
+
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    {t('Trades')}
+                    {offer.userDetails.ratedCount
+                      ? `${t('Rating')} (${offer.userDetails.ratedCount})`
+                      : t('Rating')}
+                  </Typography>
+                  <Box component="div">
+                    <Rating size="small" value={offer.userDetails.feedback} readOnly />
+                  </Box>
+                </Grid>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Trade Count')}
                   </Typography>
                   <Typography color="primary">
                     {t('0 Trades', {
-                      trades: offer.userDetails.tradecount,
+                      trades: offer.userDetails.tradeCount ?? 0,
                     })}
                   </Typography>
                 </Grid>
                 <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
                   <Typography color="textSecondary" variant="overline">
-                    {t('Rating')}
+                    {t('Trade Volume')}
                   </Typography>
-                  <Box component="div">
-                    <Rating size="small" value={offer.userDetails.feedback} readOnly />
-                  </Box>
+                  <Typography color="primary">{offer.userDetails.tradeVolume ?? 0}</Typography>
+                </Grid>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Trade Cancel Count')}
+                  </Typography>
+                  <Typography color="primary">{offer.userDetails.tradeCancelCount ?? 0}</Typography>
+                </Grid>
+                <Grid xs={6} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Average Trade Time')}
+                  </Typography>
+                  <Typography color="primary">
+                    {offer.userDetails.aveTradeTime
+                      ? dayjs(offer.userDetails.aveTradeTime).format('YYYY-MM-DD HH:mm')
+                      : '-'}
+                  </Typography>
                 </Grid>
                 {confirming && offer.orderId === currentOrderId ? (
                   <>

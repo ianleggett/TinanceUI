@@ -121,11 +121,17 @@ declare namespace Offer {
     updated: number;
     paymentDetails: PublicData.BankDetail[];
     userDetails: {
-      blurb?: string;
+      cid: number;
+      aveTradeTime: string;
       cid: number;
       countryISO: string;
       feedback: number;
-      token?: string;
+      lastseen: string;
+      ratedCount: number;
+      ratedScoreTotal: number;
+      tradeCancelCount: number;
+      tradeCount: number;
+      tradeVolume: number;
       tradecount: number;
       username: string;
     };
@@ -186,6 +192,7 @@ declare namespace Trade {
     completedHash?: any;
     depositHash?: any;
     created: string;
+    expiry: number;
   }
 }
 
@@ -397,4 +404,12 @@ declare namespace API {
     sellerfeePct: number;
     usdtcoinCtrAddr: string;
   }
+
+  interface RateTradeParams {
+    tradeid: string;
+    rating: number;
+    extraComments?: string;
+  }
+
+  interface RateTradeResponse extends BaseResponse {}
 }

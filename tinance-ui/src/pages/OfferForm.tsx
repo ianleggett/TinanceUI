@@ -669,6 +669,7 @@ const OfferFormPage: React.FC = () => {
                   variant="outlined"
                   onClick={handleNext}
                   className={classes.right}
+                  disabled={dayjs(expiryTime).isBefore(dayjs())}
                 >
                   {loading
                     ? t(oid ? 'Updating...' : 'Creating...')
