@@ -140,7 +140,7 @@ const WalletConnection: React.FC = () => {
   }, [dispatch]);
 
   enum ConnectorNames {
-    Injected = 'Injected',
+    Injected = 'MetaMask / Local',
     // Network = 'Network',
     WalletConnect = 'WalletConnect',
     WalletLink = 'WalletLink',
