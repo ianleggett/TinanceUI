@@ -439,12 +439,16 @@ const TradeListPage: React.FC = () => {
               setSelectedOrderId(oid);
             }
           } else {
-            contract.approve(escrowCtrAddr, cryptoAmt).then((txnval: TransactionReceipt) => {
-              // the escrow contract calls the transfer once deposit() is called
-              // console.log('Here to execute next step');
-              // alert('call here API v1/deposit( ctrid )');
-              depositCrypto({ oid });
-              setSelectedOrderId(oid);
+            contract.approve(escrowCtrAddr, cryptoAmt).then((txnval: TransactionResponse) => {
+              console.log(txnval);
+              txnval.wait(1).then((txnRec) => {
+                console.log('1 block waited');
+                // the escrow contract calls the transfer once deposit() is called
+                // console.log('Here to execute next step');
+                // alert('call here API v1/deposit( ctrid )');
+                depositCrypto({ oid });
+                setSelectedOrderId(oid);
+              });
             });
           }
         });
