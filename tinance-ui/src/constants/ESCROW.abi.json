@@ -43,23 +43,18 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "fee",
+						"name": "sellerfee",
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint32",
-						"name": "expiry",
-						"type": "uint32"
+						"internalType": "uint256",
+						"name": "buyerfee",
+						"type": "uint256"
 					},
 					{
 						"internalType": "enum TinanceEscrow.EscrowStatus",
 						"name": "status",
 						"type": "uint8"
-					},
-					{
-						"internalType": "bool",
-						"name": "refundApproved",
-						"type": "bool"
 					}
 				],
 				"indexed": false,
@@ -104,23 +99,18 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "fee",
+						"name": "sellerfee",
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint32",
-						"name": "expiry",
-						"type": "uint32"
+						"internalType": "uint256",
+						"name": "buyerfee",
+						"type": "uint256"
 					},
 					{
 						"internalType": "enum TinanceEscrow.EscrowStatus",
 						"name": "status",
 						"type": "uint8"
-					},
-					{
-						"internalType": "bool",
-						"name": "refundApproved",
-						"type": "bool"
 					}
 				],
 				"indexed": false,
@@ -190,23 +180,18 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "fee",
+						"name": "sellerfee",
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint32",
-						"name": "expiry",
-						"type": "uint32"
+						"internalType": "uint256",
+						"name": "buyerfee",
+						"type": "uint256"
 					},
 					{
 						"internalType": "enum TinanceEscrow.EscrowStatus",
 						"name": "status",
 						"type": "uint8"
-					},
-					{
-						"internalType": "bool",
-						"name": "refundApproved",
-						"type": "bool"
 					}
 				],
 				"indexed": false,
@@ -264,23 +249,18 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "fee",
+						"name": "sellerfee",
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint32",
-						"name": "expiry",
-						"type": "uint32"
+						"internalType": "uint256",
+						"name": "buyerfee",
+						"type": "uint256"
 					},
 					{
 						"internalType": "enum TinanceEscrow.EscrowStatus",
 						"name": "status",
 						"type": "uint8"
-					},
-					{
-						"internalType": "bool",
-						"name": "refundApproved",
-						"type": "bool"
 					}
 				],
 				"indexed": false,
@@ -290,6 +270,19 @@
 			}
 		],
 		"name": "EscrowFail",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "orderId",
+				"type": "uint256"
+			}
+		],
+		"name": "EscrowRefund",
 		"type": "event"
 	},
 	{
@@ -325,23 +318,18 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "fee",
+						"name": "sellerfee",
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint32",
-						"name": "expiry",
-						"type": "uint32"
+						"internalType": "uint256",
+						"name": "buyerfee",
+						"type": "uint256"
 					},
 					{
 						"internalType": "enum TinanceEscrow.EscrowStatus",
 						"name": "status",
 						"type": "uint8"
-					},
-					{
-						"internalType": "bool",
-						"name": "refundApproved",
-						"type": "bool"
 					}
 				],
 				"indexed": false,
@@ -386,23 +374,18 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "fee",
+						"name": "sellerfee",
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint32",
-						"name": "expiry",
-						"type": "uint32"
+						"internalType": "uint256",
+						"name": "buyerfee",
+						"type": "uint256"
 					},
 					{
 						"internalType": "enum TinanceEscrow.EscrowStatus",
 						"name": "status",
 						"type": "uint8"
-					},
-					{
-						"internalType": "bool",
-						"name": "refundApproved",
-						"type": "bool"
 					}
 				],
 				"indexed": false,
@@ -439,6 +422,37 @@
 				"internalType": "uint256",
 				"name": "_orderId",
 				"type": "uint256"
+			}
+		],
+		"name": "approveRefund",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_orderId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint8",
+				"name": "_buyerPercent",
+				"type": "uint8"
+			}
+		],
+		"name": "arbitrationEscrow",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_orderId",
+				"type": "uint256"
 			},
 			{
 				"internalType": "address payable",
@@ -457,13 +471,13 @@
 			},
 			{
 				"internalType": "uint256",
-				"name": "_fee",
+				"name": "_sellerfee",
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint32",
-				"name": "_expiry",
-				"type": "uint32"
+				"internalType": "uint256",
+				"name": "_buyerfee",
+				"type": "uint256"
 			}
 		],
 		"name": "createEscrow",
@@ -503,23 +517,18 @@
 			},
 			{
 				"internalType": "uint256",
-				"name": "fee",
+				"name": "sellerfee",
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint32",
-				"name": "expiry",
-				"type": "uint32"
+				"internalType": "uint256",
+				"name": "buyerfee",
+				"type": "uint256"
 			},
 			{
 				"internalType": "enum TinanceEscrow.EscrowStatus",
 				"name": "status",
 				"type": "uint8"
-			},
-			{
-				"internalType": "bool",
-				"name": "refundApproved",
-				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -558,8 +567,53 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_orderId",
+				"type": "uint256"
+			}
+		],
+		"name": "getBuyerFee",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getCCY",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "getContractBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getFeesAvailable",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -578,7 +632,7 @@
 				"type": "uint256"
 			}
 		],
-		"name": "getFee",
+		"name": "getSellerFee",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -659,14 +713,9 @@
 				"internalType": "uint256",
 				"name": "_orderId",
 				"type": "uint256"
-			},
-			{
-				"internalType": "uint8",
-				"name": "_buyerPercent",
-				"type": "uint8"
 			}
 		],
-		"name": "refundEscrow",
+		"name": "refundSeller",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -687,6 +736,19 @@
 	{
 		"inputs": [],
 		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_orderId",
+				"type": "uint256"
+			}
+		],
+		"name": "setArbitration",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -719,7 +781,7 @@
 		],
 		"name": "withdrawFees",
 		"outputs": [],
-		"stateMutability": "payable",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

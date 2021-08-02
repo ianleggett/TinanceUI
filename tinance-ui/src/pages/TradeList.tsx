@@ -1,5 +1,5 @@
 import { Contract } from '@ethersproject/contracts';
-import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import { TransactionReceipt, TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -178,14 +178,14 @@ const TradeListPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [{ etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr }, setNetworkConfig] = useState<any>({
     etherScanPrefix: 'https://kovan.etherscan.io/tx/',
-    escrowCtrAddr: '',
-    USDTCoinCtrAddr: '',
+    escrowCtrAddr: '0x25b605D31B85a38c34c0a94cC26ceB6817f86E0D',
+    USDTCoinCtrAddr: '0xa2d7D534ea1952cB9C24334464E1289A7C460F4d',
   });
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openRateTradeDialog, setOpenRateTradeDialog] = useState(false);
-  const { account, library } = useWeb3React<Web3Provider>();
+  const { account, library, connector } = useWeb3React<Web3Provider>();
 
   const { symbol, address, name, decimals, abi } = {
     address: USDTCoinCtrAddr,
@@ -409,6 +409,9 @@ const TradeListPage: React.FC = () => {
       const cryptoAmt = Math.round(amt * 10 ** decimals);
       console.log(`deposit ${amt} ${symbol}`);
       console.log(`units ${cryptoAmt}`);
+      console.log(`coin addr ${address}`);
+      console.log(`user acct ${account}`);
+      console.log(`escrow addr ${escrowCtrAddr}`);
       if (library === undefined) {
         snackbar.warning(t('Please connect wallet'));
         return;
@@ -426,20 +429,17 @@ const TradeListPage: React.FC = () => {
         }
         // account is user account, what is current user allowance ??
         contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
+          let txn;
           if (!val.isZero()) {
             if (!val.eq(cryptoAmt)) {
-              snackbar.warning(
-                t(
-                  `Your allowance needs to be reset before transacting (currently : ${val}), please reset and try again !!`,
-                ),
-              );
-              contract.approve(escrowCtrAddr, 0);
+              snackbar.warning(t(`Allowance reset ( ${val}), please try again !!`));
+              txn = contract.approve(escrowCtrAddr, 0);
             } else {
               depositCrypto({ oid });
               setSelectedOrderId(oid);
             }
           } else {
-            contract.approve(escrowCtrAddr, cryptoAmt).then(() => {
+            contract.approve(escrowCtrAddr, cryptoAmt).then((txnval: TransactionReceipt) => {
               // the escrow contract calls the transfer once deposit() is called
               // console.log('Here to execute next step');
               // alert('call here API v1/deposit( ctrid )');
