@@ -1,5 +1,7 @@
 import { Contract } from '@ethersproject/contracts';
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import Backdrop from '@material-ui/core/Backdrop';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -134,6 +136,14 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: 1.5,
     border: `1px dashed ${theme.palette.primary.light}`,
     borderRadius: 5,
+  },
+  backdrop: {
+    zIndex: theme.zIndex.tooltip + 1,
+  },
+  loading: {
+    userSelect: 'none',
+    color: theme.palette.common.white,
+    marginTop: theme.spacing(2),
   },
 }));
 
@@ -1190,6 +1200,14 @@ const TradeListPage: React.FC = () => {
           </DialogActions>
         </form>
       </Dialog>
+      <Backdrop open={depositing} className={classes.backdrop}>
+        <Box alignItems="center" justifyContent="center" color="#fff" textAlign="center">
+          <CircularProgress color="inherit" />
+          <Typography variant="h5" className={classes.loading}>
+            Depositing, please don&apos;t close or refresh the page.
+          </Typography>
+        </Box>
+      </Backdrop>
     </>
   );
 };
