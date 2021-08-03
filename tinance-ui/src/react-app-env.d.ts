@@ -165,7 +165,8 @@ declare namespace Trade {
       username: string;
     };
     buyerAddress: string;
-    bu;
+    buyerRating: number;
+    commentAboutSeller?: string;
     seller: {
       cid: number;
       countryISO: string;
@@ -176,6 +177,8 @@ declare namespace Trade {
     };
     sellerBankDetails: PublicData.BankDetail;
     sellerAddress: string;
+    sellerRating: number;
+    commentAboutBuyer?: string;
     fromccy: PublicData.CCYCode;
     fromAmount: number;
     toccy: PublicData.CCYCode;
@@ -409,7 +412,7 @@ declare namespace API {
   interface RateTradeParams {
     tradeid: string;
     rating: number;
-    extraComments?: string;
+    comment?: string;
   }
 
   interface RateTradeResponse extends BaseResponse {}

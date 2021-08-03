@@ -1,5 +1,5 @@
 import { Contract } from '@ethersproject/contracts';
-import { TransactionReceipt, TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -23,6 +23,7 @@ import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
@@ -141,7 +142,7 @@ const initialValues = {
 
 const initialValuesForDialog = {
   rating: -1,
-  extraComments: '',
+  comment: '',
 };
 
 const buyerInfo: Record<Trade.Status, string> = {
@@ -592,18 +593,6 @@ const TradeListPage: React.FC = () => {
           );
         }
 
-        case 'COMPLETED': {
-          return (
-            <Button
-              color="primary"
-              variant="contained"
-              onClick={() => handleRateTradeDialogOpen(trade.tradeId)}
-            >
-              {t('Rate this trade')}
-            </Button>
-          );
-        }
-
         default:
           return null;
       }
@@ -612,10 +601,8 @@ const TradeListPage: React.FC = () => {
       depositing,
       flagging,
       flagging2,
-      // handleCryptoDeposit,
       handleFlagComplete,
       handleFlagFundsSent,
-      handleRateTradeDialogOpen,
       profile,
       selectedOrderId,
       t,
@@ -666,11 +653,73 @@ const TradeListPage: React.FC = () => {
           );
         }
 
+        case 'COMPLETED': {
+          if (isSeller && trade.buyerRating !== -1) {
+            return (
+              <>
+                <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Rating')}
+                  </Typography>
+                  <Rating value={trade.buyerRating} size="small" readOnly />
+                </Grid>
+                {trade.commentAboutBuyer ? (
+                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                    <Typography color="textSecondary" variant="overline">
+                      {t('Comment')}
+                    </Typography>
+                    <Typography color="primary">{trade.commentAboutBuyer}</Typography>
+                  </Grid>
+                ) : null}
+              </>
+            );
+          }
+
+          if (!isSeller && trade.sellerRating !== -1) {
+            return (
+              <>
+                <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                  <Typography color="textSecondary" variant="overline">
+                    {t('Rating')}
+                  </Typography>
+                  <Rating value={trade.sellerRating} size="small" readOnly />
+                </Grid>
+                {trade.commentAboutSeller ? (
+                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                    <Typography color="textSecondary" variant="overline">
+                      {t('Comment')}
+                    </Typography>
+                    <Typography color="primary">{trade.commentAboutSeller}</Typography>
+                  </Grid>
+                ) : null}
+              </>
+            );
+          }
+
+          return (
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={() => handleRateTradeDialogOpen(trade.tradeId)}
+            >
+              {t('Rate this trade')}
+            </Button>
+          );
+        }
+
         default:
           return null;
       }
     },
-    [acceptting, handleAcceptCancel, handleAlertDialogOpen, profile, selectedOrderId, t],
+    [
+      acceptting,
+      handleAcceptCancel,
+      handleAlertDialogOpen,
+      handleRateTradeDialogOpen,
+      profile,
+      selectedOrderId,
+      t,
+    ],
   );
 
   useMount(run);
@@ -1029,10 +1078,10 @@ const TradeListPage: React.FC = () => {
                 <TextareaAutosize
                   minRows={5}
                   maxRows={10}
-                  id="extraComments"
-                  name="extraComments"
-                  placeholder={t('Extra Comments') as string}
-                  value={dialogFormik.values.extraComments}
+                  id="comment"
+                  name="comment"
+                  placeholder={t('Comment') as string}
+                  value={dialogFormik.values.comment}
                   onChange={dialogFormik.handleChange}
                   style={{ width: '100%' }}
                 />
