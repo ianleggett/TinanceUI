@@ -27,7 +27,6 @@ import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useWeb3React } from '@web3-react/core';
 import { useMount, useRequest, useUnmount } from 'ahooks';
-import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useCallback, useMemo, useState } from 'react';
@@ -545,11 +544,7 @@ const MarketListPage: React.FC = () => {
                   <Typography color="textSecondary" variant="overline">
                     {t('Average Trade Time')}
                   </Typography>
-                  <Typography color="primary">
-                    {offer.userDetails.aveTradeTime
-                      ? dayjs(offer.userDetails.aveTradeTime).format('YYYY-MM-DD HH:mm')
-                      : '-'}
-                  </Typography>
+                  <Typography color="primary">{offer.userDetails.aveTradeTime ?? '-'}</Typography>
                 </Grid>
                 {confirming && offer.orderId === currentOrderId ? (
                   <>
@@ -648,9 +643,10 @@ const MarketListPage: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Grid xs={false} sm={false} md={6} lg={6} xl={6} item />
+                    <Grid xs={false} sm={false} md={9} lg={9} xl={9} item />
                     <Grid xs={12} sm={12} md={3} lg={3} xl={3} item>
                       <Button
+                        fullWidth
                         color="secondary"
                         variant="outlined"
                         onClick={() => handleTakeOverOffer(offer.orderId)}

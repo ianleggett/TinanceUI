@@ -247,7 +247,7 @@ const OfferFormPage: React.FC = () => {
           orderid: oid,
           fromamt: fromamt ? Number.parseInt(fromamt, 10) : 0,
           toamt: fromamt ? Number.parseInt(toamt, 10) : 0,
-          expiry: expiryTime.format(formatter),
+          expiry: expiryTime.utc().format(formatter),
           ...restValues,
         });
       } else {
@@ -257,7 +257,7 @@ const OfferFormPage: React.FC = () => {
           orderid: oid,
           fromamt: fromamt ? Number.parseInt(fromamt, 10) : 0,
           toamt: fromamt ? Number.parseInt(toamt, 10) : 0,
-          expiry: expiryTime.format(formatter),
+          expiry: expiryTime.utc().format(formatter),
           payType,
           ...restValues,
         });
@@ -308,7 +308,7 @@ const OfferFormPage: React.FC = () => {
       const [paymentDetail] = cachedOffer.paymentDetails;
 
       setUsingDefault(false);
-      setExpiryTime(dayjs(cachedOffer.expiry));
+      setExpiryTime(dayjs.utc(cachedOffer.expiry, 'YYYY-MM-DD HH:mm:ss.SSS').local());
 
       formik.setFieldValue('fromccyid', cachedOffer.fromccy.id);
       formik.setFieldValue('fromamt', cachedOffer.fromAmount.toString());
@@ -649,6 +649,17 @@ const OfferFormPage: React.FC = () => {
                       disablePast
                       fullWidth
                     />
+                  </Grid>
+                  <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                    {expiryTime.isAfter(dayjs()) ? (
+                      <Typography variant="body1" color="primary">
+                        This offer will be expired {expiryTime.fromNow()}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body1" color="secondary">
+                        This offer has been expired {expiryTime.fromNow()}
+                      </Typography>
+                    )}
                   </Grid>
                 </Grid>
               </CardContent>

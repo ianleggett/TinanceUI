@@ -3,7 +3,6 @@ import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from '@ethersproject
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { Web3ReactProvider } from '@web3-react/core';
 import { UseRequestProvider } from 'ahooks';
 import { SnackbarProvider } from 'notistack';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';

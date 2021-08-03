@@ -409,7 +409,10 @@ const OfferListPage: React.FC = () => {
                     {t('Created Time')}
                   </Typography>
                   <Typography color="primary">
-                    {dayjs(offer.created).format('YYYY-MM-DD HH:mm')}
+                    {dayjs
+                      .utc(offer.created, 'YYYY-MM-DD HH:mm:ss.SSS')
+                      .local()
+                      .format('YYYY-MM-DD HH:mm')}
                   </Typography>
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
@@ -417,7 +420,10 @@ const OfferListPage: React.FC = () => {
                     {t('Expiry Time')}
                   </Typography>
                   <Typography color="primary">
-                    {dayjs(offer.expiry).format('YYYY-MM-DD HH:mm')}
+                    {dayjs
+                      .utc(offer.expiry, 'YYYY-MM-DD HH:mm:ss.SSS')
+                      .local()
+                      .format('YYYY-MM-DD HH:mm')}
                   </Typography>
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>

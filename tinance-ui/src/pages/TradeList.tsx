@@ -849,7 +849,10 @@ const TradeListPage: React.FC = () => {
                       {t('Created Time')}
                     </Typography>
                     <Typography color="primary">
-                      {dayjs(trade.created).format('YYYY-MM-DD HH:mm')}
+                      {dayjs
+                        .utc(trade.created, 'YYYY-MM-DD HH:mm:ss.SSS')
+                        .local()
+                        .format('YYYY-MM-DD HH:mm')}
                     </Typography>
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
@@ -857,7 +860,12 @@ const TradeListPage: React.FC = () => {
                       {t('Expiry Time')}
                     </Typography>
                     <Typography color="primary">
-                      {trade.expiry ? dayjs(trade.expiry).format('YYYY-MM-DD HH:mm') : '-'}
+                      {trade.expiry
+                        ? dayjs
+                            .utc(trade.expiry, 'YYYY-MM-DD HH:mm:ss.SSS')
+                            .local()
+                            .format('YYYY-MM-DD HH:mm')
+                        : '-'}
                     </Typography>
                   </Grid>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
