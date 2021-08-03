@@ -69,6 +69,7 @@ const initialValues = {
   field3value: '',
   field4value: '',
   field5value: '',
+  usernotes: '',
 };
 
 const BankDetailsPage: React.FC = () => {
@@ -160,6 +161,7 @@ const BankDetailsPage: React.FC = () => {
       formik.setFieldValue('field3value', bankDetails.field3value);
       formik.setFieldValue('field4value', bankDetails.field4value);
       formik.setFieldValue('field5value', bankDetails.field5value);
+      formik.setFieldValue('usernotes', bankDetails.usernotes);
     }
   }, [bankDetails]);
 
@@ -267,6 +269,17 @@ const BankDetailsPage: React.FC = () => {
                   variant="outlined"
                   label={payType.field5name}
                   value={formik.values.field5value}
+                  onChange={formik.handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid xs={12} item>
+                <TextField
+                  id="usernotes"
+                  name="usernotes"
+                  variant="outlined"
+                  label="Notes"
+                  value={formik.values.usernotes}
                   onChange={formik.handleChange}
                   fullWidth
                 />

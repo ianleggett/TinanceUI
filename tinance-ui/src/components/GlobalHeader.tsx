@@ -20,8 +20,7 @@ import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutline
 import AttachMoneyOutlinedIcon from '@material-ui/icons/AttachMoneyOutlined';
 import ExpandMoreOutlinedIcon from '@material-ui/icons/ExpandMoreOutlined';
 import MenuOutlinedIcon from '@material-ui/icons/MenuOutlined';
-import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined';
-import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
+import { useWeb3React } from '@web3-react/core';
 import { useRequest } from 'ahooks';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -163,6 +162,16 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
     history.push('/account/profile');
   }, [history]);
 
+  const handleGoToUserWalletPage = useCallback(() => {
+    setUserMenu(null);
+    history.push('/account/wallet');
+  }, [history]);
+
+  const handleGoToBankDetailsPage = useCallback(() => {
+    setUserMenu(null);
+    history.push('/account/bank-details');
+  }, [history]);
+
   const handleGoToChangePasswordPage = useCallback(() => {
     setUserMenu(null);
     history.push('/account/password');
@@ -252,12 +261,6 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
                   </ListItemIcon>
                   <ListItemText primary="Trades" onClick={handleGoToTradesPage} />
                 </ListItem>
-                <ListItem button divider>
-                  <ListItemIcon>
-                    <MoreHorizOutlinedIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="More" />
-                </ListItem>
               </List>
             </SwipeableDrawer>
           </Hidden>
@@ -285,6 +288,12 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
                 >
                   <MenuItem key="profile" onClick={handleGoToProfilePage}>
                     {t('User Profile')}
+                  </MenuItem>
+                  <MenuItem key="wallet" onClick={handleGoToUserWalletPage}>
+                    {t('User Wallet')}
+                  </MenuItem>
+                  <MenuItem key="bank-details" onClick={handleGoToBankDetailsPage}>
+                    {t('Bank Details')}
                   </MenuItem>
                   <MenuItem key="password" onClick={handleGoToChangePasswordPage}>
                     {t('Change Password')}

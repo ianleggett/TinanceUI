@@ -90,6 +90,7 @@ interface InitialValues {
     field3value: string;
     field4value: string;
     field5value: string;
+    usernotes: string;
   };
 }
 
@@ -105,6 +106,7 @@ const initialValues: InitialValues = {
     field3value: '',
     field4value: '',
     field5value: '',
+    usernotes: '',
   },
 };
 
@@ -163,7 +165,7 @@ const OfferFormPage: React.FC = () => {
       return initialValues.payType;
     }
 
-    const { field1value, field2value, field3value, field4value, field5value, payType } =
+    const { field1value, field2value, field3value, field4value, field5value, usernotes, payType } =
       bankDetails;
 
     return {
@@ -172,6 +174,7 @@ const OfferFormPage: React.FC = () => {
       field3value,
       field4value,
       field5value,
+      usernotes,
       payTypeId: payType.id,
     };
   }, [bankDetails]);
@@ -601,6 +604,20 @@ const OfferFormPage: React.FC = () => {
                       />
                     </Grid>
                   ) : null}
+                  <Grid xs={12} sm={12} md={6} item>
+                    <TextField
+                      id="payType.usernotes"
+                      name="payType.usernotes"
+                      variant="outlined"
+                      label="Notes"
+                      value={formik.values.payType.usernotes}
+                      onChange={formik.handleChange}
+                      fullWidth
+                      InputProps={{
+                        readOnly: usingDefault,
+                      }}
+                    />
+                  </Grid>
                 </Grid>
               </CardContent>
               <Divider />

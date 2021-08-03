@@ -30,9 +30,9 @@ declare namespace PublicData {
     field3value: string;
     field4value: string;
     field5value: string;
+    usernotes: string;
     timesUsed: number;
     updated: number;
-    usernotes: string;
   }
 
   interface UserProfile {
@@ -301,6 +301,7 @@ declare namespace API {
       field3value: string;
       field4value: string;
       field5value: string;
+      usernotes: string;
     };
   }
 
@@ -370,7 +371,7 @@ declare namespace API {
     field3value: string;
     field4value: string;
     field5value: string;
-    usernotes?: string;
+    usernotes: string;
   }
 
   interface UpdateUserBankResponse extends BaseResponse {}
