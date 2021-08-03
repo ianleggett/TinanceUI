@@ -1,6 +1,6 @@
 import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import type { Dispatch } from 'react';
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useCallback, useContext, useReducer } from 'react';
 
 import { GetUserDetailsService } from '../services';
 import { clearProfile, getProfile, getToken, saveProfile, snackbar } from '../utils';
@@ -81,8 +81,14 @@ export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) =
   const { loginRequired, children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const handleTokenExpired = useCallback(() => {
+    dispatch({ type: 'clearUserInfo' });
+  }, []);
+
   useMount(() => {
     const token = getToken();
+
+    document.addEventListener('tokenexpired', handleTokenExpired);
 
     if (token) {
       const profile = getProfile();
@@ -108,6 +114,8 @@ export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) =
     dispatch({
       type: 'clearUserInfo',
     });
+
+    document.removeEventListener('tokenexpired', handleTokenExpired);
   });
 
   return (

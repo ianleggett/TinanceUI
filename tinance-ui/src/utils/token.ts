@@ -38,8 +38,12 @@ export function getToken(): string {
     return cache.getItem('token') ?? '';
   }
 
+  const event = new CustomEvent('tokenexpired', { bubbles: true });
+
   clearToken();
   clearProfile();
+
+  document.dispatchEvent(event);
   snackbar.warning('Token is expired, please login');
 
   return '';
