@@ -556,7 +556,7 @@ const MarketListPage: React.FC = () => {
                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                       <Divider className={classes.divider} />
                     </Grid>
-                    {offer.buyer ? (
+                    {!offer.buyer ? (
                       <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                         <Typography component="h2" variant="h5" color="primary">
                           You are the buyer, the trading process is:
