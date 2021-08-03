@@ -23,6 +23,7 @@ import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
+import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
@@ -34,6 +35,7 @@ import dayjs from 'dayjs';
 import { BigNumber } from 'ethers';
 import { useFormik } from 'formik';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
@@ -529,6 +531,10 @@ const TradeListPage: React.FC = () => {
     history.push('/markets');
   }, [history]);
 
+  const handleCopy = useCallback(() => {
+    snackbar.success(t('Copied to clipboard!'));
+  }, [t]);
+
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
       const isSeller = !!profile && trade.seller.cid === profile.cid;
@@ -928,6 +934,7 @@ const TradeListPage: React.FC = () => {
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Divider className={classes.divider} />
                   </Grid>
+
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" component="p" variant="body1">
                       {profile && trade.seller.cid === profile.cid ? (
@@ -1031,6 +1038,91 @@ const TradeListPage: React.FC = () => {
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                     {getPrimaryButton(trade)}
                   </Grid>
+                  {trade.sellerBankDetails ? (
+                    <>
+                      <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                        <Divider className={classes.divider} />
+                      </Grid>
+                      <CopyToClipboard
+                        onCopy={handleCopy}
+                        text={trade.sellerBankDetails.field1value}
+                      >
+                        <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                          <Typography color="textSecondary" variant="overline">
+                            {trade.sellerBankDetails.payType.field1name}&nbsp;
+                            <FileCopyOutlinedIcon fontSize="inherit" />
+                          </Typography>
+                          <Typography color="primary">
+                            {trade.sellerBankDetails.field1value || '-'}
+                          </Typography>
+                        </Grid>
+                      </CopyToClipboard>
+                      <CopyToClipboard
+                        onCopy={handleCopy}
+                        text={trade.sellerBankDetails.field2value}
+                      >
+                        <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                          <Typography color="textSecondary" variant="overline">
+                            {trade.sellerBankDetails.payType.field2name}&nbsp;
+                            <FileCopyOutlinedIcon fontSize="inherit" />
+                          </Typography>
+                          <Typography color="primary">
+                            {trade.sellerBankDetails.field2value || '-'}
+                          </Typography>
+                        </Grid>
+                      </CopyToClipboard>
+                      <CopyToClipboard
+                        onCopy={handleCopy}
+                        text={trade.sellerBankDetails.field3value}
+                      >
+                        <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                          <Typography color="textSecondary" variant="overline">
+                            {trade.sellerBankDetails.payType.field3name}&nbsp;
+                            <FileCopyOutlinedIcon fontSize="inherit" />
+                          </Typography>
+                          <Typography color="primary">
+                            {trade.sellerBankDetails.field3value || '-'}
+                          </Typography>
+                        </Grid>
+                      </CopyToClipboard>
+                      <CopyToClipboard
+                        onCopy={handleCopy}
+                        text={trade.sellerBankDetails.field4value}
+                      >
+                        <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                          <Typography color="textSecondary" variant="overline">
+                            {trade.sellerBankDetails.payType.field4name}&nbsp;
+                            <FileCopyOutlinedIcon fontSize="inherit" />
+                          </Typography>
+                          <Typography color="primary">
+                            {trade.sellerBankDetails.field4value || '-'}
+                          </Typography>
+                        </Grid>
+                      </CopyToClipboard>
+                      <CopyToClipboard
+                        onCopy={handleCopy}
+                        text={trade.sellerBankDetails.field5value}
+                      >
+                        <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                          <Typography color="textSecondary" variant="overline">
+                            {trade.sellerBankDetails.payType.field5name}&nbsp;
+                            <FileCopyOutlinedIcon fontSize="inherit" />
+                          </Typography>
+                          <Typography color="primary">
+                            {trade.sellerBankDetails.field5value || '-'}
+                          </Typography>
+                        </Grid>
+                      </CopyToClipboard>
+                      <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                        <Typography color="textSecondary" variant="overline">
+                          {t('Notes')}
+                        </Typography>
+                        <Typography color="primary">
+                          {trade.sellerBankDetails.usernotes || '-'}
+                        </Typography>
+                      </Grid>
+                    </>
+                  ) : null}
                 </Grid>
               </Paper>
             ))

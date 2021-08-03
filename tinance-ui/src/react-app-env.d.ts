@@ -201,6 +201,7 @@ declare namespace Trade {
     depositHash?: any;
     created: string;
     expiry: number;
+    sellerBankDetails: PublicData.BankDetail;
   }
 }
 
