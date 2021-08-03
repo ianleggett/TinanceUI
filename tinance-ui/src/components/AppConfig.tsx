@@ -4,7 +4,12 @@ import type { Dispatch } from 'react';
 import { createContext, Suspense, useContext, useReducer } from 'react';
 
 import { appConfig } from '../constants';
-import { GetCCYCodesService, GetPaymentTypesService, GetValidationRegexService } from '../services';
+import {
+  GetCCYCodesService,
+  GetNetworkProfileService,
+  GetPaymentTypesService,
+  GetValidationRegexService,
+} from '../services';
 import { snackbar } from '../utils';
 import { GlobalFooter } from './GlobalFooter';
 import { GlobalHeader } from './GlobalHeader';
@@ -60,6 +65,17 @@ async function getAndSavePublicData(dispatch: Dispatch<AppConfigAction>) {
         validationRegex,
       },
     });
+
+    const networkProfile = await GetNetworkProfileService();
+
+    if (networkProfile) {
+      dispatch({
+        type: 'update',
+        payload: {
+          networkProfile,
+        },
+      });
+    }
   } catch {
     snackbar.warning('Get public data failed');
   }
@@ -72,7 +88,7 @@ export interface AppConfigProviderProps extends Partial<AppConfigState> {
 export const AppConfigProvider: React.FC<AppConfigProviderProps> = (props) => {
   const { children, ...restProps } = props;
   const [state, dispatch] = useReducer(reducer, { ...initialState, ...restProps });
-  const { title, lang, logo, maxWidth } = state;
+  const { title, lang, logo, maxWidth, networkProfile } = state;
 
   useMount(async () => {
     await getAndSavePublicData(dispatch);
@@ -83,7 +99,7 @@ export const AppConfigProvider: React.FC<AppConfigProviderProps> = (props) => {
       <AppConfigDispatchContext.Provider value={dispatch}>
         <Suspense fallback="Loading...">
           <I18nextProvider fallbackLng={state.lang} dispatch={dispatch}>
-            <GlobalHeader title={title} logo={logo} maxWidth={maxWidth} />
+            <GlobalHeader title={title} logo={logo} maxWidth={maxWidth} network={networkProfile} />
             <Container
               component="main"
               maxWidth={maxWidth}

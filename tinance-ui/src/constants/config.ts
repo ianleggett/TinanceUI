@@ -11,6 +11,7 @@ export const appConfig = {
   ccyCodes: [] as PublicData.CCYCode[],
   paymentTypes: [] as PublicData.PaymentType[],
   validationRegex: {} as Record<string, PublicData.Regex>,
+  networkProfile: undefined as PublicData.NetworkProfile | undefined,
   relativeExpiryTime: 2, // in hours
   feeRate: 0.0015,
   walletConnected: false,

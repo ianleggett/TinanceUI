@@ -2,6 +2,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
 import Container from '@material-ui/core/Container';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
@@ -20,6 +21,7 @@ import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutline
 import AttachMoneyOutlinedIcon from '@material-ui/icons/AttachMoneyOutlined';
 import ExpandMoreOutlinedIcon from '@material-ui/icons/ExpandMoreOutlined';
 import MenuOutlinedIcon from '@material-ui/icons/MenuOutlined';
+import NetworkCellOutlinedIcon from '@material-ui/icons/NetworkCellOutlined';
 import { useWeb3React } from '@web3-react/core';
 import { useRequest } from 'ahooks';
 import { useCallback, useState } from 'react';
@@ -87,6 +89,7 @@ export interface GlobalHeaderProps {
   title: string;
   logo: string;
   maxWidth?: 'lg' | 'xs' | 'sm' | 'md' | 'xl' | false;
+  network?: PublicData.NetworkProfile;
 }
 
 type DefaultProps = typeof defaultProps;
@@ -100,7 +103,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
   const [{ profile }, dispatch] = useUserManager();
   const [showDrawer, setShowDrawer] = useState(false);
   const [userMenu, setUserMenu] = useState<HTMLButtonElement | null>(null);
-  const { title, logo, maxWidth } = props as PropsWithDefault;
+  const { title, logo, maxWidth, network } = props as PropsWithDefault;
   const { active, error, deactivate } = useWeb3React();
 
   const { run: signout } = useRequest(SignOutService, {
@@ -231,6 +234,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
               >
                 {active ? '🟢 connected' : error ? '🔴 error' : '🟠 Not connected'}
               </Button>
+              {network ? <Chip color="primary" label={network.value} /> : null}
             </Box>
           </Hidden>
 

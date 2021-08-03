@@ -59,6 +59,11 @@ declare namespace PublicData {
     key: string;
     value: string;
   }
+
+  interface NetworkProfile {
+    key: string;
+    value: string;
+  }
 }
 
 declare namespace User {
