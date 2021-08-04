@@ -189,6 +189,7 @@ const TradeListPage: React.FC = () => {
   const { t } = useTranslation();
   const { profile } = useUserManagerState();
   const [loading, setLoading] = useState(true);
+  const [preDepositing, setPreDepositing] = useState(false);
   const [{ etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr }, setNetworkConfig] = useState<any>({
     etherScanPrefix: 'https://kovan.etherscan.io/tx/',
     escrowCtrAddr: '0x25b605D31B85a38c34c0a94cC26ceB6817f86E0D',
@@ -415,6 +416,7 @@ const TradeListPage: React.FC = () => {
 
   const handleDeposit = useCallback(
     (trade) => {
+      setPreDepositing(true);
       // (oid: string, amt) => {
       const amt = trade.fromAmount + trade.sellerFee;
       const oid = trade.tradeId;
@@ -450,6 +452,7 @@ const TradeListPage: React.FC = () => {
             } else {
               depositCrypto({ oid });
               setSelectedOrderId(oid);
+              setTimeout(() => setPreDepositing(false), 60);
             }
           } else {
             contract.approve(escrowCtrAddr, cryptoAmt).then((txnval: TransactionResponse) => {
@@ -461,6 +464,7 @@ const TradeListPage: React.FC = () => {
                 // alert('call here API v1/deposit( ctrid )');
                 depositCrypto({ oid });
                 setSelectedOrderId(oid);
+                setTimeout(() => setPreDepositing(false), 60);
               });
             });
           }
@@ -1199,7 +1203,7 @@ const TradeListPage: React.FC = () => {
           </DialogActions>
         </form>
       </Dialog>
-      <Backdrop open={depositing} className={classes.backdrop}>
+      <Backdrop open={preDepositing || depositing} className={classes.backdrop}>
         <Box alignItems="center" justifyContent="center" color="#fff" textAlign="center">
           <CircularProgress color="inherit" />
           <Typography variant="h5" className={classes.loading}>
