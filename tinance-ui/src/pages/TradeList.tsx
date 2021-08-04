@@ -944,7 +944,6 @@ const TradeListPage: React.FC = () => {
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Divider className={classes.divider} />
                   </Grid>
-
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Typography align="center" component="p" variant="body1">
                       {profile && trade.seller.cid === profile.cid ? (
@@ -1026,27 +1025,6 @@ const TradeListPage: React.FC = () => {
                         ? t(sellerInfo[trade.status])
                         : t(buyerInfo[trade.status])}
                     </Typography>
-                  </Grid>
-                  <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                    <Divider className={classes.divider} />
-                  </Grid>
-                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                    <Typography color="textSecondary" variant="overline">
-                      {t('Offer Accepted')}
-                    </Typography>
-                    <Typography color="primary">{dayjs().to(dayjs(trade.created))}</Typography>
-                  </Grid>
-                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                    <Typography color="textSecondary" variant="overline">
-                      {t('Status')}
-                    </Typography>
-                    <Typography color="primary">{trade.status}</Typography>
-                  </Grid>
-                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                    {getSecondaryButton(trade)}
-                  </Grid>
-                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                    {getPrimaryButton(trade)}
                   </Grid>
                   {trade.sellerBankDetails ? (
                     <>
@@ -1133,6 +1111,27 @@ const TradeListPage: React.FC = () => {
                       </Grid>
                     </>
                   ) : null}
+                  <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                    <Divider className={classes.divider} />
+                  </Grid>
+                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                    <Typography color="textSecondary" variant="overline">
+                      {t('Offer Accepted')}
+                    </Typography>
+                    <Typography color="primary">{dayjs().to(dayjs(trade.created))}</Typography>
+                  </Grid>
+                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                    <Typography color="textSecondary" variant="overline">
+                      {t('Status')}
+                    </Typography>
+                    <Typography color="primary">{trade.status}</Typography>
+                  </Grid>
+                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                    {getSecondaryButton(trade)}
+                  </Grid>
+                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
+                    {getPrimaryButton(trade)}
+                  </Grid>
                 </Grid>
               </Paper>
             ))
