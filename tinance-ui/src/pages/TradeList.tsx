@@ -942,7 +942,12 @@ const TradeListPage: React.FC = () => {
                       {t('Remaining Time')}
                     </Typography>
                     <Typography color="primary">
-                      {trade.expiry ? dayjs().to(dayjs(trade.expiry), true) : '-'}
+                      {trade.expiry
+                        ? dayjs().to(
+                            dayjs.utc(trade.expiry, 'YYYY-MM-DD HH:mm:ss.SSS').local(),
+                            true,
+                          )
+                        : '-'}
                     </Typography>
                   </Grid>
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>

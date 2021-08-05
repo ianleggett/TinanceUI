@@ -431,9 +431,12 @@ const OfferListPage: React.FC = () => {
                     {t('Remaining Time')}
                   </Typography>
                   <Typography color="primary">
-                    {dayjs().isAfter(dayjs(offer.expiry))
+                    {dayjs().isAfter(dayjs.utc(offer.expiry, 'YYYY-MM-DD HH:mm:ss.SSS').local())
                       ? '-'
-                      : dayjs().to(dayjs(offer.expiry), true)}
+                      : dayjs().to(
+                          dayjs.utc(offer.expiry, 'YYYY-MM-DD HH:mm:ss.SSS').local(),
+                          true,
+                        )}
                   </Typography>
                 </Grid>
                 <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
