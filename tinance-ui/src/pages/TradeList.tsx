@@ -623,6 +623,32 @@ const TradeListPage: React.FC = () => {
           );
         }
 
+        case 'COMPLETED': {
+          if (isSeller && trade.buyerRating !== -1) {
+            return (
+              <>
+                <Typography color="textSecondary" variant="overline">
+                  {t('Comment')}
+                </Typography>
+                <Typography color="primary">{trade.commentAboutBuyer || '-'}</Typography>
+              </>
+            );
+          }
+
+          if (!isSeller && trade.sellerRating !== -1) {
+            return (
+              <>
+                <Typography color="textSecondary" variant="overline">
+                  {t('Comment')}
+                </Typography>
+                <Typography color="primary">{trade.commentAboutSeller || '-'}</Typography>
+              </>
+            );
+          }
+
+          return null;
+        }
+
         default:
           return null;
       }
@@ -687,20 +713,12 @@ const TradeListPage: React.FC = () => {
           if (isSeller && trade.buyerRating !== -1) {
             return (
               <>
-                <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                  <Typography color="textSecondary" variant="overline">
-                    {t('Rating')}
-                  </Typography>
+                <Typography color="textSecondary" variant="overline">
+                  {t('Rating')}
+                </Typography>
+                <Typography color="primary">
                   <Rating value={trade.buyerRating} size="small" readOnly />
-                </Grid>
-                {trade.commentAboutBuyer ? (
-                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                    <Typography color="textSecondary" variant="overline">
-                      {t('Comment')}
-                    </Typography>
-                    <Typography color="primary">{trade.commentAboutBuyer}</Typography>
-                  </Grid>
-                ) : null}
+                </Typography>
               </>
             );
           }
@@ -708,20 +726,12 @@ const TradeListPage: React.FC = () => {
           if (!isSeller && trade.sellerRating !== -1) {
             return (
               <>
-                <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                  <Typography color="textSecondary" variant="overline">
-                    {t('Rating')}
-                  </Typography>
+                <Typography color="textSecondary" variant="overline">
+                  {t('Rating')}
+                </Typography>
+                <Typography color="primary">
                   <Rating value={trade.sellerRating} size="small" readOnly />
-                </Grid>
-                {trade.commentAboutSeller ? (
-                  <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
-                    <Typography color="textSecondary" variant="overline">
-                      {t('Comment')}
-                    </Typography>
-                    <Typography color="primary">{trade.commentAboutSeller}</Typography>
-                  </Grid>
-                ) : null}
+                </Typography>
               </>
             );
           }
@@ -744,8 +754,8 @@ const TradeListPage: React.FC = () => {
     [
       acceptting,
       handleAcceptCancel,
-      handleAlertDialogOpen,
       handleRateTradeDialogOpen,
+      handleAlertDialogOpen,
       profile,
       selectedOrderId,
       t,
@@ -876,7 +886,7 @@ const TradeListPage: React.FC = () => {
                     style={{ color: '#D97706', borderColor: '#D97706' }}
                   />
                 ) : null}
-                <Grid spacing={1} alignItems="flex-end" container>
+                <Grid spacing={1} alignItems="flex-start" container>
                   <Hidden smUp>
                     <Grid xs={12} style={{ height: 50 }} item />
                   </Hidden>
@@ -1133,6 +1143,8 @@ const TradeListPage: React.FC = () => {
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     <Divider className={classes.divider} />
                   </Grid>
+                </Grid>
+                <Grid spacing={1} alignItems="flex-end" container>
                   <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                     <Typography color="textSecondary" variant="overline">
                       {t('Offer Accepted')}
