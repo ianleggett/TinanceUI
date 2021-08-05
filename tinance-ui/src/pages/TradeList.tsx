@@ -416,37 +416,47 @@ const TradeListPage: React.FC = () => {
 
   const handleDeposit = useCallback(
     (trade) => {
-      setPreDepositing(true);
       // (oid: string, amt) => {
       const amt = trade.fromAmount + trade.sellerFee;
       const oid = trade.tradeId;
       // trade.tradeId, trade.fromAmount + trade.sellerFee
       const cryptoAmt = Math.round(amt * 10 ** decimals);
+
       console.log(`deposit ${amt} ${symbol}`);
       console.log(`units ${cryptoAmt}`);
       console.log(`coin addr ${address}`);
       console.log(`user acct ${account}`);
       console.log(`escrow addr ${escrowCtrAddr}`);
+
       if (library === undefined) {
         snackbar.warning(t('Please connect wallet'));
         return;
       }
+
       if (account !== trade.sellerAddress) {
         snackbar.warning(`Wallet has changed !!, switch to wallet ${trade.sellerAddress}`);
         return;
       }
+
+      setPreDepositing(true);
+
       // address is address of USDT
       const contract = new Contract(address, ERC20ABI, library.getSigner());
+
       contract.balanceOf(account).then((bal: BigNumber) => {
         if (bal.lt(cryptoAmt)) {
+          setPreDepositing(false);
           snackbar.warning('LOW BALANCE, not enough funds');
           return;
         }
+
         // account is user account, what is current user allowance ??
         contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
           let txn;
+
           if (!val.isZero()) {
             if (!val.eq(cryptoAmt)) {
+              setPreDepositing(false);
               snackbar.warning(t(`Allowance reset ( ${val}), please try again !!`));
               txn = contract.approve(escrowCtrAddr, 0);
             } else {
