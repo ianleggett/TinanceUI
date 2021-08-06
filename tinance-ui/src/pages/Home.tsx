@@ -15,6 +15,8 @@ const useStyles = makeStyles((theme) => ({
     padding: '32px',
   },
   video: {
+    width: '95%',
+    aspectRatio: '16 / 9',
     borderRadius: 5,
   },
   content: {
@@ -41,15 +43,18 @@ const HomePage: React.FC = () => {
       <Paper className={classes.root}>
         <Grid spacing={2} direction={direction} container>
           <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            <video
-              src={videoUrl}
-              width="100%"
-              preload="auto"
-              loop
-              controls
-              className={classes.video}
-            />
+            {videoUrl.startsWith('https://www.youtube.com') ? (
+              <iframe
+                id="ytplayer"
+                title="Weclome to Tinance"
+                src={videoUrl}
+                frameBorder={0}
+                allowFullScreen
+                className={classes.video}
+              />
+            ) : (
+              <video src={videoUrl} preload="auto" loop controls className={classes.video} />
+            )}
           </Grid>
           <Grid xs={12} sm={12} md={6} lg={6} xl={6} className={classes.content} item>
             <Typography component="h2" variant="h4" color="primary">

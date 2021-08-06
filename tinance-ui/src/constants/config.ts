@@ -6,7 +6,7 @@ export const appConfig = {
   title: 'Trusted Finance',
   logo: publicUrl && publicUrl !== '/' ? `${publicUrl}/logo192.png` : '/logo192.png',
   lang: 'en-US' as AppLang,
-  videoUrl: 'https://s0.easynm.cn/uploads/test-video.mp4',
+  videoUrl: 'https://www.youtube.com/embed/jsvfcPyu23Q',
   maxWidth: 'lg' as 'lg' | 'xs' | 'sm' | 'md' | 'xl' | false,
   ccyCodes: [] as PublicData.CCYCode[],
   paymentTypes: [] as PublicData.PaymentType[],

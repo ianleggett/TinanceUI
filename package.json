@@ -38,6 +38,9 @@
     "extends": [
       "@fastcms"
     ],
+    "rules": {
+      "jsx-a11y/media-has-caption": "off"
+    },
     "root": true
   },
   "eslintIgnore": [
