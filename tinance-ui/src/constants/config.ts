@@ -37,6 +37,7 @@ export const tradeStatusMap: Record<Trade.Status, string> = {
   DEPOSIT: 'Deposit',
   FIATSENT: 'Fiat Sent',
   COMPLETED: 'Completed',
+  REFUND: 'Refund',
   UNKNOWN: 'Unknown',
 };
 
