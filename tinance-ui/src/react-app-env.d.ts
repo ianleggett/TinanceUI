@@ -154,6 +154,7 @@ declare namespace Trade {
     | 'ERROR'
     | 'DEPOSIT'
     | 'FIATSENT'
+    | 'REFUND'
     | 'UNKNOWN';
 
   interface Model {
