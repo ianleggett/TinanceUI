@@ -13,7 +13,7 @@ export async function SignOutService(): Promise<API.SignOutResponse> {
         Authorization: `Bearer ${getToken()}`,
       },
     });
-
+    localStorage.clear();
     return res;
   } catch (error) {
     throw new Error(error.message || 'Sign out failed.');
