@@ -201,7 +201,7 @@ const TradeListPage: React.FC = () => {
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openRateTradeDialog, setOpenRateTradeDialog] = useState(false);
-  const { account, library, connector } = useWeb3React<Web3Provider>();
+  const { account, library, connector, error } = useWeb3React<Web3Provider>();
 
   const { symbol, address, name, decimals, abi } = {
     address: USDTCoinCtrAddr,
@@ -230,8 +230,8 @@ const TradeListPage: React.FC = () => {
         snackbar.warning(t('Get network config failed'));
       }
     },
-    onError(error) {
-      snackbar.warning(error.message || t('Get network config failed'));
+    onError(errorIn) {
+      snackbar.warning(errorIn.message || t('Get network config failed'));
     },
   });
 
@@ -451,34 +451,48 @@ const TradeListPage: React.FC = () => {
         }
         console.log(`Balance OK ${bal}`);
         // account is user account, what is current user allowance ??
-        contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
-          let txn;
+        contract.allowance(account, escrowCtrAddr).then(
+          (val: BigNumber) => {
+            let txn;
 
-          if (!val.isZero()) {
-            if (!val.eq(cryptoAmt)) {
-              setPreDepositing(false);
-              snackbar.warning(t(`Allowance reset ( ${val}), please try again !!`));
-              txn = contract.approve(escrowCtrAddr, 0);
-            } else {
-              depositCrypto({ oid });
-              setSelectedOrderId(oid);
-              setTimeout(() => setPreDepositing(false), 60);
-            }
-          } else {
-            contract.approve(escrowCtrAddr, cryptoAmt).then((txnval: TransactionResponse) => {
-              console.log(txnval);
-              txnval.wait(1).then((txnRec) => {
-                console.log('1 block waited');
-                // the escrow contract calls the transfer once deposit() is called
-                // console.log('Here to execute next step');
-                // alert('call here API v1/deposit( ctrid )');
+            if (!val.isZero()) {
+              if (!val.eq(cryptoAmt)) {
+                setPreDepositing(false);
+                snackbar.warning(t(`Allowance reset ( ${val}), please try again !!`));
+                txn = contract.approve(escrowCtrAddr, 0);
+              } else {
                 depositCrypto({ oid });
                 setSelectedOrderId(oid);
                 setTimeout(() => setPreDepositing(false), 60);
-              });
-            });
-          }
-        });
+              }
+            } else {
+              contract.approve(escrowCtrAddr, cryptoAmt).then(
+                (txnval: TransactionResponse) => {
+                  console.log(txnval);
+                  txnval.wait(1).then((txnRec) => {
+                    console.log('1 block waited');
+                    // the escrow contract calls the transfer once deposit() is called
+                    // console.log('Here to execute next step');
+                    // alert('call here API v1/deposit( ctrid )');
+                    depositCrypto({ oid });
+                    setSelectedOrderId(oid);
+                    setTimeout(() => setPreDepositing(false), 60);
+                  });
+                },
+                (_error: Error) => {
+                  // user rejects approval
+                  snackbar.warning(_error.message);
+                  setPreDepositing(false);
+                },
+              );
+            }
+          },
+          (_error: Error) => {
+            // user rejects approval
+            snackbar.warning(_error.message);
+            setPreDepositing(false);
+          },
+        );
       });
     },
     // [library, account],
