@@ -439,9 +439,7 @@ const TradeListPage: React.FC = () => {
         snackbar.warning(`Wallet has changed !!, switch to wallet ${trade.sellerAddress}`);
         return;
       }
-
-      setPreDepositing(true);
-
+      setPreDepositing(true); // show overlay
       // address is address of USDT
       const contract = new Contract(address, ERC20ABI, library.getSigner());
 
@@ -451,7 +449,7 @@ const TradeListPage: React.FC = () => {
           snackbar.warning('LOW BALANCE, not enough funds');
           return;
         }
-
+        console.log(`Balance OK ${bal}`);
         // account is user account, what is current user allowance ??
         contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
           let txn;
@@ -1236,7 +1234,9 @@ const TradeListPage: React.FC = () => {
         <Box alignItems="center" justifyContent="center" color="#fff" textAlign="center">
           <CircularProgress color="inherit" />
           <Typography variant="h5" className={classes.loading}>
-            Depositing, please don&apos;t close or refresh the page.
+            Depositing - check your wallet for approval,
+            <br />
+            please don&apos;t close or refresh the page.
           </Typography>
         </Box>
       </Backdrop>

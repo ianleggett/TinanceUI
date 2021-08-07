@@ -21,7 +21,9 @@ import AccountBalanceOutlinedIcon from '@material-ui/icons/AccountBalanceOutline
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
+import { AbstractConnector } from '@web3-react/abstract-connector';
 import { useWeb3React } from '@web3-react/core';
+import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import useEtherSWR, { EtherSWRConfig } from 'ether-swr';
 import { useFormik } from 'formik';
@@ -143,7 +145,7 @@ const WalletConnection: React.FC = () => {
     Injected = 'MetaMask / Local',
     // Network = 'Network',
     WalletConnect = 'WalletConnect',
-    WalletLink = 'WalletLink',
+    // WalletLink = 'WalletLink',
     // Ledger = 'Ledger',
     // Trezor = 'Trezor',
     // Lattice = 'Lattice',
@@ -155,11 +157,11 @@ const WalletConnection: React.FC = () => {
     // Torus = 'Torus'
   }
 
-  const connectorsByName: Record<ConnectorNames, any> = {
+  const connectorsByName: Record<ConnectorNames, AbstractConnector> = {
     [ConnectorNames.Injected]: injectedConnector,
     // [ConnectorNames.Network]: network,
     [ConnectorNames.WalletConnect]: walletconnect,
-    [ConnectorNames.WalletLink]: walletlink,
+    // [ConnectorNames.WalletLink]: walletlink,
     // [ConnectorNames.Ledger]: ledger,
     // [ConnectorNames.Trezor]: trezor,
     // [ConnectorNames.Lattice]: lattice,
@@ -210,6 +212,12 @@ const WalletConnection: React.FC = () => {
             fullWidth
             onClick={() => {
               deactivate();
+              if (
+                connector instanceof WalletConnectConnector &&
+                connector.walletConnectProvider?.wc?.uri
+              ) {
+                connector.walletConnectProvider = undefined;
+              }
               handleWalletDisconnect();
             }}
           >
