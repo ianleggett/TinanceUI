@@ -585,7 +585,7 @@ const TradeListPage: React.FC = () => {
               {depositing && trade.tradeId === selectedOrderId ? (
                 <>
                   <CircularProgress size="1em" />
-                  <div>Depositing...</div>
+                  <div>{t('Depositing...')}</div>
                 </>
               ) : (
                 `${t('Deposit')} ${(trade.fromAmount + trade.sellerFee).toFixed(USDT_DECIMALS)} ${
@@ -1249,9 +1249,9 @@ const TradeListPage: React.FC = () => {
         <Box alignItems="center" justifyContent="center" color="#fff" textAlign="center">
           <CircularProgress color="inherit" />
           <Typography variant="h5" className={classes.loading}>
-            Depositing - check your wallet for approval,
+            {t('Depositing - check your wallet for approval')},
             <br />
-            please don&apos;t close or refresh the page.
+            {t(`Please don't close or refresh the page`)}.
           </Typography>
         </Box>
       </Backdrop>

@@ -111,6 +111,7 @@ const WalletConnection: React.FC = () => {
   const { connector, library, chainId, account, activate, deactivate, active, error } =
     useWeb3React<Web3Provider>();
   const [activatingConnector, setActivatingConnector] = React.useState<any>();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
@@ -197,7 +198,7 @@ const WalletConnection: React.FC = () => {
                     handleWalletConnect();
                   }}
                 >
-                  {ky[0]}
+                  {t(ky[0])}
                 </Button>
               </Grid>
             );
@@ -221,7 +222,7 @@ const WalletConnection: React.FC = () => {
               handleWalletDisconnect();
             }}
           >
-            Disconnect
+            {t('Disconnect')}
           </Button>
         </Grid>
       ) : null}

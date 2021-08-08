@@ -670,11 +670,15 @@ const OfferFormPage: React.FC = () => {
                   <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                     {expiryTime.isAfter(dayjs()) ? (
                       <Typography variant="body1" color="primary">
-                        This offer will be expired {expiryTime.fromNow()}
+                        {t('This offer will be expired in', {
+                          fromNow: expiryTime.fromNow(),
+                        })}
                       </Typography>
                     ) : (
                       <Typography variant="body1" color="secondary">
-                        This offer has been expired {expiryTime.fromNow()}
+                        {t('This offer has been expired in', {
+                          fromNow: expiryTime.fromNow(),
+                        })}
                       </Typography>
                     )}
                   </Grid>

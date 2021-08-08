@@ -232,7 +232,11 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = (props) => {
                 color={pathname.startsWith('/connect') ? 'primary' : 'default'}
                 onClick={handleGoToConnectPage}
               >
-                {active ? '🟢 connected' : error ? '🔴 error' : '🟠 Not connected'}
+                {active
+                  ? `🟢 ${t('Connected')}`
+                  : error
+                  ? `🔴 ${t('Error')}`
+                  : `🟠 ${t('Not Connected')}`}
               </Button>
               {network ? <Chip color="primary" label={network.value} /> : null}
             </Box>
