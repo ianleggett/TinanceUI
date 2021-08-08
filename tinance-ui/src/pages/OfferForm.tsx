@@ -530,7 +530,7 @@ const OfferFormPage: React.FC = () => {
                         id="payType.field1value"
                         name="payType.field1value"
                         variant="outlined"
-                        label={defaultPayType.field1name}
+                        label={t(defaultPayType.field1name)}
                         value={formik.values.payType.field1value}
                         onChange={formik.handleChange}
                         fullWidth
@@ -546,7 +546,7 @@ const OfferFormPage: React.FC = () => {
                         id="payType.field2value"
                         name="payType.field2value"
                         variant="outlined"
-                        label={defaultPayType.field2name}
+                        label={t(defaultPayType.field2name)}
                         value={formik.values.payType.field2value}
                         onChange={formik.handleChange}
                         fullWidth
@@ -562,7 +562,7 @@ const OfferFormPage: React.FC = () => {
                         id="payType.field3value"
                         name="payType.field3value"
                         variant="outlined"
-                        label={defaultPayType.field3name}
+                        label={t(defaultPayType.field3name)}
                         value={formik.values.payType.field3value}
                         onChange={formik.handleChange}
                         fullWidth
@@ -578,7 +578,7 @@ const OfferFormPage: React.FC = () => {
                         id="payType.field4value"
                         name="payType.field4value"
                         variant="outlined"
-                        label={defaultPayType.field4name}
+                        label={t(defaultPayType.field4name)}
                         value={formik.values.payType.field4value}
                         onChange={formik.handleChange}
                         fullWidth
@@ -594,7 +594,7 @@ const OfferFormPage: React.FC = () => {
                         id="payType.field5value"
                         name="payType.field5value"
                         variant="outlined"
-                        label={defaultPayType.field5name}
+                        label={t(defaultPayType.field5name)}
                         value={formik.values.payType.field5value}
                         onChange={formik.handleChange}
                         fullWidth
@@ -609,7 +609,7 @@ const OfferFormPage: React.FC = () => {
                       id="payType.usernotes"
                       name="payType.usernotes"
                       variant="outlined"
-                      label="Notes"
+                      label={t('Notes')}
                       value={formik.values.payType.usernotes}
                       onChange={formik.handleChange}
                       fullWidth

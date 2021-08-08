@@ -1081,7 +1081,7 @@ const TradeListPage: React.FC = () => {
                       >
                         <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                           <Typography color="textSecondary" variant="overline">
-                            {trade.sellerBankDetails.payType.field1name}&nbsp;
+                            {t(trade.sellerBankDetails.payType.field1name)}&nbsp;
                             <FileCopyOutlinedIcon fontSize="inherit" />
                           </Typography>
                           <Typography color="primary">
@@ -1095,7 +1095,7 @@ const TradeListPage: React.FC = () => {
                       >
                         <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                           <Typography color="textSecondary" variant="overline">
-                            {trade.sellerBankDetails.payType.field2name}&nbsp;
+                            {t(trade.sellerBankDetails.payType.field2name)}&nbsp;
                             <FileCopyOutlinedIcon fontSize="inherit" />
                           </Typography>
                           <Typography color="primary">
@@ -1109,7 +1109,7 @@ const TradeListPage: React.FC = () => {
                       >
                         <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                           <Typography color="textSecondary" variant="overline">
-                            {trade.sellerBankDetails.payType.field3name}&nbsp;
+                            {t(trade.sellerBankDetails.payType.field3name)}&nbsp;
                             <FileCopyOutlinedIcon fontSize="inherit" />
                           </Typography>
                           <Typography color="primary">
@@ -1123,7 +1123,7 @@ const TradeListPage: React.FC = () => {
                       >
                         <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                           <Typography color="textSecondary" variant="overline">
-                            {trade.sellerBankDetails.payType.field4name}&nbsp;
+                            {t(trade.sellerBankDetails.payType.field4name)}&nbsp;
                             <FileCopyOutlinedIcon fontSize="inherit" />
                           </Typography>
                           <Typography color="primary">
@@ -1137,7 +1137,7 @@ const TradeListPage: React.FC = () => {
                       >
                         <Grid xs={12} sm={6} md={3} lg={3} xl={3} item>
                           <Typography color="textSecondary" variant="overline">
-                            {trade.sellerBankDetails.payType.field5name}&nbsp;
+                            {t(trade.sellerBankDetails.payType.field5name)}&nbsp;
                             <FileCopyOutlinedIcon fontSize="inherit" />
                           </Typography>
                           <Typography color="primary">

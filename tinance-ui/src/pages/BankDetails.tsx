@@ -223,7 +223,7 @@ const BankDetailsPage: React.FC = () => {
                   id="field1value"
                   name="field1value"
                   variant="outlined"
-                  label={payType.field1name}
+                  label={t(payType.field1name as string)}
                   value={formik.values.field1value}
                   onChange={formik.handleChange}
                   fullWidth
@@ -234,7 +234,7 @@ const BankDetailsPage: React.FC = () => {
                   id="field2value"
                   name="field2value"
                   variant="outlined"
-                  label={payType.field2name}
+                  label={t(payType.field2name as string)}
                   value={formik.values.field2value}
                   onChange={formik.handleChange}
                   fullWidth
@@ -245,7 +245,7 @@ const BankDetailsPage: React.FC = () => {
                   id="field3value"
                   name="field3value"
                   variant="outlined"
-                  label={payType.field3name}
+                  label={t(payType.field3name as string)}
                   value={formik.values.field3value}
                   onChange={formik.handleChange}
                   fullWidth
@@ -256,7 +256,7 @@ const BankDetailsPage: React.FC = () => {
                   id="field4value"
                   name="field4value"
                   variant="outlined"
-                  label={payType.field4name}
+                  label={t(payType.field4name as string)}
                   value={formik.values.field4value}
                   onChange={formik.handleChange}
                   fullWidth
@@ -267,7 +267,7 @@ const BankDetailsPage: React.FC = () => {
                   id="field5value"
                   name="field5value"
                   variant="outlined"
-                  label={payType.field5name}
+                  label={t(payType.field5name as string)}
                   value={formik.values.field5value}
                   onChange={formik.handleChange}
                   fullWidth
@@ -278,7 +278,7 @@ const BankDetailsPage: React.FC = () => {
                   id="usernotes"
                   name="usernotes"
                   variant="outlined"
-                  label="Notes"
+                  label={t('Notes')}
                   value={formik.values.usernotes}
                   onChange={formik.handleChange}
                   fullWidth
