@@ -40,8 +40,8 @@ import { walletconnect, walletlink } from '../utils/connectors';
 import { injectedConnector, useEagerConnect } from '../utils/hooks';
 import { snackbar } from '../utils/snackbar';
 
-const USDTCoinCtrAddr = '0xa2d7D534ea1952cB9C24334464E1289A7C460F4d';
-
+// const USDTCoinCtrAddr = '0xa2d7D534ea1952cB9C24334464E1289A7C460F4d';
+const USDTCoinCtrAddr = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
 // const mymap = new Map<string, any>([['0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6', ERC20ABI]]);
 const mymap = new Map<string, any>([[USDTCoinCtrAddr, ERC20ABI]]);
 
@@ -251,7 +251,7 @@ const UserWalletPage: React.FC = () => {
     address: USDTCoinCtrAddr,
     symbol: 'USDT',
     name: 'USDT',
-    decimals: 2,
+    decimals: 6,
     abi: ERC20ABI,
   };
 
