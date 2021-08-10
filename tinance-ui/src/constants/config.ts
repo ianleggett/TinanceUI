@@ -13,7 +13,7 @@ export const appConfig = {
   validationRegex: {} as Record<string, PublicData.Regex>,
   networkProfile: undefined as PublicData.NetworkProfile | undefined,
   relativeExpiryTime: 2, // in hours
-  feeRate: 0.0015,
+  feeRate: 0.001,
   walletConnected: false,
 };
 
