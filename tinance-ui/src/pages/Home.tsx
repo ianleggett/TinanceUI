@@ -42,6 +42,31 @@ const HomePage: React.FC = () => {
     <Container disableGutters>
       <Paper className={classes.root}>
         <Grid spacing={2} direction={direction} container>
+          <Grid xs={12} sm={12} md={12} lg={12} xl={12} className={classes.content} item>
+            <Typography component="h2" variant="h4" color="primary">
+              {t('What is Trusted Finance?')}
+            </Typography>
+            <ul className={classes.list}>
+              <li>
+                <Typography component="p" variant="body1">
+                  We solve the &apos;trust issue&apos;, leveraging decentralized smart contracts so
+                  you have no dilemma of &apos;Who moves first?&apos;
+                </Typography>
+              </li>
+              <li>
+                <Typography component="p" variant="body1">
+                  We give back control to our customers – trades are authorized directly from your
+                  own wallet, and all transactions can be verified in real-time (on blockchain).
+                </Typography>
+              </li>
+              <li>
+                <Typography component="p" variant="body1">
+                  We simplify and automate the trade flow, making it easier and more accessible to
+                  trade with anyone safely and securely.
+                </Typography>
+              </li>
+            </ul>
+          </Grid>
           <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
             {videoUrl.startsWith('https://www.youtube.com') ? (
               <iframe
@@ -56,6 +81,7 @@ const HomePage: React.FC = () => {
               <video src={videoUrl} preload="auto" loop controls className={classes.video} />
             )}
           </Grid>
+
           <Grid xs={12} sm={12} md={6} lg={6} xl={6} className={classes.content} item>
             <Typography component="h2" variant="h4" color="primary">
               {t('How it works')}
@@ -63,38 +89,59 @@ const HomePage: React.FC = () => {
             <ol className={classes.list}>
               <li>
                 <Typography component="p" variant="body1">
-                  Connect wallet
+                  Create Account
                 </Typography>
+                <ul>
+                  <li>
+                    <Typography component="p" variant="body1" />
+                    Sign in or Sign up, enter your contact details and your journey begins. It is
+                    that easy. <a href="signup">Sign up now</a> for free →
+                  </li>
+                </ul>
               </li>
               <li>
                 <Typography component="p" variant="body1">
-                  Create new offers
+                  Connect your Wallet
                 </Typography>
+                <ul>
+                  <li>
+                    <Typography component="p" variant="body1" />
+                    Connect using <a href="https://metamask.io/">Metamask</a> or compatible{' '}
+                    <a href="https://walletconnect.org/">Wallet Connect</a> crypto wallet. Add your
+                    recieving bank details and begin trading.
+                  </li>
+                </ul>
               </li>
               <li>
                 <Typography component="p" variant="body1">
-                  Select trading counterpart
+                  Browse the marketplace, <b>Accept</b> an Offer or <b>Create</b> your own Offer
                 </Typography>
+                <ul>
+                  <li>
+                    <Typography component="p" variant="body1" />
+                    Any registered user can post an offer to buy or sell. Simply set your terms and
+                    publish to the market for others to view. You can also accept Offers from other
+                    users to create a trade.
+                  </li>
+                </ul>
               </li>
               <li>
                 <Typography component="p" variant="body1">
-                  Trade
+                  Complete your Trade
                 </Typography>
-              </li>
-              <li>
-                <Typography component="p" variant="body1">
-                  Credit escrow
-                </Typography>
-              </li>
-              <li>
-                <Typography component="p" variant="body1">
-                  Receive bank transfer
-                </Typography>
-              </li>
-              <li>
-                <Typography component="p" variant="body1">
-                  Release USDT and complete trade
-                </Typography>
+                <ul>
+                  <li>
+                    <Typography component="p" variant="body1" />
+                    Each trade is managed by a{' '}
+                    <a href="https://ethereum.org/en/developers/docs/smart-contracts/">
+                      smart contract
+                    </a>
+                    , crypto is held in secure escrow and only released when digitally verified by
+                    both parties. If either party fails to verifiy each part of the process, funds
+                    are automatcically refunded. Arbitration is available in the unlikely event of a
+                    dispute.
+                  </li>
+                </ul>
               </li>
             </ol>
           </Grid>
