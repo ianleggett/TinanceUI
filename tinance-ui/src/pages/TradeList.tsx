@@ -57,7 +57,7 @@ import {
 } from '../services';
 import { snackbar, toFixed } from '../utils';
 
-const USDT_DECIMALS = 2;
+const USDT_DECIMALS = 6;
 // this comes from swagger API call getnetworkconfig.json
 // const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
 
@@ -193,9 +193,9 @@ const TradeListPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [preDepositing, setPreDepositing] = useState(false);
   const [{ etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr }, setNetworkConfig] = useState<any>({
-    etherScanPrefix: 'https://kovan.etherscan.io/tx/',
-    escrowCtrAddr: '0x25b605D31B85a38c34c0a94cC26ceB6817f86E0D',
-    USDTCoinCtrAddr: '0xa2d7D534ea1952cB9C24334464E1289A7C460F4d',
+    etherScanPrefix: 'https://etherscan.io/tx/',
+    escrowCtrAddr: '0xEb13Bb6F98dE43f9f040BD6B6823CcD3339AEB05',
+    USDTCoinCtrAddr: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
   });
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
@@ -207,7 +207,7 @@ const TradeListPage: React.FC = () => {
     address: USDTCoinCtrAddr,
     symbol: 'USDT',
     name: 'USDT',
-    decimals: 2,
+    decimals: 6,
     abi: ERC20ABI,
   };
 
@@ -443,58 +443,63 @@ const TradeListPage: React.FC = () => {
       // address is address of USDT
       const contract = new Contract(address, ERC20ABI, library.getSigner());
 
-      contract.balanceOf(account).then((bal: BigNumber) => {
-        if (bal.lt(cryptoAmt)) {
-          setPreDepositing(false);
-          snackbar.warning('LOW BALANCE, not enough funds');
-          return;
-        }
-        console.log(`Balance OK ${bal}`);
-        // account is user account, what is current user allowance ??
-        contract.allowance(account, escrowCtrAddr).then(
-          (val: BigNumber) => {
-            let txn;
-
-            if (!val.isZero()) {
-              if (!val.eq(cryptoAmt)) {
-                setPreDepositing(false);
-                snackbar.warning(t(`Allowance reset ( ${val}), please try again !!`));
-                txn = contract.approve(escrowCtrAddr, 0);
-              } else {
-                depositCrypto({ oid });
-                setSelectedOrderId(oid);
-                setTimeout(() => setPreDepositing(false), 60);
-              }
-            } else {
-              contract.approve(escrowCtrAddr, cryptoAmt).then(
-                (txnval: TransactionResponse) => {
-                  snackbar.success(t('Wallet approval accepted'));
-                  // console.log(txnval);
-                  txnval.wait(1).then((txnRec) => {
-                    console.log('1 block waited');
-                    // the escrow contract calls the transfer once deposit() is called
-                    // console.log('Here to execute next step');
-                    // alert('call here API v1/deposit( ctrid )');
-                    depositCrypto({ oid });
-                    setSelectedOrderId(oid);
-                    setTimeout(() => setPreDepositing(false), 60);
-                  });
-                },
-                (_error: Error) => {
-                  // user rejects approval
-                  snackbar.warning(_error.message);
-                  setPreDepositing(false);
-                },
-              );
-            }
-          },
-          (_error: Error) => {
-            // user rejects approval
-            snackbar.warning(_error.message);
+      contract.balanceOf(account).then(
+        (bal: BigNumber) => {
+          if (bal.lt(cryptoAmt)) {
             setPreDepositing(false);
-          },
-        );
-      });
+            snackbar.warning('LOW BALANCE, not enough funds');
+            return;
+          }
+          console.log(`Balance OK ${bal}`);
+          // account is user account, what is current user allowance ??
+          contract.allowance(account, escrowCtrAddr).then(
+            (val: BigNumber) => {
+              let txn;
+
+              if (!val.isZero()) {
+                if (!val.eq(cryptoAmt)) {
+                  setPreDepositing(false);
+                  snackbar.warning(t(`Allowance reset ( ${val}), please try again !!`));
+                  txn = contract.approve(escrowCtrAddr, 0);
+                } else {
+                  depositCrypto({ oid });
+                  setSelectedOrderId(oid);
+                  setTimeout(() => setPreDepositing(false), 60);
+                }
+              } else {
+                contract.approve(escrowCtrAddr, cryptoAmt).then(
+                  (txnval: TransactionResponse) => {
+                    snackbar.success(t('Wallet approval accepted'));
+                    // console.log(txnval);
+                    txnval.wait(1).then((txnRec) => {
+                      console.log('1 block waited');
+                      // the escrow contract calls the transfer once deposit() is called
+                      // console.log('Here to execute next step');
+                      // alert('call here API v1/deposit( ctrid )');
+                      depositCrypto({ oid });
+                      setSelectedOrderId(oid);
+                      setTimeout(() => setPreDepositing(false), 60);
+                    });
+                  },
+                  (_error: Error) => {
+                    // user rejects approval
+                    snackbar.warning(_error.message);
+                    setPreDepositing(false);
+                  },
+                );
+              }
+            },
+            (_error: Error) => {
+              // user rejects approval
+              snackbar.warning(_error.message);
+              setPreDepositing(false);
+            },
+          );
+        },
+        (_error: Error) => {
+          console.log(_error);
+        },
+      );
     },
     // [library, account],
     [library, account, address, symbol, decimals, escrowCtrAddr, depositCrypto, t],
