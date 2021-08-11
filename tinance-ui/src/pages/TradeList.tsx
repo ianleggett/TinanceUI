@@ -577,12 +577,18 @@ const TradeListPage: React.FC = () => {
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
       const isSeller = !!profile && trade.seller.cid === profile.cid;
+      const disableDeposite = (preDepositing || depositing) && trade.tradeId === selectedOrderId;
 
       switch (trade.status) {
         case 'CREATED': {
           return isSeller ? (
-            <Button color="primary" variant="contained" onClick={() => handleDeposit(trade)}>
-              {depositing && trade.tradeId === selectedOrderId ? (
+            <Button
+              color="primary"
+              variant="contained"
+              disabled={disableDeposite}
+              onClick={() => handleDeposit(trade)}
+            >
+              {disableDeposite ? (
                 <>
                   <CircularProgress size="1em" />
                   <div>{t('Depositing...')}</div>
@@ -674,6 +680,7 @@ const TradeListPage: React.FC = () => {
       flagging2,
       handleFlagComplete,
       handleFlagFundsSent,
+      preDepositing,
       profile,
       selectedOrderId,
       t,
