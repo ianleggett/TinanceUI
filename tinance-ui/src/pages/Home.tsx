@@ -89,59 +89,41 @@ const HomePage: React.FC = () => {
             <ol className={classes.list}>
               <li>
                 <Typography component="p" variant="body1">
-                  Create Account
+                  <b>Create your account</b>
                 </Typography>
-                <ul>
-                  <li>
-                    <Typography component="p" variant="body1" />
-                    Sign in or Sign up, enter your contact details and your journey begins. It is
-                    that easy. <a href="signup">Sign up now</a> for free →
-                  </li>
-                </ul>
+                <Typography component="p" variant="body1" />
+                <a href="signup">Sign up</a>, enter your contact details and your journey begins. It
+                is that easy. and its free!
               </li>
               <li>
                 <Typography component="p" variant="body1">
-                  Connect your Wallet
+                  <b>Connect your Wallet</b>
                 </Typography>
-                <ul>
-                  <li>
-                    <Typography component="p" variant="body1" />
-                    Connect using <a href="https://metamask.io/">Metamask</a> or compatible{' '}
-                    <a href="https://walletconnect.org/">Wallet Connect</a> crypto wallet. Add your
-                    recieving bank details and begin trading.
-                  </li>
-                </ul>
+                <Typography component="p" variant="body1" />
+                Link your eWallet using <a href="https://metamask.io/">Metamask</a> or compatible{' '}
+                <a href="https://walletconnect.org/">Wallet Connect</a>. Add your recieving bank
+                details and begin trading.
               </li>
               <li>
                 <Typography component="p" variant="body1">
-                  Browse the marketplace, <b>Accept</b> an Offer or <b>Create</b> your own Offer
+                  <b>Browse the marketplace and trade with other users</b>
                 </Typography>
-                <ul>
-                  <li>
-                    <Typography component="p" variant="body1" />
-                    Any registered user can post an offer to buy or sell. Simply set your terms and
-                    publish to the market for others to view. You can also accept Offers from other
-                    users to create a trade.
-                  </li>
-                </ul>
+                <Typography component="p" variant="body1" />
+                <b>Accept</b> Offers from other users or <b>Create</b> your own. Simply set your
+                terms and publish to the market for others to accept.
               </li>
               <li>
                 <Typography component="p" variant="body1">
-                  Complete your Trade
+                  <b>Complete your Trade</b>
                 </Typography>
-                <ul>
-                  <li>
-                    <Typography component="p" variant="body1" />
-                    Each trade is managed by a{' '}
-                    <a href="https://ethereum.org/en/developers/docs/smart-contracts/">
-                      smart contract
-                    </a>
-                    , crypto is held in secure escrow and only released when digitally verified by
-                    both parties. If either party fails to verifiy each part of the process, funds
-                    are automatcically refunded. Arbitration is available in the unlikely event of a
-                    dispute.
-                  </li>
-                </ul>
+                <Typography component="p" variant="body1" />
+                Each trade is managed by a{' '}
+                <a href="https://ethereum.org/en/developers/docs/smart-contracts/">
+                  smart contract
+                </a>
+                , crypto is held in secure escrow and only released when digitally verified by both
+                parties. If either party fails to verifiy every part of the process, funds are
+                automatcically refunded. Arbitration takes place in the unlikely event of disputes.
               </li>
             </ol>
           </Grid>
