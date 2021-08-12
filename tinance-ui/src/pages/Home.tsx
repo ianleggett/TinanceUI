@@ -49,14 +49,14 @@ const HomePage: React.FC = () => {
             <ul className={classes.list}>
               <li>
                 <Typography component="p" variant="body1">
-                  We solve the &apos;trust issue&apos;, leveraging decentralized smart contracts so
-                  you have no dilemma of &apos;Who moves first?&apos;
+                  We solve the &apos;trust issue&apos; using decentralized smart contracts, removing
+                  counterparty risk and eliminating the dilemma of &apos;Who moves first?&apos;
                 </Typography>
               </li>
               <li>
                 <Typography component="p" variant="body1">
                   We give back control to our customers – trades are authorized directly from your
-                  own wallet, and all transactions can be verified in real-time (on blockchain).
+                  own wallet and all transactions can be verified in real-time (on blockchain).
                 </Typography>
               </li>
               <li>
@@ -97,7 +97,7 @@ const HomePage: React.FC = () => {
               </li>
               <li>
                 <Typography component="p" variant="body1">
-                  <b>Connect your Wallet</b>
+                  <b>Connect your eWallet</b>
                 </Typography>
                 <Typography component="p" variant="body1" />
                 Link your eWallet using <a href="https://metamask.io/">Metamask</a> or compatible{' '}
@@ -109,12 +109,12 @@ const HomePage: React.FC = () => {
                   <b>Browse the marketplace and trade with other users</b>
                 </Typography>
                 <Typography component="p" variant="body1" />
-                <b>Accept</b> Offers from other users or <b>Create</b> your own. Simply set your
-                terms and publish to the market for others to accept.
+                <b>Accept</b> trades from other users or <b>Create</b> your own offer. Simply set
+                your terms and publish to the market for others to accept.
               </li>
               <li>
                 <Typography component="p" variant="body1">
-                  <b>Complete your Trade</b>
+                  <b>Complete your trade</b>
                 </Typography>
                 <Typography component="p" variant="body1" />
                 Each trade is managed by a{' '}
