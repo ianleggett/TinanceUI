@@ -145,8 +145,6 @@ const HomePage: React.FC = () => {
             <Grid xs={6} sm={6} md={6} lg={6} xl={6} className={classes.content} item>
               <Typography component="h2" align="center" variant="h4" color="primary">
                 {t('How it works')}
-                <br />
-                <br />
               </Typography>
               <Card className={classes.howTo}>
                 <CardMedia
@@ -182,6 +180,24 @@ const HomePage: React.FC = () => {
                     Link your eWallet using <a href="https://metamask.io/">Metamask</a> or
                     compatible <a href="https://walletconnect.org/">Wallet Connect</a>. Add your
                     receiving bank details and begin trading.
+                  </Typography>
+                </CardContent>
+              </Card>
+              <Card className={classes.howTo}>
+                <CardMedia
+                  component="img"
+                  className={classes.icon2}
+                  alt="trade"
+                  image="trade.png"
+                  title="trade"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="h2" color="primary">
+                    Browse the marketplace
+                  </Typography>
+                  <Typography variant="body2" className={classes.text2} component="p">
+                    <b>Accept</b> trades from other users or <b>Create</b> your own offer. Simply
+                    set your terms and publish to the market for others to accept.
                   </Typography>
                 </CardContent>
               </Card>
