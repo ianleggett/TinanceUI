@@ -78,11 +78,27 @@ const useStyles = makeStyles((theme) => ({
     margin: 'auto',
   },
   howTo: {
+    position: 'relative',
     padding: '32px 10px',
     fontSize: '16px',
     borderRadius: '20px',
     margin: '10px',
+    height: '100%',
     boxShadow: '2px 2px 4px 0 rgba(0, 0, 0, 0.1)',
+  },
+  order: {
+    position: 'absolute',
+    top: '24px',
+    left: '24px',
+    width: '48px',
+    height: '48px',
+    lineHeight: '48px',
+    borderRadius: '50%',
+    textAlign: 'center',
+    fontSize: '32px',
+    fontWeight: 600,
+    color: '#fff',
+    backgroundColor: '#ece3ff',
   },
   icon2: {
     width: '100%',
@@ -209,13 +225,7 @@ const HomePage: React.FC = () => {
           </Paper>
         </Grid>
       </Grid>
-      <Grid
-        spacing={3}
-        alignItems="flex-start"
-        direction={direction}
-        container
-        justifyContent="center"
-      >
+      <Grid spacing={3} alignItems="stretch" direction={matches ? 'row' : 'column'} container>
         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
           <Typography
             component="h2"
@@ -227,17 +237,9 @@ const HomePage: React.FC = () => {
             {t('How it works?')}
           </Typography>
         </Grid>
-        <Grid
-          xs={12}
-          sm={12}
-          md={6}
-          lg={6}
-          xl={6}
-          item
-          justifyContent="center"
-          alignContent="center"
-        >
+        <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
           <Card className={classes.howTo}>
+            <span className={classes.order}>1</span>
             <CardMedia component="img" className={classes.icon2} image="join.png" title="Join" />
 
             <CardContent>
@@ -268,6 +270,7 @@ const HomePage: React.FC = () => {
         </Grid>
         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
           <Card className={classes.howTo}>
+            <span className={classes.order}>2</span>
             <CardMedia
               component="img"
               className={classes.icon2}
@@ -305,8 +308,9 @@ const HomePage: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+        <Grid xs={12} sm={12} md={6} lg={6} xl={6} item alignItems="stretch">
           <Card className={classes.howTo}>
+            <span className={classes.order}>3</span>
             <CardMedia
               component="img"
               className={classes.icon2}
@@ -339,6 +343,7 @@ const HomePage: React.FC = () => {
         </Grid>
         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
           <Card className={classes.howTo}>
+            <span className={classes.order}>4</span>
             <CardMedia
               component="img"
               className={classes.icon2}
