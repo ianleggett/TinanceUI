@@ -129,7 +129,7 @@ const HomePage: React.FC = () => {
   return (
     <Container disableGutters>
       <Grid alignItems="center">
-        {!videoUrl.startsWith('https://www.youtube.com') ? (
+        {videoUrl.startsWith('https://www.youtube.com') ? (
           <iframe
             id="ytplayer"
             title="Weclome to Tinance"
