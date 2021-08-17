@@ -26,7 +26,6 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import InboxOutlinedIcon from '@material-ui/icons/InboxOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
@@ -41,7 +40,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
-import { useUserManagerState } from '../components';
+import { useAppConfigState, useUserManagerState } from '../components';
 import { tradeStatusMap } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
 import ESCROWABI from '../constants/ESCROW.abi.json';
@@ -52,7 +51,6 @@ import {
   FlagCompleteService,
   FlagFundsSentService,
   GetMyTradesService,
-  GetNetworkConfigService,
   RateTradeService,
 } from '../services';
 import { snackbar, toFixed } from '../utils';
@@ -190,18 +188,23 @@ const TradeListPage: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const { profile } = useUserManagerState();
+  const { networkConfig } = useAppConfigState();
   const [loading, setLoading] = useState(true);
   const [preDepositing, setPreDepositing] = useState(false);
-  const [{ etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr }, setNetworkConfig] = useState<any>({
-    etherScanPrefix: 'https://etherscan.io/tx/',
-    escrowCtrAddr: '0xEb13Bb6F98dE43f9f040BD6B6823CcD3339AEB05',
-    USDTCoinCtrAddr: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-  });
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openRateTradeDialog, setOpenRateTradeDialog] = useState(false);
   const { account, library, connector, error } = useWeb3React<Web3Provider>();
+
+  const { etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr } = useMemo(
+    () => ({
+      etherScanPrefix: networkConfig.etherScanPrefix,
+      escrowCtrAddr: networkConfig.escrowCtrAddr,
+      USDTCoinCtrAddr: networkConfig.usdtcoinCtrAddr,
+    }),
+    [networkConfig],
+  );
 
   const { symbol, address, name, decimals, abi } = {
     address: USDTCoinCtrAddr,
@@ -221,19 +224,6 @@ const TradeListPage: React.FC = () => {
       dialogFormikRef.current = null;
     }
   }, []);
-
-  const { run: getNetworkConfig } = useRequest(GetNetworkConfigService, {
-    onSuccess(res) {
-      if (res) {
-        setNetworkConfig(res);
-      } else {
-        snackbar.warning(t('Get network config failed'));
-      }
-    },
-    onError(errorIn) {
-      snackbar.warning(errorIn.message || t('Get network config failed'));
-    },
-  });
 
   const { run, cancel } = useRequest(GetMyTradesService, {
     pollingWhenHidden: false,

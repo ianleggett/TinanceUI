@@ -407,11 +407,13 @@ declare namespace API {
 
   interface GetNetworkConfigParams {}
 
-  interface GetNetworkConfigResponse extends BaseResponse {
+  interface GetNetworkConfigResponse {
     brokerPrivateKey: string;
     buyerfeePct: number;
     escrowCtrAddr: string;
+    etherScanPrefix: string;
     httpService: string;
+    maxEthFee: number;
     sellerfeePct: number;
     usdtcoinCtrAddr: string;
   }

@@ -1,11 +1,12 @@
 import Container from '@material-ui/core/Container';
-import { useMount } from 'ahooks';
+import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import type { Dispatch } from 'react';
 import { createContext, Suspense, useContext, useReducer } from 'react';
 
 import { appConfig } from '../constants';
 import {
   GetCCYCodesService,
+  GetNetworkConfigService,
   GetNetworkProfileService,
   GetPaymentTypesService,
   GetValidationRegexService,
@@ -14,6 +15,7 @@ import { snackbar } from '../utils';
 import { GlobalFooter } from './GlobalFooter';
 import { GlobalHeader } from './GlobalHeader';
 import { I18nextProvider } from './I18nextProvider';
+import { useUserManagerState } from './UserManager';
 
 const initialState = appConfig;
 
@@ -89,10 +91,35 @@ export const AppConfigProvider: React.FC<AppConfigProviderProps> = (props) => {
   const { children, ...restProps } = props;
   const [state, dispatch] = useReducer(reducer, { ...initialState, ...restProps });
   const { title, lang, logo, maxWidth, networkProfile } = state;
+  const { isLoggedIn } = useUserManagerState();
+
+  const { run: getNetworkConfig } = useRequest(GetNetworkConfigService, {
+    onSuccess(res) {
+      if (res) {
+        dispatch({
+          type: 'update',
+          payload: {
+            networkConfig: res,
+          },
+        });
+      } else {
+        snackbar.warning('Get network config failed');
+      }
+    },
+    onError(error) {
+      snackbar.warning(error.message || 'Get network config failed');
+    },
+  });
 
   useMount(async () => {
     await getAndSavePublicData(dispatch);
   });
+
+  useUpdateEffect(() => {
+    if (isLoggedIn) {
+      getNetworkConfig();
+    }
+  }, [isLoggedIn]);
 
   return (
     <AppConfigStateContext.Provider value={state}>

@@ -1,5 +1,4 @@
-import { BigNumber } from '@ethersproject/bignumber';
-import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
 import { CircularProgress } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
@@ -33,17 +32,12 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 
-import { useAppConfig } from '../components';
+import { useAppConfigDispatch, useAppConfigState } from '../components';
 import ERC20ABI from '../constants/ERC20.abi.json';
-import { GetNetworkConfigService, GetUserWalletService, SetUserWaletService } from '../services';
-import { walletconnect, walletlink } from '../utils/connectors';
+import { GetUserWalletService, SetUserWaletService } from '../services';
+import { walletconnect } from '../utils/connectors';
 import { injectedConnector, useEagerConnect } from '../utils/hooks';
 import { snackbar } from '../utils/snackbar';
-
-// const USDTCoinCtrAddr = '0xa2d7D534ea1952cB9C24334464E1289A7C460F4d';
-const USDTCoinCtrAddr = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
-// const mymap = new Map<string, any>([['0xd0e03ce5e1917dad909a5b7f03397b055d4ae9c6', ERC20ABI]]);
-const mymap = new Map<string, any>([[USDTCoinCtrAddr, ERC20ABI]]);
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -120,7 +114,7 @@ const WalletConnection: React.FC = () => {
   }, [activatingConnector, connector]);
 
   const triedEager = useEagerConnect();
-  const [{ ccyCodes }, dispatch] = useAppConfig();
+  const dispatch = useAppConfigDispatch();
 
   // Set global state `walletConnected` in app context to true
   const handleWalletConnect = useCallback(() => {
@@ -231,24 +225,22 @@ const WalletConnection: React.FC = () => {
 };
 
 const UserWalletPage: React.FC = () => {
+  const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const [{ ccyCodes }, dispatch] = useAppConfig();
-
-  const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('md'));
+  const { ccyCodes, networkConfig } = useAppConfigState();
   const direction = useMemo(() => (matches ? 'row' : 'column'), [matches]);
   const [formData, setFormData] = useState(initialValues);
   const [activatingConnector, setActivatingConnector] = useState();
-  const [networkConfig, setNetworkConfig] = useState<any>();
-
   const { connector, library, chainId, account, activate, deactivate, active } =
     useWeb3React<Web3Provider>();
 
   const chid = chainId === undefined ? 0 : chainId;
+
   const { symbol, address, name, decimals, abi } = {
-    address: USDTCoinCtrAddr,
+    address: networkConfig.usdtcoinCtrAddr,
     symbol: 'USDT',
     name: 'USDT',
     decimals: 6,
@@ -296,19 +288,6 @@ const UserWalletPage: React.FC = () => {
     },
     onError(error) {
       snackbar.warning(error.message || t('Set user wallet failed'));
-    },
-  });
-
-  const { run: getNetworkConfig } = useRequest(GetNetworkConfigService, {
-    onSuccess(res) {
-      if (res) {
-        setNetworkConfig(res);
-      } else {
-        snackbar.warning(t('Get network config failed'));
-      }
-    },
-    onError(error) {
-      snackbar.warning(error.message || t('Get network config failed'));
     },
   });
 
@@ -379,7 +358,6 @@ const UserWalletPage: React.FC = () => {
 
   useMount(() => {
     getUserWallet();
-    getNetworkConfig();
   });
 
   return (
@@ -458,7 +436,9 @@ const UserWalletPage: React.FC = () => {
                 <EtherSWRConfig
                   value={{
                     provider: library,
-                    ABIs: new Map(mymap),
+                    ABIs: new Map(
+                      new Map<string, any>([[networkConfig.usdtcoinCtrAddr, ERC20ABI]]),
+                    ),
                     refreshInterval: 30_000,
                   }}
                 >
