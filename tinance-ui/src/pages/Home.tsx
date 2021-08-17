@@ -1,4 +1,5 @@
 import { Card, CardContent, CardMedia, Typography } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -128,7 +129,7 @@ const HomePage: React.FC = () => {
 
   return (
     <Container disableGutters>
-      <Grid alignItems="center">
+      <Box alignItems="center">
         {videoUrl.startsWith('https://www.youtube.com') ? (
           <iframe
             id="ytplayer"
@@ -148,7 +149,7 @@ const HomePage: React.FC = () => {
             className={classes.video}
           />
         )}
-      </Grid>
+      </Box>
       <Grid spacing={3} alignItems="center" direction={direction} container>
         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
           <Typography
@@ -167,8 +168,8 @@ const HomePage: React.FC = () => {
             className={classes.bubble}
             style={{ backgroundColor: '#edfbfe', paddingBottom: matches ? '0' : '20px' }}
           >
-            <Grid container alignContent="center" justifyContent="center">
-              <Grid md={7} lg={7} item alignItems="center">
+            <Grid container alignItems="center" justifyContent="center">
+              <Grid md={7} lg={7} item>
                 <Typography component="p" variant="body1" className={classes.content}>
                   Simple, automated trade flow - making it easier and more accessible to trade
                   globally, and doing it safely and securely.
@@ -308,7 +309,7 @@ const HomePage: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={12} md={6} lg={6} xl={6} item alignItems="stretch">
+        <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
           <Card className={classes.howTo}>
             <span className={classes.order}>3</span>
             <CardMedia
@@ -347,7 +348,6 @@ const HomePage: React.FC = () => {
             <CardMedia
               component="img"
               className={classes.icon2}
-              object-fit
               alt="complete trade"
               image="complete.png"
               title="complete your trade"
