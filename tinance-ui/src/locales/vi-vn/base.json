@@ -192,5 +192,18 @@
   "You are the Seller": "Bạn là người bán",
   "You'll receive": "Bạn sẽ nhận được",
   "You'll send": "Bạn sẽ gửi",
-  "Your password has been reset": "Mật khẩu của bạn đã được thiết lập lại"
+  "Your password has been reset": "Mật khẩu của bạn đã được thiết lập lại",
+  "What is Trusted Finance?": "Tại sao chọn Tinance?",
+  "No more 'trust issues' - we use decentralized smart contracts - so no counterparty risk and no dilemma of 'Who moves first?'": "Không còn 'vấn đề về niềm tin' - chúng tôi sử dụng các hợp đồng thông minh phi tập trung - vì vậy không có rủi ro đối tác và không có tình huống khó xử 'Ai đi trước?'",
+  "Customer has total control – trades are authorized directly from your own wallet and all transactions can be verified in real-time (on blockchain).": "Khách hàng có toàn quyền kiểm soát - các giao dịch được ủy quyền trực tiếp từ ví của chính bạn và tất cả các giao dịch có thể được xác minh trong thời gian thực (trên blockchain).",
+  "Simple, automated trade flow - making it easier and more accessible to trade globally, and doing it safely and securely.": "Luồng giao dịch đơn giản, tự động - giúp giao dịch trên toàn cầu dễ dàng và dễ tiếp cận hơn, đồng thời thực hiện nó một cách an toàn và bảo mật.",
+  "How it works?": "Làm thế nào nó hoạt động?",
+  "Create your account": "tạo tài khoản của bạn",
+  "Sign up, enter your contact details and your journey begins. It is that easy - and its free!": "Đăng ký, nhập chi tiết liên lạc của bạn và cuộc hành trình của bạn bắt đầu. Nó là dễ dàng - và nó miễn phí!",
+  "Connect your eWallet": "Kết nối eWallet của bạn",
+  "Link your eWallet using Metamask or compatible Wallet Connect. Add your receiving bank details and begin trading.": "Liên kết eWallet của bạn bằng Metamask hoặc Wallet Connect tương thích. Thêm chi tiết ngân hàng nhận của bạn và bắt đầu giao dịch.",
+  "Browse the marketplace": "Duyệt qua thị trường",
+  "Accept trades from other users or Create your own offer. Simply set your terms and publish to the market for others to accept.": "Chấp nhận giao dịch từ những người dùng khác hoặc Tạo phiếu mua hàng của riêng bạn. Đơn giản chỉ cần thiết lập các điều khoản của bạn và xuất bản ra thị trường để những người khác chấp nhận.",
+  "Complete your trade": "Hoàn thành giao dịch của bạn",
+  "Each trade is managed by a smart contract, crypto is held in secure escrow and only released when digitally verified by both parties. If either party fails to verifiy every part of the process, funds are automatcically refunded. Arbitration takes place in the unlikely event of disputes.": "Mỗi giao dịch được quản lý bởi một hợp đồng thông minh, tiền điện tử được giữ trong ký quỹ an toàn và chỉ được phát hành khi được cả hai bên xác minh kỹ thuật số. Nếu một trong hai bên không xác minh được mọi phần của quy trình, tiền sẽ được hoàn trả một cách tự động. Trọng tài diễn ra trong trường hợp không thể xảy ra tranh chấp."
 }

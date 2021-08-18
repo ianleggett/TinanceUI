@@ -192,5 +192,18 @@
   "You are the Seller": "您是卖家",
   "You'll receive": "你将收到",
   "You'll send": "你将发送",
-  "Your password has been reset": "你的密码已重置成功"
+  "Your password has been reset": "你的密码已重置成功",
+  "What is Trusted Finance?": "为什么选择Tinance?",
+  "No more 'trust issues' - we use decentralized smart contracts - so no counterparty risk and no dilemma of 'Who moves first?'": "利用分布式的智能合约，解决了交易中最重要的信任问题，消除了交易对手风险，避免了先打数字货币还是先打款的窘境",
+  "Customer has total control – trades are authorized directly from your own wallet and all transactions can be verified in real-time (on blockchain).": "把最终的掌控权交还给客户，所有的交易都由您的私有钱包发起和控制，同时所有的交易记录实时可追溯。",
+  "Simple, automated trade flow - making it easier and more accessible to trade globally, and doing it safely and securely.": "极大地简化了交易流程，让交易变得安全，触手可及。",
+  "How it works?": "交易流程简介",
+  "Create your account": "创建你的帐号",
+  "Sign up, enter your contact details and your journey begins. It is that easy - and its free!": "请注册帐号",
+  "Connect your eWallet": "连接您的钱包",
+  "Link your eWallet using Metamask or compatible Wallet Connect. Add your receiving bank details and begin trading.": "首先请添加您的收款银行信息，然后连接您的钱包，即可交易。",
+  "Browse the marketplace": "您可在市场里浏览相关报价",
+  "Accept trades from other users or Create your own offer. Simply set your terms and publish to the market for others to accept.": "您可接受其他用户的报价，即可进入交易流程。您也可以通过简单操作创建您的报价。",
+  "Complete your trade": "完成交易",
+  "Each trade is managed by a smart contract, crypto is held in secure escrow and only released when digitally verified by both parties. If either party fails to verifiy every part of the process, funds are automatcically refunded. Arbitration takes place in the unlikely event of disputes.": "所有的交易都由分布式的智能合约来执行，数字货币安全地托管在智能合约里，只有您有权利确认最后的转账。如果一方不履行交易，数字货币将自动回到您的钱包。"
 }
