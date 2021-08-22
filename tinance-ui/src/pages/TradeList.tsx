@@ -47,7 +47,7 @@ import ESCROWABI from '../constants/ESCROW.abi.json';
 import {
   AcceptCancelService,
   CancelTradeService,
-  DepositCryptoService,
+  DepositCryptoAsyncService,
   FlagCompleteService,
   FlagFundsSentService,
   GetMyTradesService,
@@ -273,7 +273,7 @@ const TradeListPage: React.FC = () => {
     run: depositCrypto,
     loading: depositing,
     cancel: cancelDeposit,
-  } = useRequest(DepositCryptoService, {
+  } = useRequest(DepositCryptoAsyncService, {
     onSuccess(res) {
       setSelectedOrderId('');
 

@@ -3,6 +3,7 @@ export * from './add-update-order';
 export * from './cancel-trade';
 export * from './change-pwd';
 export * from './deposit-crypto';
+export * from './deposit-crypto-async';
 export * from './flag-complete';
 export * from './flag-funds-sent';
 export * from './forgot-password';
