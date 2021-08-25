@@ -2,7 +2,6 @@ import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import type { Dispatch } from 'react';
 import { createContext, useCallback, useContext, useReducer } from 'react';
 
-import pkg from '../../package.json';
 import { GetUserDetailsService } from '../services';
 import { clearProfile, getProfile, getToken, saveProfile, snackbar } from '../utils';
 
@@ -65,21 +64,6 @@ async function requestRemoteUserProfile(dispatch: Dispatch<UserManagerAction>) {
       dispatch({
         type: 'saveUserInfo',
         payload: profile,
-      });
-
-      const url = new URL('/tradesub', pkg.proxy.replace('https', 'wss'));
-      const ws = new WebSocket(url.href, [getToken()]);
-
-      ws.addEventListener(
-        'open',
-        () => {
-          ws.send(JSON.stringify(profile));
-        },
-        { once: true },
-      );
-
-      ws.addEventListener('message', (event) => {
-        console.dir(event);
       });
     } else {
       snackbar.warning('Get user profile failed');

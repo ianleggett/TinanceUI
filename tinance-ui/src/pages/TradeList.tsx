@@ -39,7 +39,9 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
+import Stomp from 'stompjs';
 
+import pkg from '../../package.json';
 import { useAppConfigState, useUserManagerState } from '../components';
 import { tradeStatusMap } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
@@ -183,6 +185,8 @@ const sellerInfo: Record<Trade.Status, string> = {
   UNKNOWN: '',
 };
 
+const url = new URL('/tradesub', pkg.proxy.replace('https', 'wss'));
+
 const TradeListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
@@ -196,6 +200,7 @@ const TradeListPage: React.FC = () => {
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openRateTradeDialog, setOpenRateTradeDialog] = useState(false);
   const { account, library, connector, error } = useWeb3React<Web3Provider>();
+  const stompClientRef = useRef<Stomp.Client | null>(null);
 
   const { etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr } = useMemo(
     () => ({
@@ -275,6 +280,17 @@ const TradeListPage: React.FC = () => {
     cancel: cancelDeposit,
   } = useRequest(DepositCryptoAsyncService, {
     onSuccess(res) {
+      const stompClient = stompClientRef.current;
+
+      if (stompClient) {
+        // Connect and subscribe channel when deposit succeed.
+        stompClient.connect({}, (frame) => {
+          stompClient.subscribe(`/topic/message/${selectedOrderId}`, (messageOutput) => {
+            console.dir(messageOutput.body);
+          });
+        });
+      }
+
       setSelectedOrderId('');
 
       if (res.statusCode === 0) {
@@ -779,10 +795,20 @@ const TradeListPage: React.FC = () => {
     ],
   );
 
-  useMount(run);
+  useMount(() => {
+    run();
+
+    // Initialize stomp clinet when mounted
+    stompClientRef.current = Stomp.over(new WebSocket(url.href));
+  });
 
   useUnmount(() => {
     cancel();
+
+    // Disconnect when unmount
+    stompClientRef.current?.disconnect(() => {
+      stompClientRef.current = null;
+    });
   });
 
   return (

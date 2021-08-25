@@ -10,7 +10,8 @@
       "react",
       "react-copy-to-clipboard",
       "react-dom",
-      "react-router-dom"
+      "react-router-dom",
+      "stompjs"
     ],
     "allowJs": true,
     "skipLibCheck": true,
