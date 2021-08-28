@@ -191,7 +191,7 @@ const sellerInfo: Record<Trade.Status, string> = {
   UNKNOWN: '',
 };
 
-const url = new URL('/tradesub', pkg.proxy.replace('https', 'wss'));
+const url = new URL('/tradesub', pkg.proxy.replace('http', 'ws'));
 
 const TradeListPage: React.FC = () => {
   const classes = useStyles();
@@ -447,7 +447,7 @@ const TradeListPage: React.FC = () => {
       const stompClient = stompClientRef.current;
 
       if (stompClient) {
-        const subscribtion = stompClient.subscribe(`/topic/messages/1234`, (messageOutput) => {
+        const subscribtion = stompClient.subscribe(`/topic/messages/${oid}`, (messageOutput) => {
           setShowOverlay(true);
 
           try {
@@ -498,14 +498,14 @@ const TradeListPage: React.FC = () => {
                   (txnval: TransactionResponse) => {
                     snackbar.success(t('Wallet approval accepted'));
                     // console.log(txnval);
-                    txnval.wait(1).then((txnRec) => {
-                      console.log('1 block waited');
-                      // the escrow contract calls the transfer once deposit() is called
-                      // console.log('Here to execute next step');
-                      // alert('call here API v1/deposit( ctrid )');
-                      depositCrypto({ oid });
-                      setSelectedOrderId(oid);
-                    });
+                    // txnval.wait(1).then((txnRec) => {
+                    //   console.log('1 block waited');
+                    // the escrow contract calls the transfer once deposit() is called
+                    // console.log('Here to execute next step');
+                    // alert('call here API v1/deposit( ctrid )');
+                    depositCrypto({ oid });
+                    setSelectedOrderId(oid);
+                    // });
                   },
                   (_error: Error) => {
                     // user rejects approval
