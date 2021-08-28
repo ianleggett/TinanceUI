@@ -191,7 +191,7 @@ const sellerInfo: Record<Trade.Status, string> = {
   UNKNOWN: '',
 };
 
-const url = new URL('/tradesub', pkg.proxy.replace('https', 'wss'));
+const url = new URL('/tradesub', pkg.proxy.replace('https', 'wss').replace('http', 'ws'));
 
 const TradeListPage: React.FC = () => {
   const classes = useStyles();
