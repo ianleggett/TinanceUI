@@ -35,7 +35,7 @@ import { useMount, useRequest, useUnmount } from 'ahooks';
 import dayjs from 'dayjs';
 import { BigNumber } from 'ethers';
 import { useFormik } from 'formik';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -138,12 +138,18 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 5,
   },
   backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     zIndex: theme.zIndex.tooltip + 1,
   },
-  loading: {
+  loadingTitle: {
     userSelect: 'none',
     color: theme.palette.common.white,
     marginTop: theme.spacing(2),
+  },
+  loadingSubtitle: {
+    userSelect: 'none',
+    color: 'rgba(255, 255, 255, 0.62)',
+    marginTop: theme.spacing(1),
   },
 }));
 
@@ -194,13 +200,16 @@ const TradeListPage: React.FC = () => {
   const { profile } = useUserManagerState();
   const { networkConfig } = useAppConfigState();
   const [loading, setLoading] = useState(true);
-  const [preDepositing, setPreDepositing] = useState(false);
   const [trades, setTrades] = useState<Trade.Model[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openRateTradeDialog, setOpenRateTradeDialog] = useState(false);
   const { account, library, connector, error } = useWeb3React<Web3Provider>();
   const stompClientRef = useRef<Stomp.Client | null>(null);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [depositingMessage, setDepositingMessage] = useState(
+    'Depositing - check your wallet for approval',
+  );
 
   const { etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr } = useMemo(
     () => ({
@@ -280,17 +289,6 @@ const TradeListPage: React.FC = () => {
     cancel: cancelDeposit,
   } = useRequest(DepositCryptoAsyncService, {
     onSuccess(res) {
-      const stompClient = stompClientRef.current;
-
-      if (stompClient) {
-        // Connect and subscribe channel when deposit succeed.
-        stompClient.connect({}, (frame) => {
-          stompClient.subscribe(`/topic/message/${selectedOrderId}`, (messageOutput) => {
-            console.dir(messageOutput.body);
-          });
-        });
-      }
-
       setSelectedOrderId('');
 
       if (res.statusCode === 0) {
@@ -445,14 +443,39 @@ const TradeListPage: React.FC = () => {
         snackbar.warning(`Wallet has changed !!, switch to wallet ${trade.sellerAddress}`);
         return;
       }
-      setPreDepositing(true); // show overlay
+
+      const stompClient = stompClientRef.current;
+
+      if (stompClient) {
+        const subscribtion = stompClient.subscribe(`/topic/messages/1234`, (messageOutput) => {
+          setShowOverlay(true);
+
+          try {
+            const { key, value } = JSON.parse(messageOutput.body);
+
+            setDepositingMessage(value);
+
+            if (key === 'End') {
+              stompClient.unsubscribe(subscribtion.id);
+
+              setTimeout(() => {
+                setShowOverlay(false);
+              }, 1000);
+            }
+          } catch (error_) {
+            console.error(error_.message);
+            stompClient.unsubscribe(subscribtion.id);
+            setShowOverlay(false);
+          }
+        });
+      }
+
       // address is address of USDT
       const contract = new Contract(address, ERC20ABI, library.getSigner());
 
       contract.balanceOf(account).then(
         (bal: BigNumber) => {
           if (bal.lt(cryptoAmt)) {
-            setPreDepositing(false);
             snackbar.warning('LOW BALANCE, not enough funds');
             return;
           }
@@ -464,13 +487,11 @@ const TradeListPage: React.FC = () => {
 
               if (!val.isZero()) {
                 if (!val.eq(cryptoAmt)) {
-                  setPreDepositing(false);
                   snackbar.warning(t(`Allowance reset ( ${val}), please try again !!`));
                   txn = contract.approve(escrowCtrAddr, 0);
                 } else {
                   depositCrypto({ oid });
                   setSelectedOrderId(oid);
-                  setTimeout(() => setPreDepositing(false), 60);
                 }
               } else {
                 contract.approve(escrowCtrAddr, cryptoAmt).then(
@@ -484,13 +505,11 @@ const TradeListPage: React.FC = () => {
                       // alert('call here API v1/deposit( ctrid )');
                       depositCrypto({ oid });
                       setSelectedOrderId(oid);
-                      setTimeout(() => setPreDepositing(false), 60);
                     });
                   },
                   (_error: Error) => {
                     // user rejects approval
                     snackbar.warning(_error.message);
-                    setPreDepositing(false);
                   },
                 );
               }
@@ -498,7 +517,6 @@ const TradeListPage: React.FC = () => {
             (_error: Error) => {
               // user rejects approval
               snackbar.warning(_error.message);
-              setPreDepositing(false);
             },
           );
         },
@@ -507,8 +525,7 @@ const TradeListPage: React.FC = () => {
         },
       );
     },
-    // [library, account],
-    [library, account, address, symbol, decimals, escrowCtrAddr, depositCrypto, t],
+    [decimals, symbol, address, account, escrowCtrAddr, library, t, depositCrypto],
   );
 
   const handleAlertDialogOpen = useCallback((oid: string) => {
@@ -588,7 +605,7 @@ const TradeListPage: React.FC = () => {
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
       const isSeller = !!profile && trade.seller.cid === profile.cid;
-      const disableDeposite = (preDepositing || depositing) && trade.tradeId === selectedOrderId;
+      const disableDeposite = depositing && trade.tradeId === selectedOrderId;
 
       switch (trade.status) {
         case 'CREATED': {
@@ -691,7 +708,6 @@ const TradeListPage: React.FC = () => {
       flagging2,
       handleFlagComplete,
       handleFlagFundsSent,
-      preDepositing,
       profile,
       selectedOrderId,
       t,
@@ -795,21 +811,28 @@ const TradeListPage: React.FC = () => {
     ],
   );
 
-  useMount(() => {
+  useEffect(() => {
     run();
 
-    // Initialize stomp clinet when mounted
-    stompClientRef.current = Stomp.over(new WebSocket(url.href));
-  });
+    const websocket = new WebSocket(url.href);
+    stompClientRef.current = Stomp.over(websocket);
+    const stompClient = stompClientRef.current;
 
-  useUnmount(() => {
-    cancel();
+    if (stompClient) {
+      stompClient.connect({}, (frame) => console.dir(frame));
+    }
 
-    // Disconnect when unmount
-    stompClientRef.current?.disconnect(() => {
-      stompClientRef.current = null;
-    });
-  });
+    return () => {
+      cancel();
+
+      if (stompClient) {
+        stompClient.disconnect(() => {
+          websocket.close();
+        });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -1273,13 +1296,14 @@ const TradeListPage: React.FC = () => {
           </DialogActions>
         </form>
       </Dialog>
-      <Backdrop open={preDepositing || depositing} className={classes.backdrop}>
+      <Backdrop open={showOverlay} className={classes.backdrop}>
         <Box alignItems="center" justifyContent="center" color="#fff" textAlign="center">
           <CircularProgress color="inherit" />
-          <Typography variant="h5" className={classes.loading}>
-            {t('Depositing - check your wallet for approval')},
-            <br />
-            {t(`Please don't close or refresh the page`)}.
+          <Typography variant="h5" className={classes.loadingTitle}>
+            {depositingMessage}
+          </Typography>
+          <Typography variant="body1" className={classes.loadingSubtitle}>
+            {t("Please don't close or refresh the page")}
           </Typography>
         </Box>
       </Backdrop>
