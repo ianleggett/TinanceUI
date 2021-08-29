@@ -496,7 +496,7 @@ const TradeListPage: React.FC = () => {
               } else {
                 contract.approve(escrowCtrAddr, cryptoAmt).then(
                   (txnval: TransactionResponse) => {
-                    snackbar.success(t('Wallet approval accepted'));
+                    // snackbar.success(t('Wallet approval accepted'));
                     // console.log(txnval);
                     // txnval.wait(1).then((txnRec) => {
                     //   console.log('1 block waited');
