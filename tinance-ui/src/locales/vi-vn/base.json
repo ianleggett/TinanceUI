@@ -207,5 +207,10 @@
   "Browse the marketplace": "Duyệt qua thị trường",
   "Accept trades from other users or Create your own offer. Simply set your terms and publish to the market for others to accept.": "Chấp nhận giao dịch từ những người dùng khác hoặc Tạo phiếu mua hàng của riêng bạn. Đơn giản chỉ cần thiết lập các điều khoản của bạn và xuất bản ra thị trường để những người khác chấp nhận.",
   "Complete your trade": "Hoàn thành giao dịch của bạn",
-  "Each trade is managed by a smart contract, crypto is held in secure escrow and only released when digitally verified by both parties. If either party fails to verifiy every part of the process, funds are automatcically refunded. Arbitration takes place in the unlikely event of disputes.": "Mỗi giao dịch được quản lý bởi một hợp đồng thông minh, tiền điện tử được giữ trong ký quỹ an toàn và chỉ được phát hành khi được cả hai bên xác minh kỹ thuật số. Nếu một trong hai bên không xác minh được mọi phần của quy trình, tiền sẽ được hoàn trả một cách tự động. Trọng tài diễn ra trong trường hợp không thể xảy ra tranh chấp."
+  "Each trade is managed by a smart contract, crypto is held in secure escrow and only released when digitally verified by both parties. If either party fails to verifiy every part of the process, funds are automatcically refunded. Arbitration takes place in the unlikely event of disputes.": "Mỗi giao dịch được quản lý bởi một hợp đồng thông minh, tiền điện tử được giữ trong ký quỹ an toàn và chỉ được phát hành khi được cả hai bên xác minh kỹ thuật số. Nếu một trong hai bên không xác minh được mọi phần của quy trình, tiền sẽ được hoàn trả một cách tự động. Trọng tài diễn ra trong trường hợp không thể xảy ra tranh chấp.",
+  "Create Contract...": "Tạo hợp đồng...",
+  "Deposit complete!!": "Gửi tiền hoàn tất!!",
+  "Check allowance...": "Kiểm tra phụ cấp...",
+  "Please don't close or refresh the page": "Vui lòng không đóng hoặc làm mới trang"
+}
 }
