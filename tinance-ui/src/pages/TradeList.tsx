@@ -4,6 +4,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
+import type { CircularProgressProps } from '@material-ui/core/CircularProgress';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -31,7 +32,7 @@ import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useWeb3React } from '@web3-react/core';
-import { useMount, useRequest, useUnmount } from 'ahooks';
+import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import { BigNumber } from 'ethers';
 import { useFormik } from 'formik';
@@ -56,6 +57,29 @@ import {
   RateTradeService,
 } from '../services';
 import { snackbar, toFixed } from '../utils';
+
+const CircularProgressWithLabel: React.FC<CircularProgressProps & { value: number }> = (props) => {
+  const { value } = props;
+
+  return (
+    <Box position="relative" display="inline-flex" style={{ color: '#fff' }}>
+      <CircularProgress color="inherit" size={64} variant="determinate" {...props} />
+      <Box
+        top={0}
+        left={0}
+        bottom={0}
+        right={0}
+        position="absolute"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        style={{ color: '#fff' }}
+      >
+        <Typography variant="caption" component="div" color="inherit">{`${value}%`}</Typography>
+      </Box>
+    </Box>
+  );
+};
 
 const USDT_DECIMALS = 6;
 // this comes from swagger API call getnetworkconfig.json
@@ -210,6 +234,19 @@ const TradeListPage: React.FC = () => {
   const [depositingMessage, setDepositingMessage] = useState(
     'Depositing - check your wallet for approval',
   );
+
+  const progress = useMemo(() => {
+    switch (depositingMessage) {
+      case 'Create Contract...':
+        return 33.3;
+      case 'Check allowance...':
+        return 66.6;
+      case 'Deposit complete!!':
+        return 100;
+      default:
+        return 5;
+    }
+  }, [depositingMessage]);
 
   const { etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr } = useMemo(
     () => ({
@@ -447,9 +484,9 @@ const TradeListPage: React.FC = () => {
       const stompClient = stompClientRef.current;
 
       if (stompClient) {
-        const subscribtion = stompClient.subscribe(`/topic/messages/${oid}`, (messageOutput) => {
-          setShowOverlay(true);
+        setShowOverlay(true);
 
+        const subscribtion = stompClient.subscribe(`/topic/messages/${oid}`, (messageOutput) => {
           try {
             const { key, value } = JSON.parse(messageOutput.body);
 
@@ -605,7 +642,7 @@ const TradeListPage: React.FC = () => {
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
       const isSeller = !!profile && trade.seller.cid === profile.cid;
-      const disableDeposite = depositing && trade.tradeId === selectedOrderId;
+      const disableDeposite = (showOverlay || depositing) && trade.tradeId === selectedOrderId;
 
       switch (trade.status) {
         case 'CREATED': {
@@ -703,15 +740,16 @@ const TradeListPage: React.FC = () => {
       }
     },
     [
-      depositing,
-      flagging,
-      flagging2,
-      handleFlagComplete,
-      handleFlagFundsSent,
       profile,
+      showOverlay,
+      depositing,
       selectedOrderId,
       t,
       handleDeposit,
+      flagging,
+      handleFlagFundsSent,
+      flagging2,
+      handleFlagComplete,
     ],
   );
 
@@ -1298,9 +1336,9 @@ const TradeListPage: React.FC = () => {
       </Dialog>
       <Backdrop open={showOverlay} className={classes.backdrop}>
         <Box alignItems="center" justifyContent="center" color="#fff" textAlign="center">
-          <CircularProgress color="inherit" />
+          <CircularProgressWithLabel value={progress} />
           <Typography variant="h5" className={classes.loadingTitle}>
-            {depositingMessage}
+            {t(depositingMessage)}
           </Typography>
           <Typography variant="body1" className={classes.loadingSubtitle}>
             {t("Please don't close or refresh the page")}
