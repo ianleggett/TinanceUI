@@ -237,9 +237,9 @@ const TradeListPage: React.FC = () => {
 
   const progress = useMemo(() => {
     switch (depositingMessage) {
-      case 'Create Contract...':
+      case 'Checking allowance...':
         return 33.3;
-      case 'Check allowance...':
+      case 'Creating Contract...':
         return 66.6;
       case 'Deposit complete!!':
         return 100;
