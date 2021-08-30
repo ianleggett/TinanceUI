@@ -241,7 +241,7 @@ const TradeListPage: React.FC = () => {
         return 33.3;
       case 'Creating Contract...':
         return 66.6;
-      case 'Deposit complete!!':
+      case 'Deposit Complete !!':
         return 100;
       default:
         return 5;
