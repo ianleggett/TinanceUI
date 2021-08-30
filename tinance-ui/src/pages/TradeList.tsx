@@ -642,7 +642,8 @@ const TradeListPage: React.FC = () => {
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
       const isSeller = !!profile && trade.seller.cid === profile.cid;
-      const disableDeposite = (showOverlay || depositing) && trade.tradeId === selectedOrderId;
+      const disableDeposite =
+        (showOverlay || depositing || loading) && trade.tradeId === selectedOrderId;
 
       switch (trade.status) {
         case 'CREATED': {
@@ -750,6 +751,7 @@ const TradeListPage: React.FC = () => {
       handleFlagFundsSent,
       flagging2,
       handleFlagComplete,
+      loading,
     ],
   );
 
