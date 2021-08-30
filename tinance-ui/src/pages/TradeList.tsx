@@ -330,7 +330,7 @@ const TradeListPage: React.FC = () => {
 
       if (res.statusCode === 0) {
         run();
-        snackbar.success(t('Deposit crypto successful'));
+        // snackbar.success(t('Deposit crypto successful'));
       } else {
         snackbar.warning(res.msg || t('Deposit crypto failed'));
       }
@@ -486,6 +486,8 @@ const TradeListPage: React.FC = () => {
       if (stompClient) {
         setShowOverlay(true);
 
+        setDepositingMessage('check your wallet..');
+
         const subscribtion = stompClient.subscribe(`/topic/messages/${oid}`, (messageOutput) => {
           try {
             const { key, value } = JSON.parse(messageOutput.body);
@@ -547,6 +549,7 @@ const TradeListPage: React.FC = () => {
                   (_error: Error) => {
                     // user rejects approval
                     snackbar.warning(_error.message);
+                    setShowOverlay(false);
                   },
                 );
               }
