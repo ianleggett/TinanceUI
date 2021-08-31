@@ -1,5 +1,6 @@
 export * from './AccessControlRoute';
 export * from './AppConfig';
+export * from './CopyIconButton';
 export * from './DepositeDialog';
 export * from './EasyCircularProgress';
 export * from './GlobalHeader';
