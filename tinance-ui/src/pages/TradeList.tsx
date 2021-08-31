@@ -1,6 +1,5 @@
 import { Contract } from '@ethersproject/contracts';
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
-import Backdrop from '@material-ui/core/Backdrop';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
@@ -43,7 +42,7 @@ import { useHistory } from 'react-router-dom';
 import Stomp from 'stompjs';
 
 import pkg from '../../package.json';
-import { useAppConfigState, useUserManagerState } from '../components';
+import { DepositeDialog, useAppConfigState, useUserManagerState } from '../components';
 import { tradeStatusMap } from '../constants';
 import ERC20ABI from '../constants/ERC20.abi.json';
 import ESCROWABI from '../constants/ESCROW.abi.json';
@@ -57,29 +56,6 @@ import {
   RateTradeService,
 } from '../services';
 import { snackbar, toFixed } from '../utils';
-
-const CircularProgressWithLabel: React.FC<CircularProgressProps & { value: number }> = (props) => {
-  const { value } = props;
-
-  return (
-    <Box position="relative" display="inline-flex" style={{ color: '#fff' }}>
-      <CircularProgress color="inherit" size={64} variant="determinate" {...props} />
-      <Box
-        top={0}
-        left={0}
-        bottom={0}
-        right={0}
-        position="absolute"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        style={{ color: '#fff' }}
-      >
-        <Typography variant="caption" component="div" color="inherit">{`${value}%`}</Typography>
-      </Box>
-    </Box>
-  );
-};
 
 const USDT_DECIMALS = 6;
 // this comes from swagger API call getnetworkconfig.json
@@ -231,22 +207,7 @@ const TradeListPage: React.FC = () => {
   const { account, library, connector, error } = useWeb3React<Web3Provider>();
   const stompClientRef = useRef<Stomp.Client | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
-  const [depositingMessage, setDepositingMessage] = useState(
-    'Depositing - check your wallet for approval',
-  );
-
-  const progress = useMemo(() => {
-    switch (depositingMessage) {
-      case 'Checking allowance...':
-        return 33.3;
-      case 'Creating Contract...':
-        return 66.6;
-      case 'Deposit Complete !!':
-        return 100;
-      default:
-        return 5;
-    }
-  }, [depositingMessage]);
+  const [depositingMessage, setDepositingMessage] = useState('Creating Connection...');
 
   const { etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr } = useMemo(
     () => ({
@@ -277,9 +238,6 @@ const TradeListPage: React.FC = () => {
   }, []);
 
   const { run, cancel } = useRequest(GetMyTradesService, {
-    pollingWhenHidden: false,
-    refreshOnWindowFocus: true,
-    pollingInterval: profile && profile.pollingRate ? profile.pollingRate * 1000 : 10_000,
     onSuccess(res) {
       if (res) {
         setTrades(res);
@@ -320,14 +278,8 @@ const TradeListPage: React.FC = () => {
     },
   });
 
-  const {
-    run: depositCrypto,
-    loading: depositing,
-    cancel: cancelDeposit,
-  } = useRequest(DepositCryptoAsyncService, {
+  const { run: depositCrypto, loading: depositing } = useRequest(DepositCryptoAsyncService, {
     onSuccess(res) {
-      setSelectedOrderId('');
-
       if (res.statusCode === 0) {
         run();
         // snackbar.success(t('Deposit crypto successful'));
@@ -485,8 +437,6 @@ const TradeListPage: React.FC = () => {
 
       if (stompClient) {
         setShowOverlay(true);
-
-        setDepositingMessage('check your wallet..');
 
         const subscribtion = stompClient.subscribe(`/topic/messages/${oid}`, (messageOutput) => {
           try {
@@ -1339,17 +1289,11 @@ const TradeListPage: React.FC = () => {
           </DialogActions>
         </form>
       </Dialog>
-      <Backdrop open={showOverlay} className={classes.backdrop}>
-        <Box alignItems="center" justifyContent="center" color="#fff" textAlign="center">
-          <CircularProgressWithLabel value={progress} />
-          <Typography variant="h5" className={classes.loadingTitle}>
-            {t(depositingMessage)}
-          </Typography>
-          <Typography variant="body1" className={classes.loadingSubtitle}>
-            {t("Please don't close or refresh the page")}
-          </Typography>
-        </Box>
-      </Backdrop>
+      <DepositeDialog
+        open={showOverlay}
+        message={depositingMessage}
+        onClose={() => setShowOverlay(false)}
+      />
     </>
   );
 };

@@ -191,10 +191,15 @@
   "WalletConnect": "WalletConnect",
   "We have sent an reset link to your email, please check your email, then reset password with the instruction in the email.": "我們已經給您發了一封密碼重置郵件,請查收郵件,然後根據郵件提示重置密碼。",
   "We have sent an verification link to your email, please check your email, then activate your account with the instruction in the email.": "我們已經給您發了一封驗證郵件,請查收郵件,然後根據郵件中提示啟動帳號。",
-  "You are the Buyer": "You are the Buyer",
-  "You are the Seller": "You are the Seller",
+  "You are the Buyer": "你是买家",
+  "You are the Seller": "你是卖家",
+  "Your refund is being prepared": "您的退款正在準備中",
   "You'll receive": "你將收到",
   "You'll send": "你將發送",
   "Your password has been reset": "你的密碼已重置成功",
+  "Creating Connection...": "創建連接...",
+  "Checking allowance...": "檢查額度...",
+  "Creating Contract...": "創建智慧合約...",
+  "Deposit Complete !!": "交易完成 !!",
   "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues"
 }
