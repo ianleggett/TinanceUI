@@ -433,87 +433,81 @@ const TradeListPage: React.FC = () => {
         return;
       }
 
-      const stompClient = stompClientRef.current;
-
-      if (stompClient) {
-        setShowOverlay(true);
-
-        const subscribtion = stompClient.subscribe(`/topic/messages/${oid}`, (messageOutput) => {
-          try {
-            const { key, value } = JSON.parse(messageOutput.body);
-
-            setDepositingMessage(value);
-
-            if (key === 'End') {
-              stompClient.unsubscribe(subscribtion.id);
-
-              setTimeout(() => {
-                setShowOverlay(false);
-              }, 1000);
-            }
-          } catch (error_) {
-            console.error(error_.message);
-            stompClient.unsubscribe(subscribtion.id);
-            setShowOverlay(false);
-          }
-        });
-      }
+      setShowOverlay(true);
 
       // address is address of USDT
       const contract = new Contract(address, ERC20ABI, library.getSigner());
 
-      contract.balanceOf(account).then(
-        (bal: BigNumber) => {
-          if (bal.lt(cryptoAmt)) {
-            snackbar.warning('LOW BALANCE, not enough funds');
-            return;
-          }
-          console.log(`Balance OK ${bal}`);
-          // account is user account, what is current user allowance ??
-          contract.allowance(account, escrowCtrAddr).then(
-            (val: BigNumber) => {
-              let txn;
+      contract.balanceOf(account).then((bal: BigNumber) => {
+        if (bal.lt(cryptoAmt)) {
+          snackbar.warning('LOW BALANCE, not enough funds');
+          return;
+        }
 
-              if (!val.isZero()) {
-                if (!val.eq(cryptoAmt)) {
-                  snackbar.warning(t(`Allowance reset ( ${val}), please try again !!`));
-                  txn = contract.approve(escrowCtrAddr, 0);
-                } else {
-                  depositCrypto({ oid });
-                  setSelectedOrderId(oid);
-                }
-              } else {
-                contract.approve(escrowCtrAddr, cryptoAmt).then(
-                  (txnval: TransactionResponse) => {
-                    // snackbar.success(t('Wallet approval accepted'));
-                    // console.log(txnval);
-                    // txnval.wait(1).then((txnRec) => {
-                    //   console.log('1 block waited');
-                    // the escrow contract calls the transfer once deposit() is called
-                    // console.log('Here to execute next step');
-                    // alert('call here API v1/deposit( ctrid )');
-                    depositCrypto({ oid });
-                    setSelectedOrderId(oid);
-                    // });
-                  },
-                  (_error: Error) => {
-                    // user rejects approval
-                    snackbar.warning(_error.message);
+        console.log(`Balance OK ${bal}`);
+
+        // account is user account, what is current user allowance ??
+        contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
+          if (val.isZero()) {
+            // approval reset
+            const stompClient = stompClientRef.current;
+
+            if (stompClient) {
+              const subscribtion = stompClient.subscribe(
+                `/topic/messages/${oid}`,
+                (messageOutput) => {
+                  try {
+                    const { key, value } = JSON.parse(messageOutput.body);
+
+                    setDepositingMessage(value);
+
+                    if (key === 'End') {
+                      stompClient.unsubscribe(subscribtion.id);
+
+                      setTimeout(() => {
+                        setShowOverlay(false);
+                      }, 1000);
+                    }
+                  } catch {
+                    // console.error(error_.message);
+                    stompClient.unsubscribe(subscribtion.id);
                     setShowOverlay(false);
-                  },
-                );
-              }
-            },
-            (_error: Error) => {
-              // user rejects approval
-              snackbar.warning(_error.message);
-            },
-          );
-        },
-        (_error: Error) => {
-          console.log(_error);
-        },
-      );
+                  }
+                },
+              );
+            }
+
+            contract.approve(escrowCtrAddr, cryptoAmt).then(
+              (txnvalApp: TransactionResponse) => {
+                depositCrypto({ oid });
+                setSelectedOrderId(oid);
+              },
+              (_error: Error) => {
+                // user rejects approval
+                snackbar.warning(_error.message);
+                setShowOverlay(false);
+              },
+            );
+          }
+
+          if (!val.isZero() && !val.eq(cryptoAmt)) {
+            snackbar.warning(
+              t(`Your allowance needs resetting to 0, please confirm and wait for confirmation`),
+            );
+            contract.approve(escrowCtrAddr, 0).then(
+              (txnval: TransactionResponse) => {
+                txnval.wait(1).then((txnRec) => {
+                  snackbar.success('Allowance has been reset, please try depositing now');
+                });
+              },
+              (_error: Error) => {
+                // user rejects approval
+                snackbar.warning(_error.message);
+              },
+            );
+          }
+        });
+      });
     },
     [decimals, symbol, address, account, escrowCtrAddr, library, t, depositCrypto],
   );
