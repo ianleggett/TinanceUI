@@ -37,6 +37,8 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
+const steps = ['CONNECT_WS', 'CHK_ALLOWANCE', 'CREATE_CTR', 'DEPOSIT', 'COMPLETE'];
+
 export interface DepositeDialogProps {
   open: boolean;
   message: string;
@@ -103,27 +105,25 @@ export const DepositeDialog: React.FC<DepositeDialogProps> = (props) => {
       <DialogTitle id="upload-dialog-title">{t('Depositing...')}</DialogTitle>
       <DialogContent>
         <List className={classes.divider}>
-          {['CONNECT_WS', 'CHK_ALLOWANCE', 'CREATE_CTR', 'DEPOSIT', 'COMPLETE'].map(
-            (message, index) => (
-              <ListItem key={message} divider>
-                <ListItemIcon className={classes.check}>{getMessageIcon(index)}</ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography variant="h6" color={getMessageColor(index)}>
-                      {t(hasError && index === currentStep ? activeMessage : message)}
-                    </Typography>
-                  }
-                />
-                <ListItemSecondaryAction>
-                  {index === currentStep && hasError ? (
-                    <Button color="primary" size="small" variant="outlined" onClick={onClose}>
-                      {t('Cancel')}
-                    </Button>
-                  ) : null}
-                </ListItemSecondaryAction>
-              </ListItem>
-            ),
-          )}
+          {steps.map((message, index) => (
+            <ListItem key={message} divider={index !== steps.length - 1}>
+              <ListItemIcon className={classes.check}>{getMessageIcon(index)}</ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography variant="h6" color={getMessageColor(index)}>
+                    {t(hasError && index === currentStep ? activeMessage : message)}
+                  </Typography>
+                }
+              />
+              <ListItemSecondaryAction>
+                {index === currentStep && hasError ? (
+                  <Button color="primary" size="small" variant="outlined" onClick={onClose}>
+                    {t('Cancel')}
+                  </Button>
+                ) : null}
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
         </List>
         <DialogContentText id="upload-dialog-description" className={classes.description}>
           PS: {t("Please don't close or refresh the page")}
