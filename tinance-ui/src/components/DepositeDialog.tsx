@@ -42,13 +42,12 @@ export interface DepositeDialogProps {
   message: string;
   hasError: boolean;
   onClose: () => void;
-  onCancel: () => void;
 }
 
 export const DepositeDialog: React.FC<DepositeDialogProps> = (props) => {
   const classes = useStyles();
   const { t } = useTranslation();
-  const { open, message: activeMessage, hasError, onClose, onCancel } = props;
+  const { open, message: activeMessage, hasError, onClose } = props;
   const [currentStep, setCurrentStep] = useState(1);
 
   const getMessageIcon = useCallback(
@@ -117,7 +116,7 @@ export const DepositeDialog: React.FC<DepositeDialogProps> = (props) => {
                 />
                 <ListItemSecondaryAction>
                   {index === currentStep && hasError ? (
-                    <Button color="primary" size="small" variant="outlined" onClick={onCancel}>
+                    <Button color="primary" size="small" variant="outlined" onClick={onClose}>
                       {t('Cancel')}
                     </Button>
                   ) : null}

@@ -1304,8 +1304,7 @@ const TradeListPage: React.FC = () => {
         open={showOverlay}
         message={depositingMessage}
         hasError={showOverlayError}
-        onClose={() => setShowOverlay(false)}
-        onCancel={handleCancelDeposite}
+        onClose={handleCancelDeposite}
       />
     </>
   );
