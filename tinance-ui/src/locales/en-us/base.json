@@ -196,10 +196,12 @@
   "You'll receive": "You'll receive",
   "Your refund is being prepared": "Your refund is being prepared",
   "You'll send": "You'll send",
-  "Creating Connection...": "Creating Connection...",
-  "Checking allowance...": "Checking allowance...",
-  "Creating Contract...": "Creating Contract...",
-  "Deposit Complete !!": "Deposit Complete !!",
+  "CONNECT_WS": "Creating Connection...",
+  "SUB_TIMEOUT": "WebSocket Subscribe timeout",
+  "CHK_ALLOWANCE": "Checking allowance...",
+  "CREATE_CTR": "Creating Contract...",
+  "DEPOSIT": "Depositing...",
+  "COMPLETE": "Deposit Complete !!",
   "Your password has been reset": "Your password has been reset",
   "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues"
 }

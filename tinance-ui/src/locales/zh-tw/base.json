@@ -197,9 +197,11 @@
   "You'll receive": "你將收到",
   "You'll send": "你將發送",
   "Your password has been reset": "你的密碼已重置成功",
-  "Creating Connection...": "創建連接...",
-  "Checking allowance...": "檢查額度...",
-  "Creating Contract...": "創建智慧合約...",
-  "Deposit Complete !!": "交易完成 !!",
+  "CONNECT_WS": "創建連接...",
+  "CHK_ALLOWANCE": "檢查額度...",
+  "CREATE_CTR": "創建智慧合約...",
+  "DEPOSIT": "轉帳中...",
+  "SUB_TIMEOUT": "WebSocket 訂閱超時",
+  "COMPLETE": "交易完成 !!",
   "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues"
 }

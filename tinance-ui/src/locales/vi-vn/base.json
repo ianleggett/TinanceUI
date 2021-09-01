@@ -209,9 +209,10 @@
   "Complete your trade": "Hoàn thành giao dịch của bạn",
   "Your refund is being prepared": "Tiền trả sẽ được chuẩn bị",
   "Each trade is managed by a smart contract, crypto is held in secure escrow and only released when digitally verified by both parties. If either party fails to verifiy every part of the process, funds are automatcically refunded. Arbitration takes place in the unlikely event of disputes.": "Mỗi giao dịch được quản lý bởi một hợp đồng thông minh, tiền điện tử được giữ trong ký quỹ an toàn và chỉ được phát hành khi được cả hai bên xác minh kỹ thuật số. Nếu một trong hai bên không xác minh được mọi phần của quy trình, tiền sẽ được hoàn trả một cách tự động. Trọng tài diễn ra trong trường hợp không thể xảy ra tranh chấp.",
-  "Creating Connection...": "Tạo kết nối...",
-  "Checking allowance...": "Kiểm tra phụ cấp...",
-  "Creating Contract...": "Tạo hợp đồng...",
-  "Deposit Complete !!": "Gửi tiền hoàn tất !!",
+  "CONNECT_WS": "Tạo kết nối...",
+  "CHK_ALLOWANCE": "Kiểm tra phụ cấp...",
+  "CREATE_CTR": "Tạo hợp đồng...",
+  "DEPOSIT": "Ký gửi...",
+  "COMPLETE": "Gửi tiền hoàn tất !!",
   "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues"
 }

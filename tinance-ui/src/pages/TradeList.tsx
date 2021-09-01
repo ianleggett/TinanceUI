@@ -28,7 +28,7 @@ import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useWeb3React } from '@web3-react/core';
-import { useRequest } from 'ahooks';
+import { useCountDown, useRequest, useUpdateEffect } from 'ahooks';
 import dayjs from 'dayjs';
 import { BigNumber } from 'ethers';
 import { useFormik } from 'formik';
@@ -57,6 +57,10 @@ import {
   RateTradeService,
 } from '../services';
 import { snackbar, toFixed } from '../utils';
+
+const WS_ERR = 'ERR';
+const WS_END = 'END';
+const WS_TIMEOUT = 15; // 15 seconds
 
 const USDT_DECIMALS = 6;
 // this comes from swagger API call getnetworkconfig.json
@@ -207,8 +211,11 @@ const TradeListPage: React.FC = () => {
   const [openRateTradeDialog, setOpenRateTradeDialog] = useState(false);
   const { account, library, connector, error } = useWeb3React<Web3Provider>();
   const stompClientRef = useRef<Stomp.Client | null>(null);
+  const subscribtionIdRef = useRef('');
   const [showOverlay, setShowOverlay] = useState(false);
-  const [depositingMessage, setDepositingMessage] = useState('Creating Connection...');
+  const [showOverlayError, setShowOverlayError] = useState(false);
+  const [depositingMessage, setDepositingMessage] = useState('CONNECT_WS');
+  const [countdown, setDueTime] = useCountDown({});
 
   const { etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr } = useMemo(
     () => ({
@@ -454,28 +461,41 @@ const TradeListPage: React.FC = () => {
             const stompClient = stompClientRef.current;
 
             if (stompClient) {
+              setDueTime(Date.now() + WS_TIMEOUT * 1000);
+
               const subscribtion = stompClient.subscribe(
                 `/topic/messages/${oid}`,
                 (messageOutput) => {
                   try {
+                    setDueTime(undefined);
+
                     const { key, value } = JSON.parse(messageOutput.body);
 
                     setDepositingMessage(value);
 
-                    if (key === 'End') {
+                    if (key === WS_ERR) {
+                      setShowOverlayError(true);
+                      stompClient.unsubscribe(subscribtion.id);
+                      return;
+                    }
+
+                    if (key === WS_END) {
                       stompClient.unsubscribe(subscribtion.id);
 
                       setTimeout(() => {
                         setShowOverlay(false);
+                        setShowOverlayError(false);
                       }, 1000);
                     }
                   } catch {
-                    // console.error(error_.message);
                     stompClient.unsubscribe(subscribtion.id);
                     setShowOverlay(false);
+                    setShowOverlayError(false);
                   }
                 },
               );
+
+              subscribtionIdRef.current = subscribtion.id;
             }
 
             contract.approve(escrowCtrAddr, cryptoAmt).then(
@@ -510,8 +530,22 @@ const TradeListPage: React.FC = () => {
         });
       });
     },
-    [decimals, symbol, address, account, escrowCtrAddr, library, t, depositCrypto],
+    [decimals, symbol, address, account, escrowCtrAddr, library, setDueTime, t, depositCrypto],
   );
+
+  const handleCancelDeposite = useCallback(() => {
+    setShowOverlay(false);
+
+    setTimeout(() => {
+      setDueTime(undefined);
+      setShowOverlayError(false);
+      setDepositingMessage('CONNECT_WS');
+    }, 300);
+
+    if (stompClientRef.current && subscribtionIdRef.current) {
+      stompClientRef.current.unsubscribe(subscribtionIdRef.current);
+    }
+  }, [setDueTime]);
 
   const handleAlertDialogOpen = useCallback((oid: string) => {
     setSelectedOrderId(oid);
@@ -798,6 +832,13 @@ const TradeListPage: React.FC = () => {
       t,
     ],
   );
+
+  useUpdateEffect(() => {
+    if (showOverlay && countdown === 0) {
+      setShowOverlayError(true);
+      setDepositingMessage('SUB_TIMEOUT');
+    }
+  }, [countdown]);
 
   useEffect(() => {
     run();
@@ -1262,7 +1303,9 @@ const TradeListPage: React.FC = () => {
       <DepositeDialog
         open={showOverlay}
         message={depositingMessage}
+        hasError={showOverlayError}
         onClose={() => setShowOverlay(false)}
+        onCancel={handleCancelDeposite}
       />
     </>
   );
