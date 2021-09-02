@@ -568,7 +568,7 @@ const TradeListPage: React.FC = () => {
   const handleFlagComplete = useCallback(
     (trade) => {
       if (library === undefined) {
-        console.log('library undefined, return');
+        snackbar.warning(t('Please connect wallet'));
         return;
       }
 
@@ -589,7 +589,7 @@ const TradeListPage: React.FC = () => {
         cancelCancel();
       });
     },
-    [library, escrowCtrAddr, cancelCancel, account, flagComplete],
+    [library, escrowCtrAddr, cancelCancel, t, account, flagComplete],
   );
 
   const handleAcceptCancel = useCallback(
@@ -661,11 +661,7 @@ const TradeListPage: React.FC = () => {
 
         case 'FIATSENT': {
           return isSeller ? (
-            <Button
-              color="primary"
-              variant="contained"
-              onClick={() => handleFlagComplete(trade.tradeId)}
-            >
+            <Button color="primary" variant="contained" onClick={() => handleFlagComplete(trade)}>
               {flagging2 && trade.tradeId === selectedOrderId
                 ? t('Confirming...')
                 : t('I have received bank funds')}
