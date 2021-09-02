@@ -328,6 +328,7 @@ declare namespace API {
 
   interface DepositCryptoParams {
     oid: string;
+    txnid?: string;
   }
 
   interface DepositCryptoResponse extends BaseResponse {}

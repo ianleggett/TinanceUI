@@ -83,6 +83,10 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = (props) => {
     return `${startYear}-${thisYear}`;
   }, [startYear]);
 
+  const handleGoToContactUsPage = useCallback(() => {
+    history.push('/contact');
+  }, [history]);
+
   const handleGoToPrivacyPage = useCallback(() => {
     history.push('/privacy');
   }, [history]);
@@ -133,6 +137,10 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = (props) => {
         </Grid>
         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
           <Box className={classes.right}>
+            <Button variant="text" color="primary" size="small" onClick={handleGoToContactUsPage}>
+              {t('Contact Us')}
+            </Button>
+            <Divider orientation="vertical" className={classes.divider} />
             <Button variant="text" color="primary" size="small" onClick={handleGoToPrivacyPage}>
               {t('Privacy Policy')}
             </Button>

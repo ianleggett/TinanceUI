@@ -494,7 +494,8 @@ const TradeListPage: React.FC = () => {
 
             contract.approve(escrowCtrAddr, cryptoAmt).then(
               (txnvalApp: TransactionResponse) => {
-                depositCrypto({ oid });
+                console.log(`Txn hash ${JSON.stringify(txnvalApp)}`);
+                depositCrypto({ oid, txnid: txnvalApp.hash });
                 setSelectedOrderId(oid);
               },
               (_error: Error) => {
@@ -503,9 +504,7 @@ const TradeListPage: React.FC = () => {
                 setShowOverlay(false);
               },
             );
-          }
-
-          if (!val.isZero() && !val.eq(cryptoAmt)) {
+          } else {
             snackbar.warning(
               t(`Your allowance needs resetting to 0, please confirm and wait for confirmation`),
             );
@@ -567,24 +566,30 @@ const TradeListPage: React.FC = () => {
   );
 
   const handleFlagComplete = useCallback(
-    (oid: string) => {
+    (trade) => {
       if (library === undefined) {
         console.log('library undefined, return');
         return;
       }
+
+      if (account !== trade.sellerAddress) {
+        snackbar.warning(`Wallet has changed !!, switch to wallet ${trade.sellerAddress}`);
+        return;
+      }
+
       const thisEscrow = new Contract(escrowCtrAddr, ESCROWABI, library.getSigner());
-      const orderIdNumeric = BigInt(`0x${oid}`);
+      const orderIdNumeric = BigInt(`0x${trade.tradeId}`);
       thisEscrow.releaseEscrow(orderIdNumeric).then((val: TransactionResponse) => {
         // alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
         console.log(`txn: ${JSON.stringify(val)}`);
         const txn = val.hash;
         // alert(`txn: ${txn} `);
-        flagComplete({ oid, txn });
-        setSelectedOrderId(oid);
+        flagComplete({ oid: trade.tradeId, txn });
+        setSelectedOrderId(trade.tradeId);
         cancelCancel();
       });
     },
-    [library, escrowCtrAddr, cancelCancel, flagComplete],
+    [library, escrowCtrAddr, cancelCancel, account, flagComplete],
   );
 
   const handleAcceptCancel = useCallback(
