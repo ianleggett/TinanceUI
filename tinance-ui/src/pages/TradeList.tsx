@@ -467,13 +467,13 @@ const TradeListPage: React.FC = () => {
 
                     setDepositingMessage(value);
 
-                    if (key === WS_ERR) {
+                    if (key.toUpperCase() === WS_ERR) {
                       setShowOverlayError(true);
                       stompClient.unsubscribe(subscribtion.id);
                       return;
                     }
 
-                    if (key === WS_END) {
+                    if (key.toUpperCase() === WS_END) {
                       stompClient.unsubscribe(subscribtion.id);
 
                       setTimeout(() => {
