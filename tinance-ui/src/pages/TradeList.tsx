@@ -58,7 +58,7 @@ import {
 } from '../services';
 import { snackbar, toFixed } from '../utils';
 
-const WS_ERR = 'ERR';
+const WS_ERR = 'ERROR';
 const WS_END = 'END';
 
 const USDT_DECIMALS = 6;
@@ -439,8 +439,6 @@ const TradeListPage: React.FC = () => {
         return;
       }
 
-      setShowOverlay(true);
-
       // address is address of USDT
       const contract = new Contract(address, ERC20ABI, library.getSigner());
 
@@ -455,6 +453,7 @@ const TradeListPage: React.FC = () => {
         // account is user account, what is current user allowance ??
         contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
           if (val.isZero()) {
+            setShowOverlay(true);
             // approval reset
             const stompClient = stompClientRef.current;
 
