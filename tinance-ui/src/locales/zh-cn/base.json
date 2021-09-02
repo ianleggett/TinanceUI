@@ -214,6 +214,5 @@
   "CREATE_CTR": "创建智能合约...",
   "DEPOSIT": "转账中...",
   "COMPLETE": "交易完成 !!",
-  "SUB_TIMEOUT": "WebSocket 订阅超时",
   "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues"
 }

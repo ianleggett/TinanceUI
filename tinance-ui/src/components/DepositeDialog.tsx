@@ -88,9 +88,15 @@ export const DepositeDialog: React.FC<DepositeDialogProps> = (props) => {
 
   useUpdateEffect(() => {
     if (!hasError) {
-      setCurrentStep((prevState) => (activeMessage === 'CONNECT_WS' ? 1 : prevState + 1));
+      setCurrentStep((prevState) => prevState + 1);
     }
-  }, [hasError, activeMessage]);
+  }, [hasError]);
+
+  useUpdateEffect(() => {
+    if (!open) {
+      setCurrentStep(1);
+    }
+  }, [open]);
 
   return (
     <Dialog

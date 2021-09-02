@@ -28,7 +28,7 @@ import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useWeb3React } from '@web3-react/core';
-import { useCountDown, useRequest, useUpdateEffect } from 'ahooks';
+import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import { BigNumber } from 'ethers';
 import { useFormik } from 'formik';
@@ -60,7 +60,6 @@ import { snackbar, toFixed } from '../utils';
 
 const WS_ERR = 'ERR';
 const WS_END = 'END';
-const WS_TIMEOUT = 15; // 15 seconds
 
 const USDT_DECIMALS = 6;
 // this comes from swagger API call getnetworkconfig.json
@@ -215,7 +214,6 @@ const TradeListPage: React.FC = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [showOverlayError, setShowOverlayError] = useState(false);
   const [depositingMessage, setDepositingMessage] = useState('CONNECT_WS');
-  const [countdown, setDueTime] = useCountDown({});
 
   const { etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr } = useMemo(
     () => ({
@@ -461,14 +459,10 @@ const TradeListPage: React.FC = () => {
             const stompClient = stompClientRef.current;
 
             if (stompClient) {
-              setDueTime(Date.now() + WS_TIMEOUT * 1000);
-
               const subscribtion = stompClient.subscribe(
                 `/topic/messages/${oid}`,
                 (messageOutput) => {
                   try {
-                    setDueTime(undefined);
-
                     const { key, value } = JSON.parse(messageOutput.body);
 
                     setDepositingMessage(value);
@@ -483,14 +477,14 @@ const TradeListPage: React.FC = () => {
                       stompClient.unsubscribe(subscribtion.id);
 
                       setTimeout(() => {
-                        setShowOverlay(false);
                         setShowOverlayError(false);
+                        setShowOverlay(false);
                       }, 1000);
                     }
                   } catch {
                     stompClient.unsubscribe(subscribtion.id);
-                    setShowOverlay(false);
                     setShowOverlayError(false);
+                    setShowOverlay(false);
                   }
                 },
               );
@@ -530,22 +524,18 @@ const TradeListPage: React.FC = () => {
         });
       });
     },
-    [decimals, symbol, address, account, escrowCtrAddr, library, setDueTime, t, depositCrypto],
+    [decimals, symbol, address, account, escrowCtrAddr, library, t, depositCrypto],
   );
 
   const handleCancelDeposite = useCallback(() => {
+    setShowOverlayError(false);
+    setDepositingMessage('CONNECT_WS');
     setShowOverlay(false);
-
-    setTimeout(() => {
-      setDueTime(undefined);
-      setShowOverlayError(false);
-      setDepositingMessage('CONNECT_WS');
-    }, 300);
 
     if (stompClientRef.current && subscribtionIdRef.current) {
       stompClientRef.current.unsubscribe(subscribtionIdRef.current);
     }
-  }, [setDueTime]);
+  }, []);
 
   const handleAlertDialogOpen = useCallback((oid: string) => {
     setSelectedOrderId(oid);
@@ -832,13 +822,6 @@ const TradeListPage: React.FC = () => {
       t,
     ],
   );
-
-  useUpdateEffect(() => {
-    if (showOverlay && countdown === 0) {
-      setShowOverlayError(true);
-      setDepositingMessage('SUB_TIMEOUT');
-    }
-  }, [countdown]);
 
   useEffect(() => {
     run();

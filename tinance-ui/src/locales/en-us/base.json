@@ -197,7 +197,6 @@
   "Your refund is being prepared": "Your refund is being prepared",
   "You'll send": "You'll send",
   "CONNECT_WS": "Creating Connection...",
-  "SUB_TIMEOUT": "WebSocket Subscribe timeout",
   "CHK_ALLOWANCE": "Checking allowance...",
   "CREATE_CTR": "Creating Contract...",
   "DEPOSIT": "Depositing...",

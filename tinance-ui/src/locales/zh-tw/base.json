@@ -201,7 +201,6 @@
   "CHK_ALLOWANCE": "檢查額度...",
   "CREATE_CTR": "創建智慧合約...",
   "DEPOSIT": "轉帳中...",
-  "SUB_TIMEOUT": "WebSocket 訂閱超時",
   "COMPLETE": "交易完成 !!",
   "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues"
 }
