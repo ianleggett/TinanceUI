@@ -403,6 +403,11 @@ declare namespace API {
     oid: string;
     v: boolean;
   }
+  interface DeleteOfferParams {
+    oid: string;
+  }
+
+  interface DeleteOfferResponse extends BaseResponse {}
 
   interface ToggleOfferLiveResponse extends BaseResponse {}
 
