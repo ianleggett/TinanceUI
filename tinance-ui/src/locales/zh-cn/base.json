@@ -209,10 +209,10 @@
   "Complete your trade": "完成交易",
   "Your refund is being prepared": "您的退款正在准备中",
   "Each trade is managed by a smart contract, crypto is held in secure escrow and only released when digitally verified by both parties. If either party fails to verifiy every part of the process, funds are automatcically refunded. Arbitration takes place in the unlikely event of disputes.": "所有的交易都由分布式的智能合约来执行，数字货币安全地托管在智能合约里，只有您有权利确认最后的转账。如果一方不履行交易，数字货币将自动回到您的钱包。",
-  "CONNECT_WS": "创建连接...",
-  "CHK_ALLOWANCE": "检查额度...",
-  "CREATE_CTR": "创建智能合约...",
-  "DEPOSIT": "转账中...",
-  "COMPLETE": "交易完成 !!",
+  "CONNECT_WS": "创建连接",
+  "CHK_ALLOWANCE": "检查额度",
+  "CREATE_CTR": "创建智能合约",
+  "DEPOSIT": "转账中",
+  "COMPLETE": "交易完成",
   "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues"
 }
