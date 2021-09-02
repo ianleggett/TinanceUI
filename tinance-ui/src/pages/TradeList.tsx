@@ -463,9 +463,9 @@ const TradeListPage: React.FC = () => {
                 `/topic/messages/${oid}`,
                 (messageOutput) => {
                   try {
-                    const { key, value } = JSON.parse(messageOutput.body);
+                    const { key, text } = JSON.parse(messageOutput.body);
 
-                    setDepositingMessage(value);
+                    setDepositingMessage(text);
 
                     if (key.toUpperCase() === WS_ERR) {
                       setShowOverlayError(true);
