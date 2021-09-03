@@ -244,6 +244,9 @@ const TradeListPage: React.FC = () => {
   }, []);
 
   const { run, cancel } = useRequest(GetMyTradesService, {
+    pollingWhenHidden: false,
+    refreshOnWindowFocus: true,
+    pollingInterval: profile && profile.pollingRate ? profile.pollingRate * 1000 : 10_000,
     onSuccess(res) {
       if (res) {
         setTrades(res);
