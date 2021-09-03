@@ -508,7 +508,9 @@ const TradeListPage: React.FC = () => {
             );
           } else {
             snackbar.warning(
-              t(`Your allowance needs resetting to 0, please confirm and wait for confirmation`),
+              t(
+                `Your allowance needs updating. If you have just deposited, reject and try again in a few minutes otherwise accept`,
+              ),
             );
             contract.approve(escrowCtrAddr, 0).then(
               (txnval: TransactionResponse) => {
