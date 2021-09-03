@@ -19,6 +19,7 @@ import ForbiddenPage from './pages/403';
 import NotFoundPage from './pages/404';
 import BankDetailsPage from './pages/BankDetails';
 import ChangePasswordPage from './pages/ChangePassword';
+import ContactUs from './pages/ContactUs';
 import FaqPage from './pages/Faq';
 import ForgotPasswordPage from './pages/ForgotPassword';
 import ForgotPasswordSuccessPage from './pages/ForgotPasswordSuccess';
@@ -80,6 +81,7 @@ const App: React.FC = () => {
                       />
                       <Route path="/reset-password" component={ResetPasswordPage} exact />
                       <Route path="/faq" component={FaqPage} exact />
+                      <Route path="/contact" component={ContactUs} exact />
                       <Route path="/privacy" component={PrivacyPage} exact />
                       <Route path="/terms" component={TermsPage} exact />
                       <Route path="/markets" component={MarketListPage} exact />

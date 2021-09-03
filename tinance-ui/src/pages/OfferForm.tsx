@@ -38,6 +38,9 @@ import { useAppConfigState } from '../components';
 import { AddUpdateOrderService, GetUserBankService } from '../services';
 import { snackbar, toFixed } from '../utils';
 
+const MIN_VOL = 20; // smallest trade size
+const MIN_VOL_TEXT = `Min volume (${MIN_VOL})`;
+
 const useStyles = makeStyles((theme) => ({
   step: {
     padding: 16,
@@ -198,8 +201,8 @@ const OfferFormPage: React.FC = () => {
 
   const validationSchema = useMemo(() => {
     return yup.object({
-      fromamt: yup.number().required(t('From amount is required')),
-      toamt: yup.number().required(t('To amount is required')),
+      fromamt: yup.number().min(MIN_VOL, MIN_VOL_TEXT).required(t('From amount is required')),
+      toamt: yup.number().min(MIN_VOL, MIN_VOL_TEXT).required(t('To amount is required')),
     });
   }, [t]);
 

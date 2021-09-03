@@ -328,6 +328,7 @@ declare namespace API {
 
   interface DepositCryptoParams {
     oid: string;
+    txnid?: string;
   }
 
   interface DepositCryptoResponse extends BaseResponse {}
@@ -402,6 +403,11 @@ declare namespace API {
     oid: string;
     v: boolean;
   }
+  interface DeleteOfferParams {
+    oid: string;
+  }
+
+  interface DeleteOfferResponse extends BaseResponse {}
 
   interface ToggleOfferLiveResponse extends BaseResponse {}
 

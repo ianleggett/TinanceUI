@@ -16,6 +16,7 @@ import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import { Delete, DeleteOutline, DeleteOutlineRounded } from '@material-ui/icons';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import DoubleArrowOutlinedIcon from '@material-ui/icons/DoubleArrowOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
@@ -32,6 +33,7 @@ import { useHistory } from 'react-router-dom';
 import { useUserManagerState } from '../components';
 import { offerStatusMap } from '../constants';
 import { GetMyOffersService, ToggleOfferLiveService } from '../services';
+import { DeleteOfferService } from '../services/delete-offer';
 import { snackbar, toFixed } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
@@ -147,6 +149,18 @@ const OfferListPage: React.FC = () => {
     },
   });
 
+  const { run: deleteOffer, loading: relist } = useRequest(DeleteOfferService, {
+    onSuccess(res) {
+      if (res.statusCode === 0) {
+        console.log(`Selected ${selectedOffer}`);
+        setSelectedOffer('');
+        snackbar.success(t('Offer delete successful'));
+      } else {
+        snackbar.warning(t('Offer delete failed'));
+      }
+    },
+  });
+
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
@@ -208,6 +222,14 @@ const OfferListPage: React.FC = () => {
       }
     },
     [toggleLive, toggling],
+  );
+
+  const handleDeleteOffer = useCallback(
+    (oid: string) => {
+      setSelectedOffer(oid);
+      deleteOffer({ oid });
+    },
+    [deleteOffer],
   );
 
   const handleEditOffer = useCallback(
@@ -479,6 +501,13 @@ const OfferListPage: React.FC = () => {
                     >
                       {t('Edit Offer')}
                     </Button>
+                    &nbsp;
+                    <Button
+                      disabled={offer.live}
+                      color="secondary"
+                      onClick={() => handleDeleteOffer(offer.orderId)}
+                      startIcon={<DeleteOutlineRounded />}
+                    />
                   </Grid>
                 ) : null}
               </Grid>

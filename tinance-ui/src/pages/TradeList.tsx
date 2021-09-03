@@ -58,7 +58,7 @@ import {
 } from '../services';
 import { snackbar, toFixed } from '../utils';
 
-const WS_ERR = 'ERR';
+const WS_ERR = 'ERROR';
 const WS_END = 'END';
 
 const USDT_DECIMALS = 6;
@@ -442,8 +442,6 @@ const TradeListPage: React.FC = () => {
         return;
       }
 
-      setShowOverlay(true);
-
       // address is address of USDT
       const contract = new Contract(address, ERC20ABI, library.getSigner());
 
@@ -458,6 +456,7 @@ const TradeListPage: React.FC = () => {
         // account is user account, what is current user allowance ??
         contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
           if (val.isZero()) {
+            setShowOverlay(true);
             // approval reset
             const stompClient = stompClientRef.current;
 
@@ -497,7 +496,8 @@ const TradeListPage: React.FC = () => {
 
             contract.approve(escrowCtrAddr, cryptoAmt).then(
               (txnvalApp: TransactionResponse) => {
-                depositCrypto({ oid });
+                console.log(`Txn hash ${JSON.stringify(txnvalApp)}`);
+                depositCrypto({ oid, txnid: txnvalApp.hash });
                 setSelectedOrderId(oid);
               },
               (_error: Error) => {
@@ -506,9 +506,7 @@ const TradeListPage: React.FC = () => {
                 setShowOverlay(false);
               },
             );
-          }
-
-          if (!val.isZero() && !val.eq(cryptoAmt)) {
+          } else {
             snackbar.warning(
               t(`Your allowance needs resetting to 0, please confirm and wait for confirmation`),
             );
@@ -570,24 +568,30 @@ const TradeListPage: React.FC = () => {
   );
 
   const handleFlagComplete = useCallback(
-    (oid: string) => {
+    (trade) => {
       if (library === undefined) {
-        console.log('library undefined, return');
+        snackbar.warning(t('Please connect wallet'));
         return;
       }
+
+      if (account !== trade.sellerAddress) {
+        snackbar.warning(`Wallet has changed !!, switch to wallet ${trade.sellerAddress}`);
+        return;
+      }
+
       const thisEscrow = new Contract(escrowCtrAddr, ESCROWABI, library.getSigner());
-      const orderIdNumeric = BigInt(`0x${oid}`);
+      const orderIdNumeric = BigInt(`0x${trade.tradeId}`);
       thisEscrow.releaseEscrow(orderIdNumeric).then((val: TransactionResponse) => {
         // alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
         console.log(`txn: ${JSON.stringify(val)}`);
         const txn = val.hash;
         // alert(`txn: ${txn} `);
-        flagComplete({ oid, txn });
-        setSelectedOrderId(oid);
+        flagComplete({ oid: trade.tradeId, txn });
+        setSelectedOrderId(trade.tradeId);
         cancelCancel();
       });
     },
-    [library, escrowCtrAddr, cancelCancel, flagComplete],
+    [library, escrowCtrAddr, cancelCancel, t, account, flagComplete],
   );
 
   const handleAcceptCancel = useCallback(
@@ -659,11 +663,7 @@ const TradeListPage: React.FC = () => {
 
         case 'FIATSENT': {
           return isSeller ? (
-            <Button
-              color="primary"
-              variant="contained"
-              onClick={() => handleFlagComplete(trade.tradeId)}
-            >
+            <Button color="primary" variant="contained" onClick={() => handleFlagComplete(trade)}>
               {flagging2 && trade.tradeId === selectedOrderId
                 ? t('Confirming...')
                 : t('I have received bank funds')}

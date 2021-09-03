@@ -7,7 +7,7 @@ export const Networks = {
   Rinkeby: 4,
   Goerli: 5,
   Kovan: 42,
-  Local: 1337,
+  Local: 1557,
 };
 export interface IERC20 {
   symbol: string;
