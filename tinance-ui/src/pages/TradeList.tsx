@@ -581,19 +581,33 @@ const TradeListPage: React.FC = () => {
         return;
       }
 
+      console.log(`Escrow Addr:${escrowCtrAddr}`);
+
       const thisEscrow = new Contract(escrowCtrAddr, ESCROWABI, library.getSigner());
       const orderIdNumeric = BigInt(`0x${trade.tradeId}`);
-      thisEscrow.releaseEscrow(orderIdNumeric).then((val: TransactionResponse) => {
-        // alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
-        console.log(`txn: ${JSON.stringify(val)}`);
-        const txn = val.hash;
-        // alert(`txn: ${txn} `);
-        flagComplete({ oid: trade.tradeId, txn });
-        setSelectedOrderId(trade.tradeId);
-        cancelCancel();
-      });
+      console.log(`Contract Id :${trade.tradeId}`);
+      // thisEscrow.getState(orderIdNumeric).then((val: any) => {
+      //   console.log(`Contract State :${val}`);
+      // });
+
+      const trans = thisEscrow.releaseEscrow(orderIdNumeric).then(
+        (val: TransactionResponse) => {
+          // alert(`Success !!! Trade complete ( hex: ${oid} number: ${orderIdNumeric} )`);
+          console.log(`txn: ${JSON.stringify(val)}`);
+          const txn = val.hash;
+          // alert(`txn: ${txn} `);
+          flagComplete({ oid: trade.tradeId, txn });
+          setSelectedOrderId(trade.tradeId);
+          // cancelCancel();
+        },
+        (_error: Error) => {
+          // user rejects approval
+          snackbar.warning(_error.message);
+        },
+      );
+      console.log(`txn resp: ${JSON.stringify(trans)}`);
     },
-    [library, escrowCtrAddr, cancelCancel, t, account, flagComplete],
+    [library, escrowCtrAddr, t, account, flagComplete],
   );
 
   const handleAcceptCancel = useCallback(
