@@ -508,6 +508,7 @@ const TradeListPage: React.FC = () => {
                 },
               );
             } else {
+              console.log(`Deposit pre-approved allowance:${val}`);
               depositCrypto({ oid, txnid: 'pre-approved' });
               setSelectedOrderId(oid);
             }
