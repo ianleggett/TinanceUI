@@ -17,12 +17,14 @@ export const appConfig = {
   walletConnected: false,
   networkConfig: {
     brokerPrivateKey: '-removed-for-security',
-    buyerfeePct: 0.015,
     escrowCtrAddr: '0xEb13Bb6F98dE43f9f040BD6B6823CcD3339AEB05',
     etherScanPrefix: 'https://etherscan.io/tx/',
     httpService: 'https://mainnet.infura.io/v3/13ba69a445a244859517b9c014a5a297',
     maxEthFee: 0.001,
     sellerfeePct: 0.015,
+    buyerfeePct: 0.015,
+    sellerGasFee: 10,
+    buyerGasFee: 10,
     usdtcoinCtrAddr: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
   } as API.GetNetworkConfigResponse,
 };

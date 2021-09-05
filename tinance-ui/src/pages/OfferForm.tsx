@@ -242,6 +242,12 @@ const OfferFormPage: React.FC = () => {
     [feeRate, invert],
   );
 
+  const { networkConfig } = useAppConfigState();
+
+  const calcGasFees = useCallback(() => {
+    return toFixed(invert ? networkConfig.buyerGasFee : networkConfig.sellerGasFee, 2);
+  }, [invert, networkConfig]);
+
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -480,6 +486,9 @@ const OfferFormPage: React.FC = () => {
                   </Typography>
                   <Typography variant="subtitle1">
                     {t('Fees')}: {calcFees(formik.values.fromamt, formik.values.toamt)}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    {t('Gas')}: {calcGasFees()}
                   </Typography>
                 </Box>
               </CardContent>

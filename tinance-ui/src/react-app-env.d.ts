@@ -421,6 +421,9 @@ declare namespace API {
     httpService: string;
     maxEthFee: number;
     sellerfeePct: number;
+    buyerfeePct: number;
+    sellerGasFee: number;
+    buyerGasFee: number;
     usdtcoinCtrAddr: string;
   }
 

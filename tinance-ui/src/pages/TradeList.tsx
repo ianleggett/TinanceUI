@@ -1106,7 +1106,7 @@ const TradeListPage: React.FC = () => {
                           </Typography>
                           <Typography component="span"> (less </Typography>
                           <Typography component="span" color="primary">
-                            {trade.sellerFee.toFixed(USDT_DECIMALS)}
+                            {trade.buyerFee.toFixed(USDT_DECIMALS)}
                           </Typography>
                           <Typography component="span"> fees) for </Typography>
                           <Typography component="span" color="primary">
