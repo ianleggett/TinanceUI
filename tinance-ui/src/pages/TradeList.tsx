@@ -455,7 +455,7 @@ const TradeListPage: React.FC = () => {
 
         // account is user account, what is current user allowance ??
         contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
-          if (val.isZero()) {
+          if (val.isZero() || val.gte(cryptoAmt)) {
             setShowOverlay(true);
             // approval reset
             const stompClient = stompClientRef.current;
@@ -493,19 +493,20 @@ const TradeListPage: React.FC = () => {
 
               subscribtionIdRef.current = subscribtion.id;
             }
-
-            contract.approve(escrowCtrAddr, cryptoAmt).then(
-              (txnvalApp: TransactionResponse) => {
-                console.log(`Txn hash ${JSON.stringify(txnvalApp)}`);
-                depositCrypto({ oid, txnid: txnvalApp.hash });
-                setSelectedOrderId(oid);
-              },
-              (_error: Error) => {
-                // user rejects approval
-                snackbar.warning(_error.message);
-                setShowOverlay(false);
-              },
-            );
+            if (val.isZero()) {
+              contract.approve(escrowCtrAddr, cryptoAmt).then(
+                (txnvalApp: TransactionResponse) => {
+                  console.log(`Txn hash ${JSON.stringify(txnvalApp)}`);
+                  depositCrypto({ oid, txnid: txnvalApp.hash });
+                  setSelectedOrderId(oid);
+                },
+                (_error: Error) => {
+                  // user rejects approval
+                  snackbar.warning(_error.message);
+                  setShowOverlay(false);
+                },
+              );
+            }
           } else {
             snackbar.warning(
               t(
