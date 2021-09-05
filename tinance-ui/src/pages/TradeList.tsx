@@ -455,6 +455,7 @@ const TradeListPage: React.FC = () => {
 
         // account is user account, what is current user allowance ??
         contract.allowance(account, escrowCtrAddr).then((val: BigNumber) => {
+          console.log(`allowance ${val}`);
           if (val.isZero() || val.gte(cryptoAmt)) {
             setShowOverlay(true);
             // approval reset
@@ -506,6 +507,9 @@ const TradeListPage: React.FC = () => {
                   setShowOverlay(false);
                 },
               );
+            } else {
+              depositCrypto({ oid, txnid: 'pre-approved' });
+              setSelectedOrderId(oid);
             }
           } else {
             snackbar.warning(
