@@ -494,12 +494,16 @@ const TradeListPage: React.FC = () => {
 
               subscribtionIdRef.current = subscribtion.id;
             }
+
             if (val.isZero()) {
               contract.approve(escrowCtrAddr, cryptoAmt).then(
                 (txnvalApp: TransactionResponse) => {
-                  console.log(`Txn hash ${JSON.stringify(txnvalApp)}`);
-                  depositCrypto({ oid, txnid: txnvalApp.hash });
-                  setSelectedOrderId(oid);
+                  // console.log(`Response 1 ${JSON.stringify(txnvalApp)}`);
+                  txnvalApp.wait(1).then((txnRec) => {
+                    console.log(`BlockHash : ${txnRec.blockHash}`);
+                    depositCrypto({ oid, txnid: txnRec.blockHash });
+                    setSelectedOrderId(oid);
+                  });
                 },
                 (_error: Error) => {
                   // user rejects approval
