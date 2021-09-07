@@ -62,6 +62,7 @@ const WS_ERR = 'ERROR';
 const WS_END = 'END';
 
 const USDT_DECIMALS = 6;
+const USDT_DISPLAY_DECIMALS = 2;
 // this comes from swagger API call getnetworkconfig.json
 // const ESCROW = '0xB112E084E74720f94f35301B7566C9Cb23993Ea3'; // Our smart contract
 
@@ -665,9 +666,9 @@ const TradeListPage: React.FC = () => {
                   <div>{t('Depositing...')}</div>
                 </>
               ) : (
-                `${t('Deposit')} ${(trade.fromAmount + trade.sellerFee).toFixed(USDT_DECIMALS)} ${
-                  trade.fromccy.name
-                }`
+                `${t('Deposit')} ${(trade.fromAmount + trade.sellerFee).toFixed(
+                  USDT_DISPLAY_DECIMALS,
+                )} ${trade.fromccy.name}`
               )}
             </Button>
           ) : null;
@@ -1090,7 +1091,7 @@ const TradeListPage: React.FC = () => {
                           </Typography>
                           <Typography component="span"> (plus </Typography>
                           <Typography component="span" color="primary">
-                            {trade.sellerFee.toFixed(USDT_DECIMALS)}
+                            {trade.sellerFee.toFixed(USDT_DISPLAY_DECIMALS)}
                           </Typography>
                           <Typography component="span"> fees) for </Typography>
                           <Typography component="span" color="primary">
@@ -1116,7 +1117,7 @@ const TradeListPage: React.FC = () => {
                           </Typography>
                           <Typography component="span"> (less </Typography>
                           <Typography component="span" color="primary">
-                            {trade.buyerFee.toFixed(USDT_DECIMALS)}
+                            {trade.buyerFee.toFixed(USDT_DISPLAY_DECIMALS)}
                           </Typography>
                           <Typography component="span"> fees) for </Typography>
                           <Typography component="span" color="primary">
