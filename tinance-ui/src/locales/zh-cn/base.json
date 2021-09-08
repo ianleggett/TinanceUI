@@ -214,5 +214,10 @@
   "CREATE_CTR": "创建智能合约",
   "DEPOSIT": "转账中",
   "COMPLETE": "交易完成",
-  "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues"
+  "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues",
+  "Share": "分享",
+  "Share Offer": "分享报价",
+  "Type in the email to share this offer with your friend": "输入电子邮箱地址，将该报价分享给您的朋友",
+  "Offer shared successful": "分享报价成功",
+  "Offer shared failed": "分享报价失败"
 }
