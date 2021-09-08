@@ -20,7 +20,7 @@ export async function RateTradeService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Rate trade failed.');
   }
 }

@@ -20,7 +20,7 @@ export async function CancelTradeService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Cancel trade failed.');
   }
 }

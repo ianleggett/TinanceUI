@@ -20,7 +20,7 @@ export async function FlagFundsSentService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Flag funds sent failed.');
   }
 }

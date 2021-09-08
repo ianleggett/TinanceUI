@@ -10,7 +10,7 @@ export async function GetCCYCodesService(): Promise<API.GetCCYCodesResponse> {
     const res = await request<API.GetCCYCodesResponse>('/v1/public/ccycodes.json');
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get ccy codes failed.');
   }
 }

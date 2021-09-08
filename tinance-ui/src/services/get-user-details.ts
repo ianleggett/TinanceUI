@@ -14,7 +14,7 @@ export async function GetUserDetailsService(): Promise<API.GetUserDetailsRespons
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get user details failed.');
   }
 }

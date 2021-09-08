@@ -14,7 +14,7 @@ export async function GetNetworkConfigService(): Promise<API.GetNetworkConfigRes
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get network config failed.');
   }
 }

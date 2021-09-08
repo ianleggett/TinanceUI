@@ -14,7 +14,7 @@ export async function GetUserBankService(): Promise<API.GetUserBankResponse> {
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get user bank failed.');
   }
 }

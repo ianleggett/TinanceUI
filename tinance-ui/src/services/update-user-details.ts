@@ -19,7 +19,7 @@ export async function UpdateUserDetailsService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Update user details failed.');
   }
 }

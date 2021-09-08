@@ -19,7 +19,7 @@ export async function SetUserWaletService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Set user wallet failed.');
   }
 }

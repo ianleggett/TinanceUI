@@ -20,7 +20,7 @@ export async function DepositCryptoAsyncService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Deposit crypto async failed.');
   }
 }

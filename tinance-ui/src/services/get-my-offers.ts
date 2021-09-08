@@ -19,7 +19,7 @@ export async function GetMyOffersService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get my offers failed.');
   }
 }

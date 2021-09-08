@@ -23,6 +23,7 @@ export * from './get-validation-regex';
 export * from './rate-trade';
 export * from './reset-password';
 export * from './set-user-wallet';
+export * from './share-offer';
 export * from './signin';
 export * from './signout';
 export * from './signup';

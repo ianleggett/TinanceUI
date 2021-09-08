@@ -15,7 +15,7 @@ export async function GetProfilePublicService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get public user profile failed.');
   }
 }

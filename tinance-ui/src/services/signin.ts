@@ -14,7 +14,7 @@ export async function SignInService(params: API.SignInParams): Promise<API.SignI
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Sign in failed.');
   }
 }

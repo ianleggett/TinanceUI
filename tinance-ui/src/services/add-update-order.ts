@@ -19,7 +19,7 @@ export async function AddUpdateOrderService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get add update order failed.');
   }
 }

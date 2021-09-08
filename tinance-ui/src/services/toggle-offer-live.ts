@@ -20,7 +20,7 @@ export async function ToggleOfferLiveService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Toggle offer live failed.');
   }
 }
