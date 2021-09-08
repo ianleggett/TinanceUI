@@ -40,7 +40,7 @@ import * as yup from 'yup';
 
 import { useUserManagerState } from '../components';
 import { offerStatusMap } from '../constants';
-import { GetMyOffersService, ShareOfferService, ToggleOfferLiveService } from '../services';
+import { GetMyOffersService, InviteTradeService, ToggleOfferLiveService } from '../services';
 import { DeleteOfferService } from '../services/delete-offer';
 import { snackbar, toFixed } from '../utils';
 
@@ -164,7 +164,6 @@ const OfferListPage: React.FC = () => {
   const { run: deleteOffer, loading: relist } = useRequest(DeleteOfferService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
-        console.log(`Selected ${selectedOffer}`);
         setSelectedOffer('');
         snackbar.success(t('Offer delete successful'));
       } else {
@@ -183,34 +182,34 @@ const OfferListPage: React.FC = () => {
     },
   });
 
-  const { run: shareOffer, loading: sending } = useRequest(ShareOfferService, {
+  const { run: inviteTrade, loading: sending } = useRequest(InviteTradeService, {
     onSuccess(res) {
       if (res.statusCode === 0) {
         setSelectedOffer('');
         setShowShareDialog(false);
-        snackbar.success(t('Offer shared successful'));
+        snackbar.success(t('Invite trade successful'));
       } else {
-        snackbar.warning(t('Offer shared failed'));
+        snackbar.warning(t('Invite trade failed'));
       }
     },
     onError() {
-      snackbar.warning(t('Offer shared failed'));
+      snackbar.warning(t('Invite trade failed'));
     },
   });
 
   const shareForm = useFormik({
     initialValues: {
-      email: '',
+      emailuser: '',
     },
     validationSchema: yup.object({
-      email: yup
+      emailuser: yup
         .string()
         .required(t('Email address is Required'))
         .email(t('Invalid email adrress format')),
     }),
     onSubmit: (values) => {
-      shareOffer({
-        oid: selectedOffer,
+      inviteTrade({
+        offerid: selectedOffer,
         ...values,
       });
     },
@@ -596,21 +595,21 @@ const OfferListPage: React.FC = () => {
         onClose={handleShareDialogClose}
         aria-labelledby="share-dialog-title"
       >
-        <DialogTitle id="share-dialog-title">{t('Share Offer')}</DialogTitle>
+        <DialogTitle id="share-dialog-title">{t('Invite Trade')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {t('Type in the email to share this offer with your friend')}
           </DialogContentText>
           <TextField
-            id="email"
-            name="email"
+            id="emailuser"
+            name="emailuser"
             margin="dense"
             disabled={sending}
             label={t('Email Address')}
-            value={shareForm.values.email}
+            value={shareForm.values.emailuser}
             onChange={shareForm.handleChange}
-            error={shareForm.touched.email && Boolean(shareForm.errors.email)}
-            helperText={shareForm.touched.email && shareForm.errors.email}
+            error={shareForm.touched.emailuser && Boolean(shareForm.errors.emailuser)}
+            helperText={shareForm.touched.emailuser && shareForm.errors.emailuser}
             autoFocus
             fullWidth
           />

@@ -409,12 +409,12 @@ declare namespace API {
 
   interface DeleteOfferResponse extends BaseResponse {}
 
-  interface ShareOfferParams {
-    oid: string;
-    email: string;
+  interface InviteTradeParams {
+    offerid: string;
+    emailuser: string;
   }
 
-  interface ShareOfferResponse extends BaseResponse {}
+  interface InviteTradeResponse extends BaseResponse {}
 
   interface ToggleOfferLiveResponse extends BaseResponse {}
 
