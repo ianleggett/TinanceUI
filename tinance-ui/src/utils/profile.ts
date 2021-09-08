@@ -17,7 +17,7 @@ export function getProfile(key: string = DEFAULT_PROFILE_KEY): User.Model | unde
 
   try {
     return JSON.parse(cachedUser) as User.Model;
-  } catch (error) {
+  } catch (error: any) {
     console.warn(error.message || 'Parse user profile failed.');
     return undefined;
   }

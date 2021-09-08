@@ -15,7 +15,7 @@ export async function GetUserWalletService(): Promise<API.GetUserWalletResponse>
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get user wallet failed.');
   }
 }

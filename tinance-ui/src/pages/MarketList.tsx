@@ -110,6 +110,7 @@ const MarketListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
   const { profile, isLoggedIn } = useUserManagerState();
   const { ccyCodes, paymentTypes, walletConnected } = useAppConfigState();
 
@@ -132,10 +133,16 @@ const MarketListPage: React.FC = () => {
     );
   }, [ccyCodes]);
 
-  const { run, loading, cancel } = useRequest(GetAllOffersService, {
+  const { run, cancel } = useRequest(GetAllOffersService, {
+    pollingWhenHidden: false,
+    refreshOnWindowFocus: true,
+    pollingInterval: profile && profile.pollingRate ? profile.pollingRate * 1000 : 10_000,
     onSuccess(res) {
       if (res) {
         setOffers(res);
+        if (loading) {
+          setLoading(false);
+        }
       }
     },
   });

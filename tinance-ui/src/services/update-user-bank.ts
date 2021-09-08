@@ -19,7 +19,7 @@ export async function UpdateUserBankService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Update user bank failed.');
   }
 }

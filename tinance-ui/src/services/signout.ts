@@ -15,7 +15,7 @@ export async function SignOutService(): Promise<API.SignOutResponse> {
     });
     localStorage.clear();
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Sign out failed.');
   }
 }

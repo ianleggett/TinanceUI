@@ -16,7 +16,7 @@ export async function ForgotPasswordService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Forgot password failed.');
   }
 }

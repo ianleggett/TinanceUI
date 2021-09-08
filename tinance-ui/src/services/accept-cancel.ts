@@ -20,7 +20,7 @@ export async function AcceptCancelService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Accept cancel failed.');
   }
 }

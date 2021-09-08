@@ -19,7 +19,7 @@ export async function TakeOrderService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Take order failed.');
   }
 }

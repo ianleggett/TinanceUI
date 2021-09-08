@@ -15,7 +15,7 @@ export async function GetUserTradesService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get public user trades failed.');
   }
 }

@@ -10,7 +10,7 @@ export async function GetNetworkProfileService(): Promise<PublicData.NetworkProf
     const res = await request<PublicData.NetworkProfile>('/v1/public/getnetworkprofile.json');
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get network profile failed.');
   }
 }

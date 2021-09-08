@@ -10,7 +10,7 @@ export async function GetPaymentTypesService(): Promise<API.GetPaymentTypesRespo
     const res = await request<API.GetPaymentTypesResponse>('/v1/public/paymenttypes.json');
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get payment types failed.');
   }
 }

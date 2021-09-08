@@ -14,7 +14,7 @@ export async function SignUpService(params: API.SignUpParams): Promise<API.SignU
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Sign up failed.');
   }
 }

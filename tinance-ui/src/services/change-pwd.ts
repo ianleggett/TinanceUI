@@ -19,7 +19,7 @@ export async function ChangePasswordService(
     });
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Change password failed.');
   }
 }

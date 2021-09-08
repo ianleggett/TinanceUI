@@ -214,5 +214,10 @@
   "CREATE_CTR": "Tạo hợp đồng",
   "DEPOSIT": "Ký gửi",
   "COMPLETE": "Gửi tiền hoàn tất",
-  "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues"
+  "Arbitration is in process, please forward evidence to support bank issues": "Arbitration is in process, please forward evidence to support bank issues",
+  "Share": "Share",
+  "Type in the email to share this offer with your friend": "Type in the email to share this offer with your friend",
+  "Invite Trade": "Invite Trade",
+  "Invite trade successful": "Invite trade successful",
+  "Invite trade failed": "Invite trade failed"
 }

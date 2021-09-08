@@ -10,7 +10,7 @@ export async function GetValidationRegexService(): Promise<API.GetValidationRege
     const res = await request<API.GetValidationRegexResponse>('/v1/public/validationregex.json');
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Get validation regex failed.');
   }
 }
