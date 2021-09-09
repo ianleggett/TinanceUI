@@ -14,9 +14,9 @@ Adding new state (DEPOSITING) to cover the whole deposit process. The DEPOSIT st
 
 # Changes to the UI
 
-Everything is unchanged, except the server will publish a websocket 'End' message after a number of minutes waiting. The UI must display this message and wait for the user to acknowledge.
+Everything is unchanged, except the server will publish a websocket 'MsgTimeout' message after a number of minutes waiting. The UI must display this message and wait for the user to acknowledge.
 
-Example 'End' timeout message:
+Example 'MsgTimeout' timeout message:
 
 ```json
 {
@@ -26,7 +26,7 @@ Example 'End' timeout message:
 }
 ...
 {
-  "key": "End",
+  "key": "MsgTimeout",
   "text": "Transaction taking longer than usual, We will update you by email when complete",
   "count": 6
 }
