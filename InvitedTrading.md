@@ -34,3 +34,11 @@ Each invited entry has the following fields:
 `id` - The database identifier. (Not useful to UI)<br/>
 `orderId` - The offer id will the same as the offer container (not useful to UI)<br/>
 `emailSent` if not empty, indicates an email has been sent to the user.
+
+## UI Todo for new user interaction
+
+The email is sent to the new user as a hyperlink and includes an order-id. The link will be:
+
+`tinance.io/markets/{order-id}`
+
+The UI must take this url and show the market page with this order (if it exists) - otherwise display the existing page. A simple way to test this function would be to use an existing order-id from the markets or offers page and add it as /markets/{order-id}
