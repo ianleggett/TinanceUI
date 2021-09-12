@@ -207,5 +207,11 @@
   "Type in the email to share this offer with your friend": "Type in the email to share this offer with your friend",
   "Invite Trade": "Invite Trade",
   "Invite trade successful": "Invite trade successful",
-  "Invite trade failed": "Invite trade failed"
+  "Invite trade failed": "Invite trade failed",
+  "Inactive": "Inactive",
+  "Toggle live successful": "Toggle live successful",
+  "Contact Us": "Contact Us",
+  "Shared": "Shared",
+  "Transaction taking longer than usual, We will update you by email when complete": "Transaction taking longer than usual, We will update you by email when complete",
+  "Block chain is busy, we will update you by email when complete": "Block chain is busy, we will update you by email when complete"
 }

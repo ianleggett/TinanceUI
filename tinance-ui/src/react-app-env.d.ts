@@ -105,6 +105,12 @@ declare namespace Offer {
     | 'IN_PROGRESS'
     | 'UNKNOWN';
 
+  interface InvitedUser {
+    id: number;
+    orderId: string;
+    email: string;
+  }
+
   interface Model {
     id: string;
     buyer: boolean;
@@ -141,6 +147,10 @@ declare namespace Offer {
       username: string;
     };
     userId: number;
+
+    invited?: InvitedUser[];
+    cid?: number;
+    emailSent?: string;
   }
 }
 
@@ -153,6 +163,7 @@ declare namespace Trade {
     | 'CANCEL_REQ'
     | 'ERROR'
     | 'DEPOSIT'
+    | 'DEPOSITING'
     | 'FIATSENT'
     | 'REFUND'
     | 'UNKNOWN';

@@ -97,7 +97,7 @@ const useStyles = makeStyles((theme) => ({
     textTransform: 'uppercase',
   },
   share: {
-    marginLeft: theme.spacing(1),
+    marginBottom: theme.spacing(1),
   },
   empty: {
     display: 'flex',
@@ -427,7 +427,25 @@ const OfferListPage: React.FC = () => {
                     style={{ color: '#D97706', borderColor: '#D97706' }}
                   />
                 ) : null}
-                <Box display="flex" alignItems="center" className={classes.topRight}>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="flex-end"
+                  className={classes.topRight}
+                >
+                  {offer.procStatus === 'CREATED' ? (
+                    <Button
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      startIcon={<ShareOutlinedIcon />}
+                      className={classes.share}
+                      onClick={() => handleShareDialogOpen(offer.orderId)}
+                      disabled={!!offer.invited && offer.invited.length > 0}
+                    >
+                      {t(!!offer.invited && offer.invited.length > 0 ? 'Shared' : 'Share')}
+                    </Button>
+                  ) : null}
                   <Tooltip
                     title={(offer.live ? t('Active') : t('Inactive')) as string}
                     placement="top"
@@ -439,18 +457,6 @@ const OfferListPage: React.FC = () => {
                       onChange={(event, checked) => handleToggleLive(event, checked, offer.orderId)}
                     />
                   </Tooltip>
-                  {offer.procStatus === 'CREATED' ? (
-                    <Button
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                      startIcon={<ShareOutlinedIcon />}
-                      className={classes.share}
-                      onClick={() => handleShareDialogOpen(offer.orderId)}
-                    >
-                      {t('Share')}
-                    </Button>
-                  ) : null}
                 </Box>
                 <Grid container alignItems="flex-end" spacing={1}>
                   <Hidden smUp>

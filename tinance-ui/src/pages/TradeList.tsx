@@ -60,6 +60,7 @@ import { snackbar, toFixed } from '../utils';
 
 const WS_ERR = 'ERROR';
 const WS_END = 'END';
+const WS_TIMEOUT = 'MSGTIMEOUT';
 
 const USDT_DECIMALS = 6;
 const USDT_DISPLAY_DECIMALS = 2;
@@ -177,6 +178,8 @@ const buyerInfo: Record<Trade.Status, string> = {
   ERROR: 'This trade has a process error, we are investigating the issue',
   DEPOSIT:
     'The seller has deposited crypto, please check the transaction and send Fiat bank funds now',
+  DEPOSITING:
+    'The seller has deposited crypto, please check the transaction and send Fiat bank funds now',
   REFUND: 'Seller is being refunded',
   FIATSENT: 'Waiting for the seller to receive Bank funds',
   UNKNOWN: '',
@@ -191,6 +194,7 @@ const sellerInfo: Record<Trade.Status, string> = {
     'The buyer is deciding to accept or reject your cancel request. The trade will still occur if the buyer rejects',
   ERROR: 'This trade has a process error, we are investigating the issue',
   DEPOSIT: 'The buyer is sending the bank funds, please check your bank',
+  DEPOSITING: 'The buyer is sending the bank funds, please check your bank',
   REFUND: 'Your refund is being prepared',
   FIATSENT: 'The buyer has sent bank funds, please check your bank and confirm',
   UNKNOWN: '',
@@ -485,6 +489,22 @@ const TradeListPage: React.FC = () => {
                         setShowOverlay(false);
                       }, 1000);
                     }
+
+                    if (key.toUpperCase() === WS_TIMEOUT) {
+                      stompClient.unsubscribe(subscribtion.id);
+
+                      setTimeout(() => {
+                        setShowOverlayError(false);
+                        setShowOverlay(false);
+                        snackbar.warning(
+                          t(
+                            'Transaction taking longer than usual, We will update you by email when complete',
+                          ),
+                        );
+
+                        run();
+                      }, 1000);
+                    }
                   } catch {
                     stompClient.unsubscribe(subscribtion.id);
                     setShowOverlayError(false);
@@ -538,7 +558,7 @@ const TradeListPage: React.FC = () => {
         });
       });
     },
-    [decimals, symbol, address, account, escrowCtrAddr, library, t, depositCrypto],
+    [decimals, symbol, address, account, escrowCtrAddr, library, t, run, depositCrypto],
   );
 
   const handleCancelDeposite = useCallback(() => {
@@ -688,6 +708,14 @@ const TradeListPage: React.FC = () => {
           );
         }
 
+        case 'DEPOSITING': {
+          return (
+            <Button color="primary" variant="contained">
+              {t('Block chain is busy, we will update you by email when complete')}
+            </Button>
+          );
+        }
+
         case 'FIATSENT': {
           return isSeller ? (
             <Button color="primary" variant="contained" onClick={() => handleFlagComplete(trade)}>
@@ -784,6 +812,10 @@ const TradeListPage: React.FC = () => {
               {t('Cancel transaction')}
             </Button>
           );
+        }
+
+        case 'DEPOSITING': {
+          return null;
         }
 
         case 'CANCEL_REQ': {

@@ -47,6 +47,7 @@ export const tradeStatusMap: Record<Trade.Status, string> = {
   CANCEL_REQ: 'Cancelled Request',
   ERROR: 'Error',
   DEPOSIT: 'Deposit',
+  DEPOSITING: 'Depositing',
   FIATSENT: 'Fiat Sent',
   COMPLETED: 'Completed',
   REFUND: 'Refund',

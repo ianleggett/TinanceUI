@@ -171,8 +171,8 @@ const HomePage: React.FC = () => {
             <Grid container alignItems="center" justifyContent="center">
               <Grid md={7} lg={7} item>
                 <Typography component="p" variant="body1" className={classes.content}>
-                  Simple, automated trade flow - making it easier and more accessible to trade
-                  globally, and doing it safely and securely.
+                  {t(`Simple, automated trade flow - making it easier and more accessible to trade
+                  globally, and doing it safely and securely.`)}
                 </Typography>
               </Grid>
               <Grid md={5} lg={5} item>
@@ -190,9 +190,8 @@ const HomePage: React.FC = () => {
             <Grid container alignContent="center" justifyContent="center">
               <Grid md={7} lg={7} item>
                 <Typography component="p" variant="body1" className={classes.content}>
-                  Customers have total control – the ability to retain ownership of your assets and
-                  trade from your wallet，and all transactions can be verified in real-time (on
-                  blockchain).
+                  {t(`Customers have total control – the ability to retain ownership of your assets and trade from your wallet，and all transactions can be verified in real-time (on
+                  blockchain).`)}
                 </Typography>
               </Grid>
               <Grid md={5} lg={5} item>
@@ -210,14 +209,14 @@ const HomePage: React.FC = () => {
             <Grid container alignContent="center" justifyContent="center">
               <Grid md={7} lg={7} item>
                 <Typography component="p" variant="body1" className={classes.content}>
-                  No more &apos;trust issues&apos; - we use decentralized{' '}
+                  {t(`No more 'trust issues' - we use decentralized`)}{' '}
                   <a
                     href="https://ethereum.org/en/developers/docs/smart-contracts/"
                     className={classes.link}
                   >
-                    smart contracts
+                    {t('smart contracts')}
                   </a>{' '}
-                  - so no counterparty risk and no dilemma of &apos;Who moves first?&apos;
+                  - {t(`so no counterparty risk and no dilemma of 'Who moves first?'`)}
                 </Typography>
               </Grid>
               <Grid md={5} lg={5} item>
@@ -253,7 +252,7 @@ const HomePage: React.FC = () => {
                 className={classes.stepTitle}
                 style={{ margin: matches ? '24px' : '0 0 24px 0' }}
               >
-                Create your account
+                {t('Create your account')}
               </Typography>
               <Typography
                 variant="body2"
@@ -262,10 +261,11 @@ const HomePage: React.FC = () => {
                 component="p"
               >
                 <a href="signup" className={classes.link}>
-                  Sign up
+                  {t('Sign up')}
                 </a>
-                , enter your contact details and your journey begins. It is that easy - and its
-                free!
+                ,{' '}
+                {t(`enter your contact details and your journey begins. It is that easy - and its
+                free!`)}
               </Typography>
             </CardContent>
           </Card>
@@ -289,7 +289,7 @@ const HomePage: React.FC = () => {
                 className={classes.stepTitle}
                 style={{ margin: matches ? '24px' : '0 0 24px 0' }}
               >
-                Connect your eWallet
+                {t(`Connect your eWallet`)}
               </Typography>
               <Typography
                 variant="body2"
@@ -297,15 +297,15 @@ const HomePage: React.FC = () => {
                 style={{ margin: matches ? '24px' : '0' }}
                 component="p"
               >
-                Link your eWallet using{' '}
+                {t('Link your eWallet using')}{' '}
                 <a href="https://metamask.io/" className={classes.link}>
-                  Metamask
+                  {t('Metamask')}
                 </a>{' '}
                 or compatible{' '}
                 <a href="https://walletconnect.org/" className={classes.link}>
-                  Wallet Connect
+                  {t('Wallet Connect')}
                 </a>
-                . Add your receiving bank details and begin trading.
+                . {t(`Add your receiving bank details and begin trading.`)}
               </Typography>
             </CardContent>
           </Card>
@@ -329,7 +329,7 @@ const HomePage: React.FC = () => {
                 className={classes.stepTitle}
                 style={{ margin: matches ? '24px' : '0 0 24px 0' }}
               >
-                Browse the marketplace
+                {t('Browse the marketplace')}
               </Typography>
               <Typography
                 variant="body2"
@@ -337,8 +337,8 @@ const HomePage: React.FC = () => {
                 style={{ margin: matches ? '24px' : '0' }}
                 component="p"
               >
-                <b>Accept</b> trades from other users or <b>Create</b> your own offer. Simply set
-                your terms and publish to the market for others to accept.
+                {t(`Accept trades from other users or Create your own offer. Simply set
+                your terms and publish to the market for others to accept.`)}
               </Typography>
             </CardContent>
           </Card>
@@ -362,7 +362,7 @@ const HomePage: React.FC = () => {
                 className={classes.stepTitle}
                 style={{ margin: matches ? '24px' : ' 0 0 24px 0' }}
               >
-                Complete your trade
+                {t('Complete your trade')}
               </Typography>
               <Typography
                 variant="body2"
@@ -370,16 +370,17 @@ const HomePage: React.FC = () => {
                 style={{ margin: matches ? '24px' : '0' }}
                 component="p"
               >
-                Each trade is managed by a{' '}
+                {t('Each trade is managed by a')}{' '}
                 <a
                   href="https://ethereum.org/en/developers/docs/smart-contracts/"
                   className={classes.link}
                 >
-                  smart contract
+                  {t('smart contract')}
                 </a>
-                , crypto is held in secure escrow and only released when digitally verified by both
-                parties. If either party fails to verifiy every part of the process, funds are
-                automatcically refunded. Arbitration takes place in the unlikely event of disputes.
+                ,{' '}
+                {t(
+                  `crypto is held in secure escrow and only released when digitally verified by both parties. If either party fails to verifiy every part of the process, funds are automatcically refunded. Arbitration takes place in the unlikely event of disputes.`,
+                )}
               </Typography>
             </CardContent>
           </Card>

@@ -207,5 +207,11 @@
   "Type in the email to share this offer with your friend": "输入电子邮箱地址，将该报价分享给您的朋友",
   "Invite Trade": "邀请交易",
   "Invite trade successful": "邀请交易成功",
-  "Invite trade failed": "邀请交易失败"
+  "Invite trade failed": "邀请交易失败",
+  "Inactive": "未激活",
+  "Toggle live successful": "切换激活状态成功",
+  "Contact Us": "联系我们",
+  "Shared": "已分享",
+  "Transaction taking longer than usual, We will update you by email when complete": "Transaction taking longer than usual, We will update you by email when complete",
+  "Block chain is busy, we will update you by email when complete": "Block chain is busy, we will update you by email when complete"
 }
