@@ -190,8 +190,9 @@ const HomePage: React.FC = () => {
             <Grid container alignContent="center" justifyContent="center">
               <Grid md={7} lg={7} item>
                 <Typography component="p" variant="body1" className={classes.content}>
-                  Customer has total control – trades are authorized directly from your own wallet
-                  and all transactions can be verified in real-time (on blockchain).
+                  Customers have total control – the ability to retain ownership of your assets and
+                  trade from your wallet，and all transactions can be verified in real-time (on
+                  blockchain).
                 </Typography>
               </Grid>
               <Grid md={5} lg={5} item>
