@@ -293,6 +293,7 @@ declare namespace API {
     payTypes?: number[];
     status?: Offer.Status[];
     fromamt?: number;
+    orderid?: string;
   }
 
   interface GetMyOffersParams extends GetAllOffersParams {

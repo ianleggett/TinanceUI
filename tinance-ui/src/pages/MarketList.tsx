@@ -31,7 +31,7 @@ import { useFormik } from 'formik';
 import groupBy from 'lodash-es/groupBy';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { useAppConfigState, useUserManagerState } from '../components';
 import { GetAllOffersService, TakeOrderService } from '../services';
@@ -110,6 +110,7 @@ const MarketListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
+  const { orderid } = useParams<{ orderid: string }>();
   const [loading, setLoading] = useState(true);
   const { profile, isLoggedIn } = useUserManagerState();
   const { ccyCodes, paymentTypes, walletConnected } = useAppConfigState();
@@ -259,10 +260,14 @@ const MarketListPage: React.FC = () => {
   }, [history]);
 
   useMount(() => {
-    run({
-      buy: true,
-      sell: false,
-    });
+    if (orderid) {
+      run({ orderid });
+    } else {
+      run({
+        buy: true,
+        sell: false,
+      });
+    }
   });
 
   useUnmount(() => {
@@ -271,134 +276,139 @@ const MarketListPage: React.FC = () => {
 
   return (
     <Grid container direction={direction} spacing={2} className={classes.container}>
-      <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
-        <Paper className={classes.paper}>
-          <form onSubmit={handleSubmit} onReset={handleReset}>
-            <Grid container direction="column" spacing={3}>
-              <Grid item xs={12}>
-                <ButtonGroup color="secondary" fullWidth>
-                  <Button onClick={() => setIsBuy(true)} variant={isBuy ? 'contained' : 'outlined'}>
-                    {t('Buy')}
-                  </Button>
-                  <Button
-                    onClick={() => setIsBuy(false)}
-                    variant={isBuy ? 'outlined' : 'contained'}
-                  >
-                    {t('Sell')}
-                  </Button>
-                </ButtonGroup>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl variant="outlined" fullWidth>
-                  <InputLabel id="fromccyid-select">{t('Crypto')}</InputLabel>
-                  <Select
-                    id="fromccyid"
-                    name="fromccyid"
-                    labelId="fromccyid-select"
-                    label={t('Crypto')}
-                    value={formik.values.fromccyid}
-                    onChange={formik.handleChange}
-                  >
-                    <MenuItem value={0}>
-                      <em>{t('Any Crypto')}</em>
-                    </MenuItem>
-                    {options.ERC20 !== undefined
-                      ? options.ERC20.map((erc20) => (
-                          <MenuItem key={erc20.id} value={erc20.id}>
-                            {erc20.name}
-                          </MenuItem>
-                        ))
-                      : null}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl variant="outlined" fullWidth>
-                  <InputLabel id="toccyid-select">{t('Fiat')}</InputLabel>
-                  <Select
-                    id="toccyid"
-                    name="toccyid"
-                    labelId="toccyid-select"
-                    label={t('Fiat')}
-                    value={formik.values.toccyid}
-                    onChange={formik.handleChange}
-                  >
-                    <MenuItem value={0}>
-                      <em>{t('Any Fiat')}</em>
-                    </MenuItem>
-                    {options.Fiat !== undefined
-                      ? options.Fiat.map((fiat) => (
-                          <MenuItem key={fiat.id} value={fiat.id}>
-                            {fiat.name}
-                          </MenuItem>
-                        ))
-                      : null}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  id="fromamt"
-                  name="fromamt"
-                  variant="outlined"
-                  label={t('Volume')}
-                  placeholder="Volume"
-                  inputMode="numeric"
-                  value={formik.values.fromamt}
-                  onChange={formik.handleChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl variant="outlined" fullWidth>
-                  <InputLabel id="paytypes-select">{t('Payment')}</InputLabel>
-                  <Select
-                    id="payTypes"
-                    name="payTypes"
-                    labelId="paytypes-select"
-                    label={t('Payment')}
-                    value={formik.values.payTypes}
-                    onChange={formik.handleChange}
-                  >
-                    <MenuItem value={0}>
-                      <em>{t('Any Payment')}</em>
-                    </MenuItem>
-                    {paymentTypes
-                      .filter((v) => v.enabled)
-                      .map((paymentType) => (
-                        <MenuItem key={paymentType.id} value={paymentType.id}>
-                          {t(paymentType.name)}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={1}>
-                  <Grid item xs={6}>
-                    <Button color="primary" variant="outlined" type="reset" fullWidth>
-                      {t('Reset')}
-                    </Button>
-                  </Grid>
-                  <Grid item xs={6}>
+      {orderid ? null : (
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
+          <Paper className={classes.paper}>
+            <form onSubmit={handleSubmit} onReset={handleReset}>
+              <Grid container direction="column" spacing={3}>
+                <Grid item xs={12}>
+                  <ButtonGroup color="secondary" fullWidth>
                     <Button
-                      color="primary"
-                      variant="contained"
-                      type="submit"
-                      startIcon={<SearchOutlinedIcon />}
-                      fullWidth
+                      onClick={() => setIsBuy(true)}
+                      variant={isBuy ? 'contained' : 'outlined'}
                     >
-                      {t('Search')}
+                      {t('Buy')}
                     </Button>
+                    <Button
+                      onClick={() => setIsBuy(false)}
+                      variant={isBuy ? 'outlined' : 'contained'}
+                    >
+                      {t('Sell')}
+                    </Button>
+                  </ButtonGroup>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl variant="outlined" fullWidth>
+                    <InputLabel id="fromccyid-select">{t('Crypto')}</InputLabel>
+                    <Select
+                      id="fromccyid"
+                      name="fromccyid"
+                      labelId="fromccyid-select"
+                      label={t('Crypto')}
+                      value={formik.values.fromccyid}
+                      onChange={formik.handleChange}
+                    >
+                      <MenuItem value={0}>
+                        <em>{t('Any Crypto')}</em>
+                      </MenuItem>
+                      {options.ERC20 !== undefined
+                        ? options.ERC20.map((erc20) => (
+                            <MenuItem key={erc20.id} value={erc20.id}>
+                              {erc20.name}
+                            </MenuItem>
+                          ))
+                        : null}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl variant="outlined" fullWidth>
+                    <InputLabel id="toccyid-select">{t('Fiat')}</InputLabel>
+                    <Select
+                      id="toccyid"
+                      name="toccyid"
+                      labelId="toccyid-select"
+                      label={t('Fiat')}
+                      value={formik.values.toccyid}
+                      onChange={formik.handleChange}
+                    >
+                      <MenuItem value={0}>
+                        <em>{t('Any Fiat')}</em>
+                      </MenuItem>
+                      {options.Fiat !== undefined
+                        ? options.Fiat.map((fiat) => (
+                            <MenuItem key={fiat.id} value={fiat.id}>
+                              {fiat.name}
+                            </MenuItem>
+                          ))
+                        : null}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    id="fromamt"
+                    name="fromamt"
+                    variant="outlined"
+                    label={t('Volume')}
+                    placeholder="Volume"
+                    inputMode="numeric"
+                    value={formik.values.fromamt}
+                    onChange={formik.handleChange}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl variant="outlined" fullWidth>
+                    <InputLabel id="paytypes-select">{t('Payment')}</InputLabel>
+                    <Select
+                      id="payTypes"
+                      name="payTypes"
+                      labelId="paytypes-select"
+                      label={t('Payment')}
+                      value={formik.values.payTypes}
+                      onChange={formik.handleChange}
+                    >
+                      <MenuItem value={0}>
+                        <em>{t('Any Payment')}</em>
+                      </MenuItem>
+                      {paymentTypes
+                        .filter((v) => v.enabled)
+                        .map((paymentType) => (
+                          <MenuItem key={paymentType.id} value={paymentType.id}>
+                            {t(paymentType.name)}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <Grid container spacing={1}>
+                    <Grid item xs={6}>
+                      <Button color="primary" variant="outlined" type="reset" fullWidth>
+                        {t('Reset')}
+                      </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        type="submit"
+                        startIcon={<SearchOutlinedIcon />}
+                        fullWidth
+                      >
+                        {t('Search')}
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-          </form>
-        </Paper>
-      </Grid>
+            </form>
+          </Paper>
+        </Grid>
+      )}
 
-      <Grid item xs={12} sm={12} md={9} lg={9} xl={9}>
+      <Grid item xs={12} sm={12} md={orderid ? 12 : 9} lg={orderid ? 12 : 9} xl={orderid ? 12 : 9}>
         {loading ? (
           <Paper className={classes.card}>
             <Grid xs={12} sm={12} md={12} lg={12} xl={12} className={classes.title} item>
