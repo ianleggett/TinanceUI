@@ -188,6 +188,7 @@ const OfferListPage: React.FC = () => {
         setSelectedOffer('');
         setShowShareDialog(false);
         snackbar.success(t('Invite trade successful'));
+        run();
       } else {
         snackbar.warning(t('Invite trade failed'));
       }
