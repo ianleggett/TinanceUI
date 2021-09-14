@@ -661,10 +661,6 @@ const TradeListPage: React.FC = () => {
     history.push('/markets');
   }, [history]);
 
-  const handleCopy = useCallback(() => {
-    snackbar.success(t('Copied to clipboard!'));
-  }, [t]);
-
   const getPrimaryButton = useCallback(
     (trade: Trade.Model) => {
       const isSeller = !!profile && trade.seller.cid === profile.cid;
@@ -709,10 +705,15 @@ const TradeListPage: React.FC = () => {
         }
 
         case 'DEPOSITING': {
-          return (
-            <Button color="primary" variant="contained">
-              {t('Block chain is busy, we will update you by email when complete')}
+          return showOverlay ? (
+            <Button color="primary" variant="contained" disabled>
+              <CircularProgress size="1em" />
+              <div>{t('Depositing...')}</div>
             </Button>
+          ) : (
+            <Typography color="primary">
+              {t('Block chain is busy, we will update you by email when complete')}
+            </Typography>
           );
         }
 

@@ -85,6 +85,7 @@ const App: React.FC = () => {
                       <Route path="/privacy" component={PrivacyPage} exact />
                       <Route path="/terms" component={TermsPage} exact />
                       <Route path="/markets" component={MarketListPage} exact />
+                      <Route path="/markets/:orderid" component={MarketListPage} exact />
 
                       <AccessControlRoute path="/offers" component={OfferListPage} exact />
                       <AccessControlRoute path="/offers/create" component={OfferFormPage} exact />
