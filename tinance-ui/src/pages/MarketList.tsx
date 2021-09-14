@@ -110,7 +110,7 @@ const MarketListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { orderid } = useParams<{ orderid: string }>();
+  const { wildcardId } = useParams<{ wildcardId: string }>();
   const [loading, setLoading] = useState(true);
   const { profile, isLoggedIn } = useUserManagerState();
   const { ccyCodes, paymentTypes, walletConnected } = useAppConfigState();
@@ -260,8 +260,8 @@ const MarketListPage: React.FC = () => {
   }, [history]);
 
   useMount(() => {
-    if (orderid) {
-      run({ orderid });
+    if (wildcardId) {
+      run({ wildcardId });
     } else {
       run({
         buy: true,
@@ -276,7 +276,7 @@ const MarketListPage: React.FC = () => {
 
   return (
     <Grid container direction={direction} spacing={2} className={classes.container}>
-      {orderid ? null : (
+      {wildcardId ? null : (
         <Grid item xs={12} sm={12} md={3} lg={3} xl={3}>
           <Paper className={classes.paper}>
             <form onSubmit={handleSubmit} onReset={handleReset}>
@@ -408,7 +408,14 @@ const MarketListPage: React.FC = () => {
         </Grid>
       )}
 
-      <Grid item xs={12} sm={12} md={orderid ? 12 : 9} lg={orderid ? 12 : 9} xl={orderid ? 12 : 9}>
+      <Grid
+        item
+        xs={12}
+        sm={12}
+        md={wildcardId ? 12 : 9}
+        lg={wildcardId ? 12 : 9}
+        xl={wildcardId ? 12 : 9}
+      >
         {loading ? (
           <Paper className={classes.card}>
             <Grid xs={12} sm={12} md={12} lg={12} xl={12} className={classes.title} item>
