@@ -1,7 +1,9 @@
 import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import type { Dispatch } from 'react';
-import { createContext, useCallback, useContext, useReducer } from 'react';
+import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
+import Stomp from 'stompjs';
 
+import pkg from '../../package.json';
 import { GetUserDetailsService } from '../services';
 import { clearProfile, getProfile, getToken, saveProfile, snackbar } from '../utils';
 
@@ -106,6 +108,12 @@ export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) =
 
   useUpdateEffect(() => {
     if (state.isLoggedIn) {
+      const url = new URL('/tradesub', pkg.proxy.replace('https', 'wss').replace('http', 'ws'));
+
+      window.websocket = new WebSocket(url.href);
+      window.stompClient = Stomp.over(window.websocket);
+      window.stompClient.connect({}, (frame: any) => console.dir(frame));
+
       requestRemoteUserProfile(dispatch);
     }
   }, [state.isLoggedIn]);
@@ -114,6 +122,14 @@ export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) =
     dispatch({
       type: 'clearUserInfo',
     });
+
+    if (window.stompClient) {
+      window.stompClient.disconnect(() => {
+        if (window.websocket) {
+          window.websocket.close();
+        }
+      });
+    }
 
     document.removeEventListener('tokenexpired', handleTokenExpired);
   });

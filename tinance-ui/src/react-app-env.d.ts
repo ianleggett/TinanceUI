@@ -454,3 +454,8 @@ declare namespace API {
 
   interface RateTradeResponse extends BaseResponse {}
 }
+
+declare interface Window {
+  websocket: WebSocket | null;
+  stompClient: any | null;
+}

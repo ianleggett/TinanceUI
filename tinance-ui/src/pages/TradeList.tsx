@@ -28,16 +28,15 @@ import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import Rating from '@material-ui/lab/Rating';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useWeb3React } from '@web3-react/core';
-import { useRequest } from 'ahooks';
+import { useMount, useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import { BigNumber } from 'ethers';
 import { useFormik } from 'formik';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import Stomp from 'stompjs';
 
-import pkg from '../../package.json';
 import {
   CopyIconButton,
   DepositeDialog,
@@ -200,8 +199,6 @@ const sellerInfo: Record<Trade.Status, string> = {
   UNKNOWN: '',
 };
 
-const url = new URL('/tradesub', pkg.proxy.replace('https', 'wss').replace('http', 'ws'));
-
 const TradeListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
@@ -214,7 +211,6 @@ const TradeListPage: React.FC = () => {
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [openRateTradeDialog, setOpenRateTradeDialog] = useState(false);
   const { account, library, connector, error } = useWeb3React<Web3Provider>();
-  const stompClientRef = useRef<Stomp.Client | null>(null);
   const subscribtionIdRef = useRef('');
   const [showOverlay, setShowOverlay] = useState(false);
   const [showOverlayError, setShowOverlayError] = useState(false);
@@ -464,7 +460,7 @@ const TradeListPage: React.FC = () => {
           if (val.isZero() || val.gte(cryptoAmt)) {
             setShowOverlay(true);
             // approval reset
-            const stompClient = stompClientRef.current;
+            const stompClient = window.stompClient as Stomp.Client | null;
 
             if (stompClient) {
               const subscribtion = stompClient.subscribe(
@@ -566,8 +562,8 @@ const TradeListPage: React.FC = () => {
     setDepositingMessage('CONNECT_WS');
     setShowOverlay(false);
 
-    if (stompClientRef.current && subscribtionIdRef.current) {
-      stompClientRef.current.unsubscribe(subscribtionIdRef.current);
+    if (window.stompClient && subscribtionIdRef.current) {
+      window.stompClient.unsubscribe(subscribtionIdRef.current);
     }
   }, []);
 
@@ -886,28 +882,9 @@ const TradeListPage: React.FC = () => {
     ],
   );
 
-  useEffect(() => {
+  useMount(() => {
     run();
-
-    const websocket = new WebSocket(url.href);
-    stompClientRef.current = Stomp.over(websocket);
-    const stompClient = stompClientRef.current;
-
-    if (stompClient) {
-      stompClient.connect({}, (frame) => console.dir(frame));
-    }
-
-    return () => {
-      cancel();
-
-      if (stompClient) {
-        stompClient.disconnect(() => {
-          websocket.close();
-        });
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return (
     <>
