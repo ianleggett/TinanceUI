@@ -41,4 +41,20 @@ The email is sent to the new user as a hyperlink and includes an order-id. The l
 
 `tinance.io/markets/{order-id}`
 
-The UI must take this url and show the market page with this order (if it exists) - otherwise display the existing page. A simple way to test this function would be to use an existing order-id from the markets or offers page and add it as /markets/{order-id}
+The UI calls `v1/getoffers.json` as before, except we have added `wildcardId` to the webfilterobject :
+
+```json
+{
+  "buy": true,
+  "fromamt": 0,
+  "fromccyid": 0,
+  "payTypes": [],
+  "sell": true,
+  "status": [],
+  "toccyid": 0,
+  "wildcardId": "<the order-id from url>"
+}
+```
+
+The UI must set the wildcardId using the {order-id} in the url.
+A simple way to test this function would be to use an existing order-id from the markets or offers page browse the url `tinance.io/markets/{order-id}`
