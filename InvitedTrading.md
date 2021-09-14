@@ -41,7 +41,7 @@ The email is sent to the new user as a hyperlink and includes an order-id. The l
 
 `tinance.io/markets/{order-id}`
 
-The UI calls `v1/getoffers.json` as before, except we have added `wildcardId` to the webfilterobject :
+The UI calls `v1/public/getoffers.json` as before, except we have added `wildcardId` to the webfilterobject :
 
 ```json
 {
