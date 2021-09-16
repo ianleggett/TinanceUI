@@ -4,6 +4,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -12,6 +13,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
 import { useUpdateEffect } from 'ahooks';
 import { useCallback, useState } from 'react';
@@ -23,6 +25,12 @@ const useStyles = makeStyles((theme) => {
   return {
     root: {
       width: 512,
+    },
+    close: {
+      position: 'absolute',
+      right: 16,
+      top: 8,
+      color: theme.palette.grey[500],
     },
     divider: {
       padding: 0,
@@ -101,14 +109,20 @@ export const DepositeDialog: React.FC<DepositeDialogProps> = (props) => {
   return (
     <Dialog
       open={open}
-      onClose={onClose}
       aria-labelledby="upload-dialog-title"
       aria-describedby="upload-dialog-description"
       classes={{
         paper: classes.root,
       }}
     >
-      <DialogTitle id="upload-dialog-title">{t('Depositing...')}</DialogTitle>
+      <DialogTitle id="upload-dialog-title">
+        {t('Depositing...')}
+        {onClose ? (
+          <IconButton onClick={onClose} aria-label="Close Dialog" className={classes.close}>
+            <CloseIcon />
+          </IconButton>
+        ) : null}
+      </DialogTitle>
       <DialogContent>
         <List className={classes.divider}>
           {steps.map((message, index) => (
