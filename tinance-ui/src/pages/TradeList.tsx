@@ -229,7 +229,7 @@ const TradeListPage: React.FC = () => {
     address: USDTCoinCtrAddr,
     symbol: 'USDT',
     name: 'USDT',
-    decimals: 6,
+    decimals: USDT_DECIMALS,
     abi: ERC20ABI,
   };
 

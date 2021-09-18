@@ -40,6 +40,7 @@ import { walletconnect } from '../utils/connectors';
 import { injectedConnector, useEagerConnect } from '../utils/hooks';
 import { snackbar } from '../utils/snackbar';
 
+const USDT_DECIMALS = 6;
 const USDT_DISPLAY_DECIMALS = 2;
 
 const useStyles = makeStyles((theme) => ({
@@ -80,42 +81,28 @@ const initialValues = {
   walletAddr: '',
 };
 
-// const contract = new Contract(address, ERC20ABI, library.getSigner());
-
-// const resetAllowance = useCallback(() => {
-//   contract.approve(escrowCtrAddr, 0).then(
-//     (txnval: TransactionResponse) => {
-//       txnval.wait(1).then((txnRec) => {
-//         snackbar.success('Allowance has been reset, please try depositing now');
-//       });
-//     },
-//     (_error: Error) => {
-//       // user rejects approval
-//       snackbar.warning(_error.message);
-//     },
-//   );
-// }, []);
-
 export const TokenBalance = ({
   symbol,
   address,
   decimals,
   account,
+  escrowCtrAddr,
+  usdtContract,
 }: {
   symbol: string;
   address: string;
   decimals: number;
   account: string | null | undefined;
+  escrowCtrAddr: string;
+  usdtContract: Contract;
 }): JSX.Element => {
   const { data: balance } = useEtherSWR([address, 'balanceOf', account]);
   const { data: allow } = useEtherSWR([
     address,
     'allowance',
     account,
-    '0xc50C962C12DB259A9095342ea55126f241cf2Fd0', // this needs to be networkConfig.escrowCtrAddr
+    escrowCtrAddr, // '0xc50C962C12DB259A9095342ea55126f241cf2Fd0', // this needs to be networkConfig.escrowCtrAddr
   ]);
-
-  // console.log(`Bal:${JSON.stringify(balance)}`);
 
   if (!balance) {
     return <div>...</div>;
@@ -145,8 +132,17 @@ export const TokenBalance = ({
               variant="outlined"
               size="large"
               onClick={() => {
-                snackbar.warning('Reset allowance Not implemented yet');
-                // resetAllowance();
+                usdtContract.approve(escrowCtrAddr, 0).then(
+                  (txnval: TransactionResponse) => {
+                    txnval.wait(1).then((txnRec) => {
+                      snackbar.success('Allowance has been reset, please try depositing now');
+                    });
+                  },
+                  (_error: Error) => {
+                    // user rejects approval
+                    snackbar.warning(_error.message);
+                  },
+                );
               }}
             >
               Reset
@@ -302,9 +298,21 @@ const UserWalletPage: React.FC = () => {
     address: networkConfig.usdtcoinCtrAddr,
     symbol: 'USDT',
     name: 'USDT',
-    decimals: 6,
+    decimals: USDT_DECIMALS,
     abi: ERC20ABI,
   };
+
+  /** Start of ICL changes ** */
+  const { etherScanPrefix, escrowCtrAddr, USDTCoinCtrAddr } = useMemo(
+    () => ({
+      etherScanPrefix: networkConfig.etherScanPrefix,
+      escrowCtrAddr: networkConfig.escrowCtrAddr,
+      USDTCoinCtrAddr: networkConfig.usdtcoinCtrAddr,
+    }),
+    [networkConfig],
+  );
+  const usdtContract = new Contract(address, ERC20ABI, library?.getSigner());
+  /** END of changes ICL */
 
   /** Options of Crypto and Fiat select */
   const options = useMemo(() => {
@@ -501,7 +509,11 @@ const UserWalletPage: React.FC = () => {
                     refreshInterval: 30_000,
                   }}
                 >
-                  {active && <TokenBalance {...{ symbol, address, decimals, account }} />}
+                  {active && (
+                    <TokenBalance
+                      {...{ symbol, address, decimals, account, escrowCtrAddr, usdtContract }}
+                    />
+                  )}
                 </EtherSWRConfig>
               </Grid>
             </Grid>
