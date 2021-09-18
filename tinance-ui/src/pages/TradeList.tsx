@@ -427,11 +427,11 @@ const TradeListPage: React.FC = () => {
       // trade.tradeId, trade.fromAmount + trade.sellerFee
       const cryptoAmt = Math.round(amt * 10 ** decimals);
 
-      console.log(`deposit ${amt} ${symbol}`);
-      console.log(`units ${cryptoAmt}`);
-      console.log(`coin addr ${address}`);
-      console.log(`user acct ${account}`);
-      console.log(`escrow addr ${escrowCtrAddr}`);
+      // console.log(`deposit ${amt} ${symbol}`);
+      // console.log(`units ${cryptoAmt}`);
+      // console.log(`coin addr ${address}`);
+      // console.log(`user acct ${account}`);
+      // console.log(`escrow addr ${escrowCtrAddr}`);
 
       if (library === undefined) {
         snackbar.warning(t('Please connect wallet'));
@@ -442,7 +442,6 @@ const TradeListPage: React.FC = () => {
         snackbar.warning(`Wallet has changed !!, switch to wallet ${trade.sellerAddress}`);
         return;
       }
-
       // address is address of USDT
       const contract = new Contract(address, ERC20ABI, library.getSigner());
 
@@ -502,6 +501,7 @@ const TradeListPage: React.FC = () => {
                       }, 1000);
                     }
                   } catch {
+                    console.log(`StompException unsubscribing id:${subscribtion.id}`);
                     stompClient.unsubscribe(subscribtion.id);
                     setShowOverlayError(false);
                     setShowOverlay(false);
@@ -510,6 +510,8 @@ const TradeListPage: React.FC = () => {
               );
 
               subscribtionIdRef.current = subscribtion.id;
+            } else {
+              console.log(`StompClient is null !!`);
             }
 
             if (val.isZero()) {
@@ -554,7 +556,7 @@ const TradeListPage: React.FC = () => {
         });
       });
     },
-    [decimals, symbol, address, account, escrowCtrAddr, library, t, run, depositCrypto],
+    [decimals, address, account, escrowCtrAddr, library, t, run, depositCrypto],
   );
 
   const handleCancelDeposite = useCallback(() => {

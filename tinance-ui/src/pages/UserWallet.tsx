@@ -1,4 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { Contract } from '@ethersproject/contracts';
+import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
 import { CircularProgress } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
@@ -39,6 +40,8 @@ import { walletconnect } from '../utils/connectors';
 import { injectedConnector, useEagerConnect } from '../utils/hooks';
 import { snackbar } from '../utils/snackbar';
 
+const USDT_DISPLAY_DECIMALS = 2;
+
 const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: theme.spacing(2),
@@ -77,6 +80,22 @@ const initialValues = {
   walletAddr: '',
 };
 
+// const contract = new Contract(address, ERC20ABI, library.getSigner());
+
+// const resetAllowance = useCallback(() => {
+//   contract.approve(escrowCtrAddr, 0).then(
+//     (txnval: TransactionResponse) => {
+//       txnval.wait(1).then((txnRec) => {
+//         snackbar.success('Allowance has been reset, please try depositing now');
+//       });
+//     },
+//     (_error: Error) => {
+//       // user rejects approval
+//       snackbar.warning(_error.message);
+//     },
+//   );
+// }, []);
+
 export const TokenBalance = ({
   symbol,
   address,
@@ -88,16 +107,56 @@ export const TokenBalance = ({
   decimals: number;
   account: string | null | undefined;
 }): JSX.Element => {
-  const { data: balance, mutate } = useEtherSWR([address, 'balanceOf', account]);
+  const { data: balance } = useEtherSWR([address, 'balanceOf', account]);
+  const { data: allow } = useEtherSWR([
+    address,
+    'allowance',
+    account,
+    '0xc50C962C12DB259A9095342ea55126f241cf2Fd0', // this needs to be networkConfig.escrowCtrAddr
+  ]);
+
+  // console.log(`Bal:${JSON.stringify(balance)}`);
 
   if (!balance) {
     return <div>...</div>;
   }
 
   return (
-    <div>
-      Balance : {Number.parseFloat(formatUnits(balance, decimals))} {symbol}
-    </div>
+    <>
+      <Grid xs={12} sm={12} md={8} item>
+        <TextField
+          variant="outlined"
+          label="Balance"
+          value={`${Number.parseFloat(formatUnits(balance, decimals)).toFixed(
+            USDT_DISPLAY_DECIMALS,
+          )} ${symbol}`}
+        />
+        {allow !== undefined ? (
+          <>
+            <TextField
+              variant="outlined"
+              label="Contract Allowance"
+              value={`${Number.parseFloat(formatUnits(allow, decimals)).toFixed(
+                USDT_DISPLAY_DECIMALS,
+              )} ${symbol}`}
+            />
+            <Button
+              color="secondary"
+              variant="outlined"
+              size="large"
+              onClick={() => {
+                snackbar.warning('Reset allowance Not implemented yet');
+                // resetAllowance();
+              }}
+            >
+              Reset
+            </Button>
+          </>
+        ) : (
+          <></>
+        )}
+      </Grid>
+    </>
   );
 };
 
@@ -309,11 +368,11 @@ const UserWalletPage: React.FC = () => {
   //   return TOKENS_BY_NETWORK[chainId][0];
   // }, []);
 
-  console.log(active);
-  console.log(`ChainId ${chainId} `);
-  console.log(`ADDR ${address} `);
-  console.log(`ACCT: ${account} `);
-  console.log(`Signer: ${library?.getSigner} `);
+  // console.log(active);
+  // console.log(`ChainId ${chainId} `);
+  // console.log(`ADDR ${address} `);
+  // console.log(`ACCT: ${account} `);
+  // console.log(`Signer: ${library?.getSigner} `);
 
   //  console.log(`BAL: ${balance} `);
 
