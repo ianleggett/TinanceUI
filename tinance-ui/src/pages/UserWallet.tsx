@@ -2,6 +2,7 @@ import { Contract } from '@ethersproject/contracts';
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
 import { CircularProgress } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
@@ -81,21 +82,15 @@ const initialValues = {
   walletAddr: '',
 };
 
-export const TokenBalance = ({
-  symbol,
-  address,
-  decimals,
-  account,
-  escrowCtrAddr,
-  usdtContract,
-}: {
+export const TokenBalance: React.FC<{
   symbol: string;
   address: string;
   decimals: number;
   account: string | null | undefined;
   escrowCtrAddr: string;
-  usdtContract: Contract;
-}): JSX.Element => {
+}> = (props) => {
+  const { t } = useTranslation();
+  const { symbol, address, decimals, account, escrowCtrAddr } = props;
   const { data: balance } = useEtherSWR([address, 'balanceOf', account]);
   const { data: allow } = useEtherSWR([
     address,
@@ -105,58 +100,39 @@ export const TokenBalance = ({
   ]);
 
   if (!balance) {
-    return <div>...</div>;
+    return <Box>{t('Loading...')}</Box>;
   }
 
   return (
-    <>
-      <Grid xs={12} sm={12} md={8} item>
+    <Grid spacing={2} container>
+      <Grid xs={12} sm={12} md={6} item>
         <TextField
           variant="outlined"
-          label="Balance"
+          label={t('Balance')}
+          fullWidth
           value={`${Number.parseFloat(formatUnits(balance, decimals)).toFixed(
             USDT_DISPLAY_DECIMALS,
           )} ${symbol}`}
         />
-        {allow !== undefined ? (
-          <>
-            <TextField
-              variant="outlined"
-              label="Contract Allowance"
-              value={`${Number.parseFloat(formatUnits(allow, decimals)).toFixed(
-                USDT_DISPLAY_DECIMALS,
-              )} ${symbol}`}
-            />
-            <Button
-              color="secondary"
-              variant="outlined"
-              size="large"
-              onClick={() => {
-                usdtContract.approve(escrowCtrAddr, 0).then(
-                  (txnval: TransactionResponse) => {
-                    txnval.wait(1).then((txnRec) => {
-                      snackbar.success('Allowance has been reset, please try depositing now');
-                    });
-                  },
-                  (_error: Error) => {
-                    // user rejects approval
-                    snackbar.warning(_error.message);
-                  },
-                );
-              }}
-            >
-              Reset
-            </Button>
-          </>
-        ) : (
-          <></>
-        )}
       </Grid>
-    </>
+      {allow !== undefined ? (
+        <Grid xs={12} sm={12} md={6} item>
+          <TextField
+            variant="outlined"
+            label={t('Contract Allowance')}
+            fullWidth
+            value={`${Number.parseFloat(formatUnits(allow, decimals)).toFixed(
+              USDT_DISPLAY_DECIMALS,
+            )} ${symbol}`}
+          />
+        </Grid>
+      ) : null}
+    </Grid>
   );
 };
 
-const WalletConnection: React.FC = () => {
+const WalletConnection: React.FC<{ usdtContract: Contract; escrowCtrAddr: string }> = (props) => {
+  const { usdtContract, escrowCtrAddr } = props;
   const { connector, library, chainId, account, activate, deactivate, active, error } =
     useWeb3React<Web3Provider>();
   const [activatingConnector, setActivatingConnector] = React.useState<any>();
@@ -254,26 +230,51 @@ const WalletConnection: React.FC = () => {
           })
         : null}
       {active || error ? (
-        <Grid xs={12} sm={12} md={4} item>
-          <Button
-            color="secondary"
-            variant="outlined"
-            size="large"
-            fullWidth
-            onClick={() => {
-              deactivate();
-              if (
-                connector instanceof WalletConnectConnector &&
-                connector.walletConnectProvider?.wc?.uri
-              ) {
-                connector.walletConnectProvider = undefined;
-              }
-              handleWalletDisconnect();
-            }}
-          >
-            {t('Disconnect')}
-          </Button>
-        </Grid>
+        <>
+          <Grid xs={12} sm={12} md={4} item>
+            <Button
+              color="secondary"
+              variant="outlined"
+              size="large"
+              fullWidth
+              onClick={() => {
+                usdtContract.approve(escrowCtrAddr, 0).then(
+                  (txnval: TransactionResponse) => {
+                    txnval.wait(1).then((txnRec) => {
+                      snackbar.success('Allowance has been reset, please try depositing now');
+                    });
+                  },
+                  (_error: Error) => {
+                    // user rejects approval
+                    snackbar.warning(_error.message);
+                  },
+                );
+              }}
+            >
+              {t('Reset')}
+            </Button>
+          </Grid>
+          <Grid xs={12} sm={12} md={4} item>
+            <Button
+              color="secondary"
+              variant="outlined"
+              size="large"
+              fullWidth
+              onClick={() => {
+                deactivate();
+                if (
+                  connector instanceof WalletConnectConnector &&
+                  connector.walletConnectProvider?.wc?.uri
+                ) {
+                  connector.walletConnectProvider = undefined;
+                }
+                handleWalletDisconnect();
+              }}
+            >
+              {t('Disconnect')}
+            </Button>
+          </Grid>
+        </>
       ) : null}
     </>
   );
@@ -511,14 +512,18 @@ const UserWalletPage: React.FC = () => {
                 >
                   {active && (
                     <TokenBalance
-                      {...{ symbol, address, decimals, account, escrowCtrAddr, usdtContract }}
+                      symbol={symbol}
+                      address={address}
+                      decimals={decimals}
+                      account={account}
+                      escrowCtrAddr={escrowCtrAddr}
                     />
                   )}
                 </EtherSWRConfig>
               </Grid>
             </Grid>
             <Grid spacing={2} container>
-              <WalletConnection />
+              <WalletConnection usdtContract={usdtContract} escrowCtrAddr={escrowCtrAddr} />
               <Grid xs={12} sm={12} md={12} item>
                 <Button type="submit" color="primary" variant="contained" size="large" fullWidth>
                   {loading ? t('Updating...') : t('Update User Wallet')}
