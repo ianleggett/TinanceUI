@@ -251,7 +251,7 @@ const WalletConnection: React.FC<{ usdtContract: Contract; escrowCtrAddr: string
                 );
               }}
             >
-              {t('Reset')}
+              {t('Reset Allowance')}
             </Button>
           </Grid>
           <Grid xs={12} sm={12} md={4} item>
