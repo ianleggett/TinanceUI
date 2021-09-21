@@ -188,14 +188,11 @@ const MarketListPage: React.FC = () => {
 
   const isBuyer = useCallback(
     (trade: Offer.Model): boolean => {
-      if (profile) {
-        return (
-          (trade.userDetails.cid === profile.cid && trade.buyer) ||
-          (trade.userDetails.cid !== profile.cid && !trade.buyer)
-        );
+      if (profile && trade.userDetails.cid === profile.cid) {
+        return trade.buyer;
       }
 
-      return false;
+      return !trade.buyer;
     },
     [profile],
   );
