@@ -38,9 +38,6 @@ import { useAppConfigState } from '../components';
 import { AddUpdateOrderService, GetUserBankService } from '../services';
 import { snackbar, toFixed } from '../utils';
 
-const MIN_VOL = 20; // smallest trade size
-const MIN_VOL_TEXT = `Min volume (${MIN_VOL})`;
-
 const useStyles = makeStyles((theme) => ({
   step: {
     padding: 16,
@@ -121,7 +118,7 @@ const OfferFormPage: React.FC = () => {
   const { oid } = useParams<{ oid: string }>();
   const { t } = useTranslation();
   const { feeRate } = useAppConfigState();
-  const { ccyCodes, relativeExpiryTime } = useAppConfigState();
+  const { ccyCodes, networkConfig, relativeExpiryTime } = useAppConfigState();
   const [invert, setInvert] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [usingDefault, setUsingDefault] = useState(true);
@@ -199,12 +196,26 @@ const OfferFormPage: React.FC = () => {
     return bankDetails.payType;
   }, [bankDetails]);
 
+  const calcGasFees = useMemo(() => {
+    return invert ? networkConfig.buyerGasFee : networkConfig.sellerGasFee;
+  }, [invert, networkConfig]);
+
+  const minVolume = useMemo(() => {
+    return Math.max(networkConfig.buyerGasFee, networkConfig.sellerGasFee) + calcGasFees;
+  }, [calcGasFees, networkConfig.buyerGasFee, networkConfig.sellerGasFee]);
+
   const validationSchema = useMemo(() => {
     return yup.object({
-      fromamt: yup.number().min(MIN_VOL, MIN_VOL_TEXT).required(t('From amount is required')),
-      toamt: yup.number().min(MIN_VOL, MIN_VOL_TEXT).required(t('To amount is required')),
+      fromamt: yup
+        .number()
+        .required(t('From amount is required'))
+        .min(minVolume, `Min volume (${minVolume})`),
+      toamt: yup
+        .number()
+        .required(t('To amount is required'))
+        .min(minVolume, `Min volume (${minVolume})`),
     });
-  }, [t]);
+  }, [minVolume, t]);
 
   const { run, loading } = useRequest(AddUpdateOrderService, {
     onSuccess(res) {
@@ -242,12 +253,6 @@ const OfferFormPage: React.FC = () => {
     [feeRate, invert],
   );
 
-  const { networkConfig } = useAppConfigState();
-
-  const calcGasFees = useCallback(() => {
-    return toFixed(invert ? networkConfig.buyerGasFee : networkConfig.sellerGasFee, 2);
-  }, [invert, networkConfig]);
-
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -282,6 +287,12 @@ const OfferFormPage: React.FC = () => {
   }, []);
 
   const handleNext = useCallback(() => {
+    if (!formik.errors.fromamt && !formik.errors.toamt) {
+      setActiveStep((prevState) => Math.min(prevState + 1, 2));
+    }
+  }, [formik]);
+
+  const handleNext2 = useCallback(() => {
     setActiveStep((prevState) => Math.min(prevState + 1, 2));
   }, []);
 
@@ -417,6 +428,7 @@ const OfferFormPage: React.FC = () => {
                           label={t("You'll send")}
                           value={formik.values.fromamt}
                           onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           error={formik.touched.fromamt && Boolean(formik.errors.fromamt)}
                           helperText={formik.touched.fromamt && formik.errors.fromamt}
                           fullWidth
@@ -464,6 +476,7 @@ const OfferFormPage: React.FC = () => {
                           label={t("You'll receive")}
                           value={formik.values.toamt}
                           onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           error={formik.touched.toamt && Boolean(formik.errors.toamt)}
                           helperText={formik.touched.toamt && formik.errors.toamt}
                           fullWidth
@@ -488,7 +501,7 @@ const OfferFormPage: React.FC = () => {
                     {t('Fees')}: {calcFees(formik.values.fromamt, formik.values.toamt)}
                   </Typography>
                   <Typography variant="subtitle1">
-                    {t('Gas')}: {calcGasFees()}
+                    {t('Gas')}: {toFixed(calcGasFees, 2)}
                   </Typography>
                 </Box>
               </CardContent>
@@ -645,7 +658,7 @@ const OfferFormPage: React.FC = () => {
                 <Button
                   color="primary"
                   endIcon={<ChevronRightOutlinedIcon />}
-                  onClick={handleNext}
+                  onClick={handleNext2}
                   className={classes.right}
                 >
                   {t('Next')}
