@@ -60,6 +60,7 @@ import { snackbar, toFixed } from '../utils';
 const WS_ERR = 'ERROR';
 const WS_END = 'END';
 const WS_TIMEOUT = 'MSGTIMEOUT';
+const TRADE_MSG_ROOT = '/system/trade/';
 
 const USDT_DECIMALS = 6;
 const USDT_DISPLAY_DECIMALS = 2;
@@ -463,7 +464,7 @@ const TradeListPage: React.FC = () => {
 
             if (stompClient) {
               const subscribtion = stompClient.subscribe(
-                `/topic/messages/${oid}`,
+                `${TRADE_MSG_ROOT}${oid}`,
                 (messageOutput) => {
                   try {
                     const { key, text } = JSON.parse(messageOutput.body);
