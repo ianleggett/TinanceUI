@@ -213,5 +213,6 @@
   "Contact Us": "Contact Us",
   "Shared": "Shared",
   "Transaction taking longer than usual, We will update you by email when complete": "Transaction taking longer than usual, We will update you by email when complete",
-  "Block chain is busy, we will update you by email when complete": "Block chain is busy, we will update you by email when complete"
+  "Block chain is busy, we will update you by email when complete": "Block chain is busy, we will update you by email when complete",
+  "Invited": "Invited: {{email}}"
 }

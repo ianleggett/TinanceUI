@@ -435,17 +435,28 @@ const OfferListPage: React.FC = () => {
                   className={classes.topRight}
                 >
                   {offer.procStatus === 'CREATED' ? (
-                    <Button
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                      startIcon={<ShareOutlinedIcon />}
-                      className={classes.share}
-                      onClick={() => handleShareDialogOpen(offer.orderId)}
-                      disabled={!!offer.invited && offer.invited.length > 0}
-                    >
-                      {t(!!offer.invited && offer.invited.length > 0 ? 'Shared' : 'Share')}
-                    </Button>
+                    offer.invited && offer.invited.length > 0 ? (
+                      <Typography
+                        color="primary"
+                        variant="overline"
+                        style={{ textTransform: 'initial' }}
+                      >
+                        {t('Invited', {
+                          email: offer.invited[0].email,
+                        })}
+                      </Typography>
+                    ) : (
+                      <Button
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        startIcon={<ShareOutlinedIcon />}
+                        className={classes.share}
+                        onClick={() => handleShareDialogOpen(offer.orderId)}
+                      >
+                        {t('Share')}
+                      </Button>
+                    )
                   ) : null}
                   <Tooltip
                     title={(offer.live ? t('Active') : t('Inactive')) as string}

@@ -213,5 +213,6 @@
   "Contact Us": "联系我们",
   "Shared": "已分享",
   "Transaction taking longer than usual, We will update you by email when complete": "Transaction taking longer than usual, We will update you by email when complete",
-  "Block chain is busy, we will update you by email when complete": "Block chain is busy, we will update you by email when complete"
+  "Block chain is busy, we will update you by email when complete": "Block chain is busy, we will update you by email when complete",
+  "Invited": "已邀請: {{email}}"
 }
