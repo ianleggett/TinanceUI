@@ -204,7 +204,7 @@ const TradeListPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { t } = useTranslation();
-  const { profile } = useUserManagerState();
+  const { profile, systemStatus } = useUserManagerState();
   const { networkConfig } = useAppConfigState();
   const [loading, setLoading] = useState(true);
   const [trades, setTrades] = useState<Trade.Model[]>([]);
@@ -502,7 +502,7 @@ const TradeListPage: React.FC = () => {
                       }, 1000);
                     }
                   } catch {
-                    console.log(`StompException unsubscribing id:${subscribtion.id}`);
+                    console.log(`StompException unsubscribing id: ${subscribtion.id}`);
                     stompClient.unsubscribe(subscribtion.id);
                     setShowOverlayError(false);
                     setShowOverlay(false);
@@ -672,7 +672,7 @@ const TradeListPage: React.FC = () => {
             <Button
               color="primary"
               variant="contained"
-              disabled={disableDeposite}
+              disabled={!systemStatus.deposit || disableDeposite}
               onClick={() => handleDeposit(trade)}
             >
               {disableDeposite ? (
@@ -694,6 +694,7 @@ const TradeListPage: React.FC = () => {
             <Button
               color="primary"
               variant="contained"
+              disabled={!systemStatus.sendFiat}
               onClick={() => handleFlagFundsSent(trade.tradeId)}
             >
               {flagging && trade.tradeId === selectedOrderId
@@ -718,7 +719,12 @@ const TradeListPage: React.FC = () => {
 
         case 'FIATSENT': {
           return isSeller ? (
-            <Button color="primary" variant="contained" onClick={() => handleFlagComplete(trade)}>
+            <Button
+              color="primary"
+              variant="contained"
+              disabled={!systemStatus.releaseFund}
+              onClick={() => handleFlagComplete(trade)}
+            >
               {flagging2 && trade.tradeId === selectedOrderId
                 ? t('Confirming...')
                 : t('I have received bank funds')}
@@ -774,14 +780,17 @@ const TradeListPage: React.FC = () => {
       profile,
       showOverlay,
       depositing,
+      loading,
       selectedOrderId,
+      systemStatus.deposit,
+      systemStatus.sendFiat,
+      systemStatus.releaseFund,
       t,
       handleDeposit,
       flagging,
       handleFlagFundsSent,
       flagging2,
       handleFlagComplete,
-      loading,
     ],
   );
 

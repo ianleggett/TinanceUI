@@ -1,21 +1,38 @@
 import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import type { Dispatch } from 'react';
-import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
+import { createContext, useCallback, useContext, useReducer, useRef } from 'react';
 import Stomp from 'stompjs';
 
 import pkg from '../../package.json';
 import { GetUserDetailsService } from '../services';
 import { clearProfile, getProfile, getToken, saveProfile, snackbar } from '../utils';
 
+interface SystemStatus {
+  deposit: boolean;
+  sendFiat: boolean;
+  releaseFund: boolean;
+}
+
+interface SystemMessage {
+  msgid: number;
+  msg: string;
+}
+
 const initialState = {
   isLoggedIn: false,
   profile: undefined as User.Model | undefined,
+  systemStatus: {
+    deposit: true,
+    sendFiat: true,
+    releaseFund: true,
+  } as SystemStatus,
 };
 
 export type UserManagerState = typeof initialState;
 export type UserManagerAction =
   | { type: 'saveUserInfo'; payload: User.Model }
   | { type: 'clearUserInfo' }
+  | { type: 'updateSystemStatus'; payload: SystemStatus }
   | { type: 'reset' };
 
 const UserManagerStateContext = createContext<UserManagerState | undefined>(undefined);
@@ -38,6 +55,13 @@ const reducer = (state: UserManagerState, action: UserManagerAction): UserManage
         ...state,
         isLoggedIn: false,
         profile: undefined,
+      };
+    }
+
+    case 'updateSystemStatus': {
+      return {
+        ...state,
+        systemStatus: action.payload,
       };
     }
 
@@ -82,6 +106,9 @@ export interface UserManagerProviderProps {
 export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) => {
   const { loginRequired, children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
+  const systemMessageId = useRef(0);
+  const systemStatusSubscriptionId = useRef('');
+  const systemMessageSubscriptionId = useRef('');
 
   const handleTokenExpired = useCallback(() => {
     dispatch({ type: 'clearUserInfo' });
@@ -111,8 +138,47 @@ export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) =
       const url = new URL('/tradesub', pkg.proxy.replace('https', 'wss').replace('http', 'ws'));
 
       window.websocket = new WebSocket(url.href);
-      window.stompClient = Stomp.over(window.websocket);
-      window.stompClient.connect({}, (frame: any) => console.dir(frame));
+      const stompClient = Stomp.over(window.websocket);
+
+      stompClient.connect({}, (frame: any) => {
+        const systemStatusSubscription = stompClient.subscribe(
+          '/system/status',
+          (messageOutput) => {
+            try {
+              const systemStatus: SystemStatus = JSON.parse(messageOutput.body);
+
+              dispatch({
+                type: 'updateSystemStatus',
+                payload: systemStatus,
+              });
+            } catch {
+              console.log(`StompException unsubscribing id: ${systemStatusSubscription.id}`);
+              stompClient.unsubscribe(systemStatusSubscription.id);
+            }
+          },
+        );
+
+        const systemMessageSubscription = stompClient.subscribe(
+          '/system/message',
+          (messageOutput) => {
+            try {
+              const systemMessage: SystemMessage = JSON.parse(messageOutput.body);
+
+              if (systemMessage.msgid !== systemMessageId.current) {
+                systemMessageId.current = systemMessage.msgid;
+                snackbar.warning(systemMessage.msg);
+              }
+            } catch {
+              console.log(`StompException unsubscribing id: ${systemMessageSubscription.id}`);
+              stompClient.unsubscribe(systemMessageSubscription.id);
+            }
+          },
+        );
+
+        window.stompClient = stompClient;
+        systemStatusSubscriptionId.current = systemStatusSubscription.id;
+        systemMessageSubscriptionId.current = systemMessageSubscription.id;
+      });
 
       requestRemoteUserProfile(dispatch);
     }
@@ -124,6 +190,17 @@ export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) =
     });
 
     if (window.stompClient) {
+      if (systemStatusSubscriptionId.current) {
+        window.stompClient.unsubscribe(systemStatusSubscriptionId.current);
+        systemStatusSubscriptionId.current = '';
+      }
+
+      if (systemMessageSubscriptionId.current) {
+        window.stompClient.unsubscribe(systemMessageSubscriptionId.current);
+        systemMessageSubscriptionId.current = '';
+        systemMessageId.current = 0;
+      }
+
       window.stompClient.disconnect(() => {
         if (window.websocket) {
           window.websocket.close();
