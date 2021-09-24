@@ -165,7 +165,7 @@ const initialValues = {
 };
 
 const initialValuesForDialog = {
-  rating: 0,
+  rating: -1,
   comment: '',
 };
 
@@ -393,6 +393,11 @@ const TradeListPage: React.FC = () => {
   const dialogFormik = useFormik({
     initialValues: initialValuesForDialog,
     onSubmit: (values) => {
+      if (values.rating === -1) {
+        snackbar.warning(t("You haven't rate this yet"));
+        return;
+      }
+
       rateTrade({
         ...values,
         tradeid: selectedOrderId,
@@ -1307,7 +1312,7 @@ const TradeListPage: React.FC = () => {
                   size="large"
                   value={dialogFormik.values.rating}
                   onChange={(event, value) => {
-                    dialogFormik.setFieldValue('rating', value ?? 0);
+                    dialogFormik.setFieldValue('rating', value ?? -1);
                   }}
                 />
               </Grid>
