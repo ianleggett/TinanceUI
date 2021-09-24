@@ -165,7 +165,7 @@ const initialValues = {
 };
 
 const initialValuesForDialog = {
-  rating: -1,
+  rating: 0,
   comment: '',
 };
 
@@ -1307,7 +1307,7 @@ const TradeListPage: React.FC = () => {
                   size="large"
                   value={dialogFormik.values.rating}
                   onChange={(event, value) => {
-                    dialogFormik.setFieldValue('rating', value ?? -1);
+                    dialogFormik.setFieldValue('rating', value ?? 0);
                   }}
                 />
               </Grid>
