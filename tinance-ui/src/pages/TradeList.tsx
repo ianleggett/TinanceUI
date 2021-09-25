@@ -178,8 +178,7 @@ const buyerInfo: Record<Trade.Status, string> = {
   ERROR: 'This trade has a process error, we are investigating the issue',
   DEPOSIT:
     'The seller has deposited crypto, please check the transaction and send Fiat bank funds now',
-  DEPOSITING:
-    'The seller has deposited crypto, please check the transaction and send Fiat bank funds now',
+  DEPOSITING: 'The seller is depositing crypto, please wait for confirmation',
   REFUND: 'Seller is being refunded',
   FIATSENT: 'Waiting for the seller to receive Bank funds',
   UNKNOWN: '',
@@ -194,7 +193,7 @@ const sellerInfo: Record<Trade.Status, string> = {
     'The buyer is deciding to accept or reject your cancel request. The trade will still occur if the buyer rejects',
   ERROR: 'This trade has a process error, we are investigating the issue',
   DEPOSIT: 'The buyer is sending the bank funds, please check your bank',
-  DEPOSITING: 'The buyer is sending the bank funds, please check your bank',
+  DEPOSITING: 'Funds are being deposited, please wait for confrimation',
   REFUND: 'Your refund is being prepared',
   FIATSENT: 'The buyer has sent bank funds, please check your bank and confirm',
   UNKNOWN: '',
