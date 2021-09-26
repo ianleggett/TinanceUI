@@ -1,4 +1,5 @@
 import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
+import { useSnackbar } from 'notistack';
 import type { Dispatch } from 'react';
 import { createContext, useCallback, useContext, useReducer, useRef } from 'react';
 import Stomp from 'stompjs';
@@ -106,9 +107,9 @@ export interface UserManagerProviderProps {
 export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) => {
   const { loginRequired, children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
-  const systemMessageId = useRef(0);
   const systemStatusSubscriptionId = useRef('');
   const systemMessageSubscriptionId = useRef('');
+  const { closeSnackbar } = useSnackbar();
 
   const handleTokenExpired = useCallback(() => {
     dispatch({ type: 'clearUserInfo' });
@@ -158,15 +159,23 @@ export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) =
           },
         );
 
+        localStorage.removeItem('msgid');
+
         const systemMessageSubscription = stompClient.subscribe(
           '/system/message',
           (messageOutput) => {
             try {
+              const cachedMsgid = localStorage.getItem('msgid');
               const systemMessage: SystemMessage = JSON.parse(messageOutput.body);
 
-              if (systemMessage.msgid !== systemMessageId.current) {
-                systemMessageId.current = systemMessage.msgid;
-                snackbar.warning(systemMessage.msg);
+              if (cachedMsgid === null || systemMessage.msgid > Number.parseInt(cachedMsgid, 10)) {
+                localStorage.setItem('msgid', systemMessage.msgid.toString());
+
+                if (systemMessage.msg.toLowerCase() === 'system ok') {
+                  snackbar.success(systemMessage.msg);
+                } else {
+                  snackbar.warning(systemMessage.msg);
+                }
               }
             } catch {
               console.log(`StompException unsubscribing id: ${systemMessageSubscription.id}`);
@@ -198,7 +207,7 @@ export const UserManagerProvider: React.FC<UserManagerProviderProps> = (props) =
       if (systemMessageSubscriptionId.current) {
         window.stompClient.unsubscribe(systemMessageSubscriptionId.current);
         systemMessageSubscriptionId.current = '';
-        systemMessageId.current = 0;
+        localStorage.removeItem('msgid');
       }
 
       window.stompClient.disconnect(() => {
