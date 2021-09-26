@@ -39,7 +39,18 @@ We also use `/system/message` subscription to display system wide messages to th
 }
 ```
 
-We use the msgid to indicate a new message if the last msgid is different or a message update if the last msgid and this msgis is the same. This is useful to display a visual flash or attention UI effect upon a new message.
+We use the msgid to indicate a new message if the last msgid is different or a message update if the last msgid and this msgid is the same. This is useful to display a visual flash or attention UI effect upon a new message.
+
+- ADDITIONAL NOTE
+
+You must store the msgid in local storage (as we have done with other persistent data) and compare as this example shows:
+
+| prev msgid | this msgid | comment                       |
+| ---------- | ---------- | ----------------------------- |
+| 234        | 234        | dont display msg              |
+| 234        | 235        | display msg, store msgid      |
+| 234        | 250        | display msg, store msgid      |
+| 234        | 1          | dont display msg, store msgid |
 
 # Testing on dev.tinance.io
 
