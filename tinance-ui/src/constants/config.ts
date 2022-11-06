@@ -3,8 +3,8 @@ export type AppLang = 'en-US' | 'zh-CN' | 'zh-TW' | 'vi-VN';
 const publicUrl = process.env.PUBLIC_URL;
 
 export const appConfig = {
-  title: 'Trusted Finance',
-  logo: publicUrl && publicUrl !== '/' ? `${publicUrl}/logo192.png` : '/logo192.png',
+  title: 'Swap Safe',
+  logo: publicUrl && publicUrl !== '/' ? `${publicUrl}/swapsafe4.png` : '/swapsafe4.png',
   lang: 'en-US' as AppLang,
   videoUrl: 'https://www.youtube.com/embed/MC8IygKuq3I',
   maxWidth: 'lg' as 'lg' | 'xs' | 'sm' | 'md' | 'xl' | false,

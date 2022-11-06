@@ -54,5 +54,5 @@
     "@testing-library/user-event": "^13.2.0",
     "react-scripts": "4.0.3"
   },
-  "proxy": "https://demo.tinance.io"
+  "proxy": "http://bluebox:8443"
 }

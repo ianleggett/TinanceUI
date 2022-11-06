@@ -133,7 +133,7 @@ const HomePage: React.FC = () => {
         {videoUrl.startsWith('https://www.youtube.com') ? (
           <iframe
             id="ytplayer"
-            title="Weclome to Tinance"
+            title="Weclome to Swap-Safe"
             src={videoUrl}
             frameBorder={0}
             allowFullScreen
@@ -159,7 +159,7 @@ const HomePage: React.FC = () => {
             align="center"
             className={matches ? classes.subTitle : classes.subTitle2}
           >
-            {t('What is Trusted Finance?')}
+            {t('What is Swap Safe?')}
           </Typography>
         </Grid>
         <Grid xs={12} sm={12} md={6} lg={4} xl={4} item>

@@ -36,23 +36,23 @@ const privacy = {
     '<h1>Privacy Policy</h1>' +
     '<p>This Privacy Policy concerns any personal information of yours which is provided to us.</p>' +
     '<p>Personal information is any information about an identified individual or an individual who is reasonably identifiable, whether the information is true or not and whether the information is recorded in a material form or not.</p>' +
-    '<p>Tinance collects, uses, and discloses personal information in accordance with this Privacy Policy.</p>' +
+    '<p>SwapSafe collects, uses, and discloses personal information in accordance with this Privacy Policy.</p>' +
     '<h2>What personal information do we collect and why?</h2>' +
     '<p>The types of personal information we may collect include:</p>' +
     '<ul>' +
-    '<li>from users who sign up for a Tinance account – email addresses, names (if used as a username), trade activity (such as amounts and local currencies), phone numbers, and information about a user’s response time.</li>' +
+    '<li>from users who sign up for a SwapSafe account – email addresses, names (if used as a username), trade activity (such as amounts and local currencies), phone numbers, and information about a user’s response time.</li>' +
     '<li>from website visitors – IP addresses, website preferences, traffic sources and device information;</li>' +
     '<li>if you contact us with a query – your contact details.</li>' +
     '</ul>' +
     '<p>If we are not provided with the information that we request, then we may not be able to provide services to you or respond to your query.</p>' +
     '<p>The personal information you provide us may be used for a number of purposes connected with our business operations, which include to:</p>' +
     '<ul>' +
-    '<li>provide the Tinance services,</li>' +
+    '<li>provide the SwapSafe services,</li>' +
     '<li>respond to any requests from you;</li>' +
     '<li>better understand your needs in relation to cryptocurrency trading;</li>' +
     '<li>develop and improve the quality and scope of the services we provide, and seek your feedback;</li>' +
     '<li>store choices you previously have made on the site, including when you are not logged in, to improve your experience;</li>' +
-    '<li>better understand our how website visitors use the website and how Tinance users use the service; and</li>' +
+    '<li>better understand our how website visitors use the website and how SwapSafe users use the service; and</li>' +
     '<li>to send you marketing messages about our products and services.</li>' +
     '</ul>' +
     '<p>We may send you messages by email, SMS, or push notification, with updates about our services, news related to cryptocurrency or decentralised finance, and marketing messages. You always have the right to opt-out of receiving such information. You may exercise that right by clicking the "unsubscribe" link in a message we send you, or contacting us using the details below.</p>' +
@@ -66,7 +66,7 @@ const privacy = {
     '<h2>Sharing your personal information</h2>' +
     '<p>We also may disclose your personal information to:</p>' +
     '<ul>' +
-    '<li>others in accordance with a request made by you – for example, if your username is your real name, then we will list this when you ask to be listed on the Tinance marketplace;</li>' +
+    '<li>others in accordance with a request made by you – for example, if your username is your real name, then we will list this when you ask to be listed on the SwapSafe marketplace;</li>' +
     '<li>our third party service providers engaged by us to perform business and technology services, when reasonably required;</li>' +
     '<li>law enforcement bodies – both if required by a warrant or voluntarily if we suspect you have engaged in fraud or misuse; and</li>' +
     '<li>persons to whom we are required by law to disclose information.</li>' +
@@ -89,9 +89,9 @@ const privacy = {
     '<p>In the event of any loss or unauthorised access or disclosure of your personal information that is likely to result in serious harm to you, we will investigate and notify you as soon as practicable.</p>' +
     '<h2>Complaints</h2>' +
     '<p>If you have any questions or concerns about our collection, use or disclosure of personal information, or if you believe we have not complied with this Privacy Policy, please contact us as set out below. We will investigate the complaint and determine whether a breach has occurred and what action, if any, to take.</p>' +
-    '<p>Tinance takes all privacy complaints seriously and will aim to resolve any such complaint in a timely and efficient manner.</p>' +
+    '<p>SwapSafe takes all privacy complaints seriously and will aim to resolve any such complaint in a timely and efficient manner.</p>' +
     '<h2>How to contact us</h2>' +
-    '<p>If you wish to exercise your right to opt-out of receiving our marketing materials, or you have any questions or concerns about this Privacy Policy or our information practices, please contact us at: <a href="mailto:support@tinance.io">support@tinance.io</a></p>' +
+    '<p>If you wish to exercise your right to opt-out of receiving our marketing materials, or you have any questions or concerns about this Privacy Policy or our information practices, please contact us at: <a href="mailto:support@swap-safe.com">support@swap-safe.com</a></p>' +
     '<h2>Changes to this Privacy Policy</h2>' +
     '<p>Our Privacy Policy may change from time to time as updated on this website. Before providing us with personal information, please check this Policy on our website for any changes.</p>',
   'zh-CN':

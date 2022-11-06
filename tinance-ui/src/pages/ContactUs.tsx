@@ -35,9 +35,9 @@ const contactText = {
   'en': 'please select your language',
   'en-US':
     '<h1>Support Center</h1>' +
-    '<p>Please contact us by email on <a href="mailto:support@tinance.io">support@tinance.io</a>, ensuring you include:</p>' +
+    '<p>Please contact us by email on <a href="mailto:support@swap-safe.com">support@swap-safe.com</a>, ensuring you include:</p>' +
     '<ul><li>Your username</li><li>Trade ID</li><li>Detailed description of your query</li><li>Screenshots (where applicable)</li></ul>' +
-    '<p>Alternatively, check the  <a href="https://t.me/tinanceio">Telegram group</a> for service updates.</p>',
+    '<p>Alternatively, check the  <a href="https://t.me/swapsafe">Telegram group</a> for service updates.</p>',
   'zh-CN':
     '<h3>标题 01</h3><p>本网站内所有内容并不反映任何本网站之意见及观点。本网站内容有梅斯医学原创信息（来源标注为梅斯医学），以及用户自行产生的内容（UGC内容）， 以及部分授权转载内容。对于用户自行产生内容，本站仅作存储目的，不对内容本身的版权，合法性和权威性进行判定，如果有违规，由原始发布用户承担。本站部分资料或资源来自网友自发上传或网上收集，版权均归原作者所有，如有侵权请与联系我们，本站将在2日内删除。本站对资料或信息版权及其后果免责。</p><p>本网站不完全保证网站内容的真实性，准确性，完整性，也不保证未来内容不会发生变更，信息仅供专业的医生参考！本网站医学内容仅供参考，不作为诊断及医疗依据。涉及到疾病诊疗，以及健康指导的意见，请咨询当地专科医生。凡因为观看本站信息而作出医疗或健康推荐，发生的任何后果，与本网站无关。</p><h3>标题 02</h3><p>本站对资料、图片版权、或信息版权及其后果均不承担任何法律责任。发布的文件中若含有版权信息、版权图片、版权文件，由原始发布人、或原始作者承担责任以及后果。如果版权方要求本站删除，本站将根据版权方要求进行删除，并进行证据保全。</p><p>本网站如因系统维护或升级而需暂停服务时，将事先公告。若因线路及非本公司控制范围外的硬件故障或其它不可抗力而导致暂停服务，于暂停服务期间造成的一切不便与损失，本网站不负任何责任。</p>',
   'zh-TW':
