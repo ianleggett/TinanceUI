@@ -129,27 +129,6 @@ const HomePage: React.FC = () => {
 
   return (
     <Container disableGutters>
-      <Box alignItems="center">
-        {videoUrl.startsWith('https://www.youtube.com') ? (
-          <iframe
-            id="ytplayer"
-            title="Weclome to Swap-Safe"
-            src={videoUrl}
-            frameBorder={0}
-            allowFullScreen
-            className={classes.video}
-          />
-        ) : (
-          <video
-            src={videoUrl}
-            preload="auto"
-            poster="banner.jpg"
-            loop
-            controls
-            className={classes.video}
-          />
-        )}
-      </Box>
       <Grid spacing={3} alignItems="center" direction={direction} container>
         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
           <Typography
